@@ -9,53 +9,54 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
 <style>
 /* Layout: links eine dunkle „Stoppuhr“ mit Timer-Ring und Übungsliste, rechts ein Segment-Menü für Übungen, Rezepte, Glücksrad, Ernährung, Tipps, Fortschritt. Unter 980 px eine Spalte. */
+/* Farben: warmes Creme, ruhiges Blaugrün, nichts Grelles */
 :root {
-  --bg: #e9ebe7;
-  --surface: #f8f9f6;
-  --surface-2: #eceee9;
-  --track: #dcdfd9;
-  --ink: #14181b;
-  --muted: #5d676d;
-  --line: #d3d7d1;
-  --accent: #3b4fe0;
+  --bg: #f1eee6;
+  --surface: #fbf9f4;
+  --surface-2: #efebe1;
+  --track: #e2ddd0;
+  --ink: #2a2f33;
+  --muted: #646b70;
+  --line: #dcd6c8;
+  --accent: #35788a;
   --accent-ink: #ffffff;
-  --accent-soft: #e1e5fd;
-  --good: #1b7a57;
-  --good-soft: #d9efe5;
+  --accent-soft: #dbe9ee;
+  --good: #2f7d57;
+  --good-soft: #dcefe4;
   --warn: #9a5b00;
-  --wheel-a: #fbfcfa;
-  --wheel-b: #e2e5df;
+  --wheel-a: #fffdf8;
+  --wheel-b: #e9e4d6;
   --display: "Bricolage Grotesque", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
   --body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --material: rgba(233, 235, 231, 0.78);
-  --material-line: rgba(20, 24, 27, 0.07);
+  --material: rgba(241, 238, 230, 0.82);
+  --material-line: rgba(60, 50, 30, 0.08);
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --r-lg: 26px;
   --r-md: 18px;
   --r-sm: 12px;
-  --shadow: 0 1px 1px rgba(20, 24, 27, 0.04), 0 8px 24px -8px rgba(20, 24, 27, 0.10);
+  --shadow: 0 1px 1px rgba(60, 50, 30, 0.04), 0 8px 24px -10px rgba(60, 50, 30, 0.14);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0e1113;
-    --surface: #171b1e;
-    --surface-2: #1f2428;
-    --track: #1a1f22;
-    --ink: #eef0ee;
-    --muted: #98a2a8;
-    --line: #2a3136;
-    --accent: #8ea2ff;
-    --accent-ink: #0c1130;
-    --accent-soft: #232b55;
-    --good: #5ed0a0;
-    --good-soft: #14352a;
-    --warn: #e9b35b;
-    --wheel-a: #1d2226;
-    --wheel-b: #151a1d;
-    --material: rgba(14, 17, 19, 0.74);
+    --bg: #1c2226;
+    --surface: #252d32;
+    --surface-2: #2e373d;
+    --track: #384248;
+    --ink: #e9ece7;
+    --muted: #a5afb2;
+    --line: #3b464c;
+    --accent: #86c3d3;
+    --accent-ink: #0e2730;
+    --accent-soft: #244049;
+    --good: #82d1a6;
+    --good-soft: #213f31;
+    --warn: #e6b866;
+    --wheel-a: #2b343a;
+    --wheel-b: #20282d;
+    --material: rgba(28, 34, 38, 0.82);
     --material-line: rgba(255, 255, 255, 0.07);
-    --shadow: 0 1px 1px rgba(0, 0, 0, 0.4), 0 10px 28px -8px rgba(0, 0, 0, 0.55);
+    --shadow: 0 1px 1px rgba(0, 0, 0, 0.3), 0 10px 28px -10px rgba(0, 0, 0, 0.45);
     color-scheme: dark;
   }
 }
@@ -108,7 +109,7 @@ a { color: var(--accent); }
 .card p, .card li { max-width: 68ch; }
 
 /* Coach: immer dunkel, wie eine Stoppuhr */
-.coach { --surface: #171b1e; --surface-2: #232a2f; --track: #2d353b; --ink: #f0f2f1; --muted: #9ba5ab; --line: #333c42; --accent: #8ea2ff; --accent-ink: #0c1130; --accent-soft: #232b55; --good: #5ed0a0; --warn: #e9b35b; background: #121619; color: var(--ink); gap: 18px; padding: 24px; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3), 0 18px 40px -16px rgba(10, 14, 20, 0.5); }
+.coach { --surface: #34454e; --surface-2: #3f525c; --track: #4c616c; --ink: #f2f4f0; --muted: #b3bfc3; --line: #50656f; --accent: #93cfdd; --accent-ink: #0e2730; --accent-soft: #3a5a66; --good: #86d8ad; --warn: #efc472; background: #2c3b44; color: var(--ink); gap: 18px; padding: 24px; box-shadow: 0 1px 1px rgba(30, 40, 50, 0.2), 0 18px 40px -18px rgba(30, 45, 55, 0.45); }
 .coach .btn { background: var(--surface-2); }
 .coach .btn:hover { background: var(--track); }
 .coach .btn.primary { background: var(--accent); }
@@ -596,12 +597,38 @@ body[data-coach="0"] .side { display: none; }
 .cats { gap: 6px; flex-wrap: wrap; }
 .cats .btn { min-height: 36px; padding: 0 12px; }
 .ver { position: fixed; top: 3px; right: 10px; z-index: 5; font-size: 0.6875rem; line-height: 1; color: var(--muted); opacity: 0.8; pointer-events: none; font-variant-numeric: tabular-nums; }
+
+.hday { border-top: 1px solid var(--line); padding: 4px 0; }
+.hday summary { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; cursor: pointer; padding: 8px 0; flex-wrap: wrap; list-style: none; }
+.hday summary::-webkit-details-marker { display: none; }
+.hitems { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.hitems > li { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.hitems > li > div { display: grid; gap: 4px; justify-items: start; min-width: 0; }
+.hdet { list-style: none; margin: 2px 0; padding: 0 0 0 10px; border-left: 2px solid var(--line); display: grid; gap: 2px; font-size: 0.8125rem; color: var(--muted); }
+@media (max-width: 640px) {
+  body { font-size: 0.9375rem; }
+  .card { padding: 16px; gap: 11px; border-radius: 20px; }
+  .panel { gap: 14px; margin-top: 14px; }
+  .app { gap: 14px; }
+  .hero { padding: 18px; }
+  .pagehead { padding-bottom: 0; }
+  .tdhead .btn { white-space: nowrap; }
+  body[data-group="essen"] .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); width: 100%; overflow: hidden; gap: 0; padding: 3px; }
+  body[data-group="essen"] .tab { padding: 0 2px; font-size: 0.8125rem; min-width: 0; justify-content: center; text-align: center; }
+  .calcrows li { flex-wrap: wrap; }
+}
+@media (max-width: 360px) { body[data-group="essen"] .tab { font-size: 0.75rem; } }
+@media (max-width: 979px) {
+  .gnav { background: var(--surface) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 -1px 0 var(--line), 0 -8px 24px rgba(0, 0, 0, 0.05) !important; }
+  .coach[data-idle="1"] .cmd { display: none; }
+  .coach[data-idle="1"] .caption:empty { display: none; }
+}
 </style>
 </head>
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">Stand 02.11. 16:23</span>
+<span class="ver" id="appver" aria-label="Stand der Version">Stand 02.11. 16:37</span>
 <header class="top">
   <div class="brand"><h1>Fitness Coach</h1><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -684,6 +711,7 @@ body[data-coach="0"] .side { display: none; }
 
     <section class="panel" id="panel-fortschritt" role="tabpanel" hidden>
       <div class="stats" id="stats"></div>
+      <div class="card" id="eathist"></div>
       <div class="card" id="volcard"></div>
       <div class="card" id="badgecard"></div>
       <div class="charts" id="charts"></div>
@@ -2150,6 +2178,25 @@ function renderBadges() {
   $("#badgecard").innerHTML = "<h3>Erfolge</h3><p class=\"muted\">" + got + " von " + l.length + " erreicht. Alles bleibt auf deinem Gerät, kein Vergleich mit anderen.</p><ul class=\"badges\">" +
     l.map((b) => '<li class="' + (b.v >= b.g ? "got" : "") + '"><b>' + b.t + "</b><span>" + (b.v >= b.g ? b.d : "noch " + (b.g - b.v > 0 ? nf(Math.ceil(b.g - b.v)) : 0) + " bis dahin") + "</span></li>").join("") + "</ul>";
 }
+
+/* Essens-Tagebuch: alle eingetragenen Tage ansehen */
+let HISTN = 14;
+function renderEatHist() {
+  const box = $("#eathist"); if (!box) return;
+  const days = Object.keys(DIARY).filter((d) => DIARY[d] && DIARY[d].items && DIARY[d].items.length).sort().reverse();
+  if (!days.length) { box.innerHTML = '<h3>Essens-Tagebuch</h3><p class="muted">Noch nichts eingetragen. Trag auf „Heute“ ein, was du isst, dann findest du es hier wieder.</p>'; return; }
+  const sum = (d) => DIARY[d].items.reduce((a, x) => ({ k: a.k + x.k, p: a.p + x.p, c: a.c + (x.c || 0) }), { k: 0, p: 0, c: 0 });
+  const wd = (d) => ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"][new Date(d + "T12:00:00").getDay()];
+  const last7 = days.filter((d) => d > shiftDay(todayISO(), -7)), avg = last7.length ? last7.map(sum).reduce((a, x) => ({ k: a.k + x.k / last7.length, p: a.p + x.p / last7.length }), { k: 0, p: 0 }) : null;
+  const shown = days.slice(0, HISTN);
+  box.innerHTML = '<div class="rday-h"><h3>Essens-Tagebuch</h3><span class="rtot">' + days.length + (days.length === 1 ? " Tag" : " Tage") + "</span></div>" +
+    (avg ? '<p class="small muted">Schnitt der letzten 7 Tage mit Einträgen: ' + Math.round(avg.k).toLocaleString("de-DE") + " kcal und " + Math.round(avg.p) + " g Eiweiß pro Tag.</p>" : "") +
+    shown.map((d, di) => { const t = sum(d); return '<details class="hday"' + (di === 0 ? " open" : "") + "><summary><span><b>" + wd(d) + ", " + dateDE(d) + "</b></span><span class=\"small muted\">" + t.k.toLocaleString("de-DE") + " kcal · " + t.p + " g Eiweiß" + (t.c ? " · " + eur(t.c) : "") + "</span></summary>" +
+      '<ul class="hitems">' + DIARY[d].items.map((x, i) => '<li><div><b>' + x.t + '</b><span class="small muted"> ' + x.k + " kcal, " + x.p + " g Eiweiß" + (x.c ? ", " + eur(x.c) : "") + "</span>" +
+        (x.det && x.det.length ? '<ul class="hdet">' + x.det.map((l) => "<li>" + String(l).replace(/</g, "&lt;") + "</li>").join("") + "</ul>" : "") +
+        (x.id && byId(x.id) ? '<button class="btn sm" type="button" data-recipe="' + x.id + '">Rezept ansehen</button>' : "") + '</div><button class="x" type="button" data-hdel="' + d + ":" + i + '" aria-label="Eintrag löschen">×</button></li>').join("") + "</ul></details>"; }).join("") +
+    (days.length > HISTN ? '<div class="row"><button class="btn" type="button" data-histmore="1">Ältere Tage anzeigen</button></div>' : "");
+}
 function renderProgress() {
   const w = change("weight"), c = change("waist");
   const sign = (n) => (n == null ? "–" : (n > 0 ? "+" : n < 0 ? "−" : "") + nf(Math.abs(n)));
@@ -2159,7 +2206,7 @@ function renderProgress() {
     '<div class="stat"><span class="big">' + sign(w) + "</span><span>kg seit Start</span></div>" +
     '<div class="stat"><span class="big">' + sign(c) + "</span><span>cm Taille seit Start</span></div>";
   $("#waistnote").textContent = waistNote();
-  renderVolume(); renderBadges();
+  renderEatHist(); renderVolume(); renderBadges();
   renderCharts();
   if (!log.length) { $("#logtable").innerHTML = '<p class="muted">Noch keine Einträge. Miss heute Gewicht und Taille und trag sie oben ein.</p>'; return; }
   const rows = log.slice().reverse().map((e) =>
@@ -2175,7 +2222,7 @@ const GROUPS = [
   { id: "essen", title: "Essen", tabs: ["rezepte", "rad", "vorkochen", "einkauf", "ernaehrung"] },
   { id: "fortschritt", title: "Fortschritt", tabs: ["fortschritt"] }
 ];
-const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", rezepte: "Rezepte", rad: "Glücksrad", vorkochen: "Vorkochen", einkauf: "Einkauf", ernaehrung: "Ernährung", fortschritt: "Fortschritt" };
+const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", rezepte: "Rezepte", rad: "Rad", vorkochen: "Vorkochen", einkauf: "Einkauf", ernaehrung: "Ernährung", fortschritt: "Fortschritt" };
 const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", rezepte: "167 Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", vorkochen: "Sonntag kochen, die Woche essen", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf" };
 const LAST = {};
 let CUR = "heute";
@@ -2980,7 +3027,7 @@ function renderToday() {
   const glasses = Array.from({ length: GOALS.water }, (_, i) => '<button class="gl' + (i < day.water ? " on" : "") + '" data-water="' + i + '" aria-pressed="' + (i < day.water) + '" aria-label="Glas ' + (i + 1) + '"></button>').join("");
   $("#panel-heute").innerHTML =
     '<div class="card hero"><div class="tdhead"><div><h3>' + title + '</h3><p class="muted">' + (plan[2] ? "Ganzkörper, etwa " + estMinutes() + " Minuten" : plan[1]) + "</p></div>" +
-    '<div class="row">' + (plan[2] && !doneToday && !isActive() ? '<button class="btn primary" data-act="start">Training starten</button>' : "") + '<button class="btn" data-eatopen="1">Essen eintragen</button><button class="btn" data-tab="rad">Essen auswählen</button></div></div>' +
+    '<div class="row">' + (plan[2] && !doneToday && !isActive() ? '<button class="btn primary" data-act="start">Training starten</button>' : "") + '<button class="btn" data-eatopen="1">Essen eintragen</button><button class="btn" data-tab="rad">Essen wählen</button></div></div>' +
     '<div class="rings">' +
     ringHTML(e.p / pg, "var(--good)", e.p, "von " + pg + " g", "Eiweiß") +
     ringHTML(e.k / GOALS.kcal, e.k > GOALS.kcal + 150 ? "var(--warn)" : "var(--accent)", e.k.toLocaleString("de-DE"), "von " + GOALS.kcal.toLocaleString("de-DE") + " kcal", "Kalorien") +
@@ -2993,7 +3040,7 @@ function renderToday() {
     (day.items.length
       ? '<ul class="eatlist">' + day.items.map((x, i) => "<li><div><b>" + x.t + '</b><span class="muted small">' + x.p + " g Eiweiß, " + x.k + ' kcal</span></div><button class="btn icon sm" data-eatdel="' + i + '" aria-label="Eintrag löschen">' + ic("close") + "</button></li>").join("") + "</ul>"
       : '<p class="muted">Noch nichts eingetragen. Trag ein, was du gegessen hast, oder tippe auf ein Rezept in den Vorschlägen.</p>') +
-    planHTML(rest, day) + "</div>";
+    planHTML(rest, day) + '<div class="row"><button class="btn sm" type="button" data-tab="fortschritt" data-histgo="1">Alle Tage ansehen</button></div></div>';
 }
 
 /* ======================= Selbst berechnen (Zutaten oder Gericht) ======================= */
@@ -3191,7 +3238,7 @@ function calcRead() { $$(".calcman").forEach((el) => { const i = el.dataset.i; C
 function calcAdd() {
   const T = cTotals(), srv = Math.max(1, Math.min(8, parseInt(($("#calc-srv") || {}).value, 10) || 1)), name = ((($("#calc-name") || {}).value) || CALC.name || "Eigenes Gericht").trim() || "Eigenes Gericht";
   CALC.srv = srv; if (!T.rows.some((r) => r.k != null)) return;
-  dayEns().items.push({ t: name + (srv > 1 ? " (1 von " + srv + ")" : ""), k: Math.round(T.k / srv), p: Math.round(T.p / srv), c: T.c != null ? Math.round(T.c / srv * 100) / 100 : 0 });
+  dayEns().items.push({ t: name + (srv > 1 ? " (1 von " + srv + ")" : ""), k: Math.round(T.k / srv), p: Math.round(T.p / srv), c: T.c != null ? Math.round(T.c / srv * 100) / 100 : 0, det: T.rows.filter((r) => r.k != null).map((r) => (r.qty ? r.qty + " " : "") + (r.name || r.raw) + ": " + Math.round(r.k) + " kcal, " + (Math.round(r.p * 10) / 10).toLocaleString("de-DE") + " g Eiweiß").slice(0, 25).concat(srv > 1 ? ["Aufgeteilt auf " + srv + " Personen, gesamt " + Math.round(T.k) + " kcal"] : []) });
   saveToday(); renderToday(); const ok = name; CALC = { text: "", rows: null, man: {}, srv: 1, name: "", ai: false, busy: false, err: "" }; drawEat("Eingetragen: " + ok);
 }
 
@@ -3208,7 +3255,7 @@ function mydHTML() {
 function mydFromInput(i) { const d = MYD[i]; if (!d) return; const el = document.querySelector('.myd-g[data-i="' + i + '"]'), g = Math.max(1, Math.min(3000, parseFloat(el.value) || 0)), f = g / d.w; d.lg = g; const o = document.getElementById("mydv" + i); if (o) o.textContent = "= " + Math.round(d.k * f) + " kcal, " + (Math.round(d.p * f * 10) / 10).toLocaleString("de-DE") + " g Eiweiß"; }
 function mydEat(i) {
   const d = MYD[i]; if (!d) return; mydFromInput(i); const g = d.lg, f = g / d.w;
-  dayEns().items.push({ t: d.name + " (" + Math.round(g) + " g)", k: Math.round(d.k * f), p: Math.round(d.p * f), c: Math.round(d.c * f * 100) / 100 });
+  dayEns().items.push({ t: d.name + " (" + Math.round(g) + " g)", k: Math.round(d.k * f), p: Math.round(d.p * f), c: Math.round(d.c * f * 100) / 100, det: ["Gespeichertes Gericht: " + Math.round(g) + " g von " + Math.round(d.w) + " g" + (d.est ? " (Gewicht geschätzt)" : "")].concat(d.text ? ["Zutaten: " + d.text.replace(/\s+/g, " ")] : []) });
   mydSave(); saveToday(); renderToday(); drawEat("Eingetragen: " + d.name + ", " + Math.round(g) + " g");
 }
 function mydNew() {
@@ -3438,6 +3485,8 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.prepcart) { const c = prepCalc(); c.entries.forEach((e) => cartAdd(e.id, e.n)); t.textContent = "Übernommen"; return; }
   if (t.dataset.calcgo) return calcGo();
   if (t.dataset.eatjump) { const el = document.getElementById(t.dataset.eatjump); if (el) el.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" }); return; }
+  if (t.dataset.histmore) { HISTN += 30; return renderEatHist(); }
+  if (t.dataset.hdel) { const [dd, ii] = t.dataset.hdel.split(":"), day = DIARY[dd]; if (day && day.items[+ii]) { day.items.splice(+ii, 1); if (!day.items.length && !day.water && !day.plan) delete DIARY[dd]; saveToday(); renderEatHist(); renderToday(); } return; }
   if (t.dataset.mydsave) return mydNew();
   if (t.dataset.mydeat) return mydEat(parseInt(t.dataset.mydeat, 10));
   if (t.dataset.mydel) { const d = MYD[parseInt(t.dataset.mydel, 10)]; if (d) { MYD.splice(parseInt(t.dataset.mydel, 10), 1); mydSave(); drawEat("Gelöscht: " + d.name); } return; }
@@ -3475,6 +3524,7 @@ document.addEventListener("click", (ev) => {
     return act(t.dataset.act === "pause" && tm.id && !tm.running ? "resume" : t.dataset.act);
   }
   if (t.dataset.group) { const gg = GROUPS.find((x) => x.id === t.dataset.group); return showTab(LAST[gg.id] || gg.tabs[0]); }
+  if (t.dataset.histgo) { showTab("fortschritt"); const h = document.getElementById("eathist"); if (h) h.scrollIntoView({ block: "start" }); return; }
   if (t.dataset.tab) return showTab(t.dataset.tab);
   if (t.dataset.lvl) {
     const e = EX.find((x) => x.id === t.dataset.lvl);
@@ -3986,7 +4036,7 @@ function makeView(opts) {
   const rgb = (c, a) => "rgba(" + Math.round(c[0]) + "," + Math.round(c[1]) + "," + Math.round(c[2]) + "," + (a == null ? 1 : a) + ")";
   const mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
   function palette() {
-    if (opts.dark) return { acc: [142, 162, 255], ink: [240, 242, 241], bg: [18, 22, 25], muted: [155, 165, 171], dark: true, near: [142, 162, 255], far: [88, 102, 190], hot: [255, 146, 80], nose: [236, 238, 242], torso: [205, 210, 218], head: [228, 231, 236], line: [8, 10, 14], floor: [255, 255, 255], grid: [255, 255, 255], floorA: 0.06, gridA: 0.1 };
+    if (opts.dark) return { acc: [147, 207, 221], ink: [242, 244, 240], bg: [44, 59, 68], muted: [179, 191, 195], dark: true, near: [147, 207, 221], far: [92, 148, 164], hot: [255, 150, 85], nose: [236, 238, 242], torso: [214, 221, 224], head: [235, 239, 239], line: [20, 30, 36], floor: [255, 255, 255], grid: [255, 255, 255], floorA: 0.06, gridA: 0.1 };
     const cs = getComputedStyle(document.documentElement), g = (n, d) => (cs.getPropertyValue(n).trim() || d);
     const acc = rgbOf(g("--accent", "#3b4bd6")), ink = rgbOf(g("--ink", "#111")), bg = rgbOf(g("--surface", "#fff")), muted = rgbOf(g("--muted", "#666"));
     const dark = (bg[0] + bg[1] + bg[2]) / 3 < 128;
