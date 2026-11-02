@@ -659,7 +659,15 @@ details.acc > summary::after { content: ""; flex: none; width: 9px; height: 9px;
 details.acc[open] > summary::after { transform: rotate(-135deg) translateY(-2px); }
 details.acc[open] > summary { margin-bottom: 12px; }
 .accbody { display: flex; flex-direction: column; gap: 12px; }
+.acct { display: grid; gap: 2px; min-width: 0; }
 .acct h3, .acct h4 { margin: 0; }
+.accsub { font-family: var(--body); font-weight: 400; font-size: 0.875rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+details.acc.card { gap: 0; padding: 16px 20px; }
+@media (min-width: 980px) {
+  #panel-einkauf, #panel-ernaehrung, #panel-tipps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+  #panel-einkauf > .card[data-nofold], #panel-ernaehrung > .card[data-nofold], #panel-tipps > .card[data-nofold], #panel-ernaehrung > .grid2, #panel-tipps > .grid2 { grid-column: 1 / -1; }
+  #panel-tipps > .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
 .exmore > summary { cursor: pointer; font-weight: 650; color: var(--accent); padding: 6px 0; list-style: none; }
 .exmore > summary::-webkit-details-marker { display: none; }
 .exmore > summary::before { content: "+ "; }
@@ -680,7 +688,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.6 · 02.11. 22:09</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.7 · 02.11. 22:20</span>
 <header class="top">
   <div class="brand"><h1>Fitness Coach</h1><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -2067,6 +2075,8 @@ function foldCards(root, keep) {
     h.remove();
     while (card.firstChild) body.appendChild(card.firstChild);
     body.querySelectorAll(":scope > div:empty").forEach((d) => d.remove());
+    const tx = body.querySelector("p, li"), tt = body.querySelector(".shop") ? "Checkliste zum Abhaken" : tx ? tx.textContent.replace(/\s+/g, " ").trim() : "";
+    if (tt) { const sub = document.createElement("span"); sub.className = "accsub"; sub.textContent = tt.length > 72 ? tt.slice(0, 70).replace(/\s\S*$/, "") + " …" : tt; sum.querySelector(".acct").appendChild(sub); }
     det.append(sum, body); card.replaceWith(det);
   });
 }
@@ -2808,7 +2818,7 @@ function renderShop() {
     (CART.length
       ? '<ul class="crows">' + rows + '</ul><div class="row"><button class="btn sm" data-cartclear="1">Liste leeren</button><button class="btn sm" data-tab="rezepte">Rezept hinzufügen</button><button class="btn sm" data-tab="rad">Vom Glücksrad</button></div>' +
         '<div class="stats"><div class="stat"><span class="big">' + eur(calc.total).replace("\u00a0€", "") + '<small>€</small></span><span>Einkauf gesamt, ca.</span></div><div class="stat"><span class="big">' + eur(calc.total / portions).replace("\u00a0€", "") + '<small>€</small></span><span>pro Portion im Schnitt</span></div><div class="stat"><span class="big">' + portions + '</span><span>Portionen</span></div></div>' + budget
-      : '<div class="empty-in"><p class="muted">Noch leer.</p><div class="row"><button class="btn primary" data-tab="rezepte">Zu den Rezepten</button><button class="btn" data-tab="rad">Zum Glücksrad</button></div></div>') + "</div>" +
+      : '<div class="empty-in"><p class="muted">Noch leer.</p><div class="row"><button class="btn primary" data-tab="rezepte">Zu den Rezepten</button><button class="btn" data-tab="rad">Zum Glücksrad</button><button class="btn" data-tab="vorkochen">Vorkochplan</button></div></div>') + "</div>" +
     (CART.length ? '<div class="card" data-nofold><h3>Was du brauchst</h3><div class="slist">' + shopListHTML(calc) + '</div><p class="small muted">Auf ganze Packungen aufgerundet.</p></div>' : "") +
     '<div class="card"><h3>So sparst du bei Lidl</h3><ul>' +
     "<li><b>Quark und Skyr zuerst.</b> Ein 500-g-Becher kostet etwa einen Euro und liefert rund 55 bis 60 g Eiweiß. Hähnchenbrust bringt pro Euro nur etwa die Hälfte.</li>" +
