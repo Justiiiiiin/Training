@@ -614,7 +614,7 @@ body[data-coach="0"] .side { display: none; }
   .pagehead { padding-bottom: 0; }
   .tdhead .btn { white-space: nowrap; }
   body[data-group="essen"] .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); width: 100%; overflow: hidden; gap: 0; padding: 3px; }
-  body[data-group="essen"] .tab { padding: 0 2px; font-size: 0.8125rem; min-width: 0; justify-content: center; text-align: center; }
+  body[data-group="essen"] .tab { padding: 0 1px; font-size: 0.75rem; letter-spacing: -0.01em; min-width: 0; justify-content: center; text-align: center; overflow: hidden; }
   .calcrows li { flex-wrap: wrap; }
 }
 @media (max-width: 360px) { body[data-group="essen"] .tab { font-size: 0.75rem; } }
@@ -652,12 +652,35 @@ body[data-coach="0"] .side { display: none; }
   .card { gap: 12px; }
   .eatlist li { padding: 6px 0; }
 }
+
+details.acc > summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; cursor: pointer; list-style: none; font-family: var(--display); font-weight: 650; font-size: 1.125rem; padding: 2px 0; min-height: 28px; }
+details.acc > summary::-webkit-details-marker { display: none; }
+details.acc > summary::after { content: ""; flex: none; width: 9px; height: 9px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform 0.2s var(--ease); }
+details.acc[open] > summary::after { transform: rotate(-135deg) translateY(-2px); }
+details.acc[open] > summary { margin-bottom: 12px; }
+.accbody { display: flex; flex-direction: column; gap: 12px; }
+.acct h3, .acct h4 { margin: 0; }
+.exmore > summary { cursor: pointer; font-weight: 650; color: var(--accent); padding: 6px 0; list-style: none; }
+.exmore > summary::-webkit-details-marker { display: none; }
+.exmore > summary::before { content: "+ "; }
+.exmore[open] > summary::before { content: "– "; }
+.exmore[open] > summary { margin-bottom: 8px; }
+.exmore > p, .exmore > ol { margin: 0 0 10px; }
+.excard .exnow { display: grid; gap: 6px; }
+.excard > .row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
+.excard > .row .btn { padding: 0 14px; min-width: 0; }
+@media (max-width: 380px) { .excard > .row { grid-template-columns: 1fr 1fr; } .excard > .row .btn:last-child { grid-column: 1 / -1; } }
+.excard .exnow b { font-size: 1.0625rem; }
+.prepsum { margin: 0; }
+.prepweek li { grid-template-columns: 44px minmax(0, 1fr); align-items: baseline; }
+.prepweek li.wk-all { color: var(--muted); }
+em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; margin-left: 4px; }
 </style>
 </head>
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.5 · 02.11. 21:45</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.6 · 02.11. 22:09</span>
 <header class="top">
   <div class="brand"><h1>Fitness Coach</h1><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -2032,27 +2055,41 @@ function fatigueHint() {
   const t2 = tot(k[0]), t1 = tot(k[1]), t0 = tot(k[2]);
   return t0 < t1 && t1 < t2 && t0 < 0.85 * t2 ? '<p class="note">Deine letzten Einheiten wurden schwächer. Prüfe Schlaf, Essen und Stress. Wenn es so bleibt, mach eine Woche mit einem Satz weniger pro Übung. Feste Pausenwochen bringen laut einer Studie von 2024 keinen Vorteil, sie sind nur bei Bedarf sinnvoll.</p>' : "";
 }
+
+/* Lange Infokarten einklappen: Titel bleibt sichtbar, Text erst nach Tipp */
+function foldCards(root, keep) {
+  if (!root) return;
+  root.querySelectorAll(":scope > .card, :scope > .grid2 > .card").forEach((card, i) => {
+    if (card.hasAttribute("data-nofold") || i < (keep || 0) || card.tagName === "DETAILS") return;
+    const h = card.querySelector("h3, h4"); if (!h) return;
+    const det = document.createElement("details"), sum = document.createElement("summary"), body = document.createElement("div");
+    det.className = card.className + " acc"; sum.innerHTML = '<span class="acct">' + h.innerHTML + "</span>"; body.className = "accbody";
+    h.remove();
+    while (card.firstChild) body.appendChild(card.firstChild);
+    body.querySelectorAll(":scope > div:empty").forEach((d) => d.remove());
+    det.append(sum, body); card.replaceWith(det);
+  });
+}
 function phaseHTML() {
   const w = weekNo(), rec = w <= 2 ? 2 : 3, cur = settings.sets;
-  const txt = w <= 2 ? "Technik lernen: 2 Sätze, bei jedem Satz noch etwa 3 Wiederholungen übrig lassen." : w <= 8 ? "Aufbau: 3 Sätze, 1 bis 3 Wiederholungen übrig lassen. Steigere erst die Wiederholungen, dann die Stufe." : "Weiter aufbauen: Klappen 3 Sätze sauber, nimm die nächste Stufe. Einen vierten Satz nur bei einer Übung, die hinterherhinkt.";
-  return '<div class="card"><h3>Woche ' + w + "</h3><p>" + txt + "</p>" + (w <= 8 && cur !== rec ? '<div class="row"><button class="btn primary" type="button" data-setsrec="' + rec + '">Auf ' + rec + " Sätze stellen</button></div>" : '<p class="small muted">Aktuell: ' + cur + " Sätze pro Übung.</p>") + fatigueHint() + "</div>";
+  const txt = w <= 2 ? "Technik lernen. Lass bei jedem Satz noch ein paar Wiederholungen übrig." : w <= 8 ? "Aufbau. Lass 1 bis 3 Wiederholungen übrig, steigere erst die Wiederholungen, dann die Stufe." : "Weiter aufbauen. Klappt alles sauber, nimm die nächste Stufe.";
+  return '<div class="card phase" data-nofold><div class="rday-h"><h3>Woche ' + w + '</h3><span class="rtot">' + cur + " Sätze pro Übung</span></div><p>" + txt + "</p>" + (w <= 8 && cur !== rec ? '<div class="row"><button class="btn primary" type="button" data-setsrec="' + rec + '">Auf ' + rec + " Sätze stellen</button></div>" : "") + fatigueHint() + "</div>";
 }
 function renderEx() {
   $("#panel-uebungen").innerHTML = phaseHTML() +
-    '<div class="card"><h3>Ganzkörper, ' + trainDays() + ' Mal pro Woche</h3><ul>' +
-    "<li>Mindestens ein Ruhetag zwischen zwei Einheiten.</li>" +
-    "<li>Wochen 1 und 2: 2 Sätze pro Übung, ab Woche 3: 3 Sätze (Einstellungen mit dem Zahnrad).</li>" +
-    "<li>Beende jeden Satz 1 bis 3 Wiederholungen vor dem Muskelversagen.</li>" +
-    "<li>Pausen 60 bis 90 Sekunden.</li>" +
-    "<li>Schaffst du bei allen Sätzen die obere Wiederholungszahl sauber, geh eine Stufe weiter und fang wieder unten an.</li></ul></div>" +
+    '<div class="card"><h3>So trainierst du</h3><ul>' +
+    "<li>Ganzkörper, " + trainDays() + " Mal pro Woche, dazwischen mindestens ein Ruhetag.</li>" +
+    "<li>Pausen 60 bis 90 Sekunden. Beende jeden Satz 1 bis 3 Wiederholungen vor dem Versagen.</li>" +
+    "<li>Schaffst du bei allen Sätzen die obere Zahl sauber, geh eine Stufe weiter.</li></ul></div>" +
     '<div class="grid2">' + EX.map((e) => {
-      const li = lvl(e);
-      return '<article class="card"><div class="exhead"><div><h3>' + e.name + '</h3><p class="kicker">' + e.reps + (e.id !== e.slot ? " · Alternative" : "") + '</p></div><button class="btn icon sm infobtn" type="button" data-v3="' + e.id + '" aria-label="So geht’s: 3D-Ansicht für ' + e.name + '" title="So geht’s: 3D-Ansicht">' + ic("info") + "</button></div><p>" + e.cue + "</p>" +
-        '<div class="lvlbar"><div class="meter"><span style="width:' + Math.round((li + 1) / e.ladder.length * 100) + '%"></span></div><p class="small muted">Stufe ' + (li + 1) + " von " + e.ladder.length + '</p></div><ol class="ladder">' + e.ladder.map((n, i) => '<li class="' + (i === li ? "cur" : "") + '">' + n + (i === li ? " (deine Stufe)" : "") + '<button class="v3mini" type="button" data-v3="' + e.id + '" data-i="' + i + '" aria-label="3D-Ansicht: ' + n + '">3D</button></li>').join("") + "</ol>" +
-        '<p class="mistake"><b>Häufige Fehler:</b> ' + e.mistakes + "</p>" +
-        '<p class="small muted">Du brauchst: ' + e.need + '</p><div class="row"><button class="btn" data-lvl="' + e.id + '" data-d="-1">Leichter</button><button class="btn" data-lvl="' + e.id + '" data-d="1">Schwerer</button>' + (slotVariants(e.slot).length > 1 ? '<button class="btn" type="button" data-swapopen="' + e.slot + '">' + ic("repeat") + "<span>Austauschen</span></button>" : "") + '</div></article>';
+      const li = lvl(e), nvar = slotVariants(e.slot).length;
+      return '<article class="card excard" data-nofold><div class="exhead"><div><h3>' + e.name + '</h3><p class="kicker">' + e.reps + (e.id !== e.slot ? " · Alternative" : "") + '</p></div><button class="btn icon sm infobtn" type="button" data-v3="' + e.id + '" aria-label="So geht’s: 3D-Ansicht für ' + e.name + '" title="3D-Ansicht">' + ic("info") + "</button></div>" +
+        '<div class="exnow"><b>' + levelName(e) + '</b><div class="meter"><span style="width:' + Math.round((li + 1) / e.ladder.length * 100) + '%"></span></div><span class="small muted">Stufe ' + (li + 1) + " von " + e.ladder.length + "</span></div>" +
+        '<div class="row"><button class="btn" data-lvl="' + e.id + '" data-d="-1">Leichter</button><button class="btn" data-lvl="' + e.id + '" data-d="1">Schwerer</button>' + (nvar > 1 ? '<button class="btn" type="button" data-swapopen="' + e.slot + '">' + ic("repeat") + "<span>Tauschen</span></button>" : "") + "</div>" +
+        '<details class="exmore"><summary>Anleitung und alle Stufen</summary><p>' + e.cue + '</p><ol class="ladder">' + e.ladder.map((n, i) => '<li class="' + (i === li ? "cur" : "") + '">' + n + (i === li ? " (deine Stufe)" : "") + '<button class="v3mini" type="button" data-v3="' + e.id + '" data-i="' + i + '" aria-label="3D-Ansicht: ' + n + '">3D</button></li>').join("") + '</ol><p class="mistake"><b>Häufige Fehler:</b> ' + e.mistakes + '</p><p class="small muted">Du brauchst: ' + e.need + "</p></details></article>";
     }).join("") + "</div>" +
     '<h3 style="margin-top:6px">Zusatz</h3><div class="grid2">' + EXTRAS.map((x) => '<article class="card flat"><h4>' + x.name + '</h4><p class="kicker">' + x.sub + "</p><p>" + x.text + "</p>" + (V3KEY[x.name] ? '<div class="row"><button class="btn" type="button" data-v3="' + V3KEY[x.name] + '">' + ic("info") + "<span>3D-Ansicht</span></button></div>" : "") + "</article>").join("") + "</div>";
+  foldCards($("#panel-uebungen"));
 }
 function bodyCalc() {
   const w = prof.weight, h = prof.height;
@@ -2094,10 +2131,10 @@ function oatsCard() {
 }
 function renderNutrition() {
   $("#panel-ernaehrung").innerHTML =
-    '<div class="card"><h3>Richtwerte für dich</h3>' +
+    '<div class="card" data-nofold><h3>Richtwerte für dich</h3>' +
     '<div class="form"><label class="field">Gewicht (kg)<input type="number" id="b-weight" min="30" max="250" step="0.5" value="' + prof.weight + '"></label><label class="field">Größe (cm)<input type="number" id="b-height" min="120" max="230" step="1" value="' + prof.height + '"></label></div>' +
     '<div class="stats" id="calc">' + calcStats(bodyCalc()) + "</div>" +
-    '<p class="note">Die Fachgesellschaft ISSN nennt 1,4 bis 2,0 g Eiweiß pro kg und Tag für Trainierende. Eine große Auswertung (Morton 2018) fand oberhalb von etwa 1,6 g pro kg kaum noch zusätzlichen Zuwachs an Muskelmasse. Pro Mahlzeit gelten etwa 0,25 g pro kg oder 20 bis 40 g als sinnvoll. Das Defizit sollte klein bleiben (grob 250 bis 500 Kalorien unter deinem Verbrauch), weil zu schnelles Abnehmen auch Muskeln kostet. Das sind Orientierungswerte und kein medizinischer Rat. Bei Vorerkrankungen sprich vorher mit deinem Arzt.</p></div>' +
+    '<details class="exmore"><summary>Woher kommen die Zahlen?</summary><p class="note">Die Fachgesellschaft ISSN nennt 1,4 bis 2,0 g Eiweiß pro kg und Tag für Trainierende. Eine große Auswertung (Morton 2018) fand oberhalb von etwa 1,6 g pro kg kaum noch zusätzlichen Zuwachs an Muskelmasse. Pro Mahlzeit gelten etwa 0,25 g pro kg oder 20 bis 40 g als sinnvoll. Das Defizit sollte klein bleiben (grob 250 bis 500 Kalorien unter deinem Verbrauch), weil zu schnelles Abnehmen auch Muskeln kostet. Das sind Orientierungswerte und kein medizinischer Rat. Bei Vorerkrankungen sprich vorher mit deinem Arzt.</p></details></div>' +
     dayCard() + oatsCard() + '<div class="grid2"><div class="card"><h3>Die Basis nach DGE</h3><ul>' +
     "<li>Am besten Wasser trinken, rund 1,5 Liter am Tag.</li>" +
     "<li>Mindestens 5 Portionen Obst und Gemüse am Tag, zu jeder Mahlzeit etwas davon. Mit deiner Auswahl (Tomate, Gurke, Paprika, Zwiebel, Salat, Spinat, Rucola, Erdbeeren, Banane) klappt das gut, wenn bei jeder Mahlzeit eine Handvoll dabei ist. Probier gern ab und zu etwas Neues, am einfachsten in Soßen.</li>" +
@@ -2111,12 +2148,15 @@ function renderNutrition() {
     "<li>Eier kochen, bis Eiweiß und Eigelb fest sind.</li>" +
     "<li>Reis und Nudeln nach dem Kochen rasch abkühlen (flach verteilen), innerhalb von etwa 2 Stunden in den Kühlschrank, am besten am nächsten Tag essen, spätestens nach 2 Tagen und vollständig erhitzen.</li>" +
     "<li>Tiefkühl-Beeren vor dem Essen mindestens 2 Minuten auf über 90 °C erhitzen und abkühlen lassen (BfR). Das gilt auch für Overnight Oats, Quark und Shakes.</li>" +
-    "<li>Keine lauwarmen Reste stehen lassen. Die Keime, die sich dann vermehren, überstehen das Kochen.</li></ul></div></div>" ;
+    "<li>Keine lauwarmen Reste stehen lassen. Die Keime, die sich dann vermehren, überstehen das Kochen.</li></ul></div></div>";
+  foldCards($("#panel-ernaehrung"));
 }
 function renderTips() {
   $("#panel-tipps").innerHTML =
     '<div class="card"><h3>Deine Woche</h3><div class="week">' + weekPlan().map((d) => '<div class="' + (d[2] ? "on" : "") + '"><b>' + d[0] + "</b>" + d[1] + "</div>").join("") + "</div></div>" +
-    '<div class="grid2">' + TIPS.map((g) => '<article class="card"><h3>' + g.h + "</h3><ul>" + g.items.map((i) => "<li>" + i + "</li>").join("") + "</ul></article>").join("") + "</div>" ;
+    '<div class="grid2">' + TIPS.map((g) => '<article class="card"><h3>' + g.h + "</h3><ul>" + g.items.map((i) => "<li>" + i + "</li>").join("") + "</ul></article>").join("") + "</div>";
+  $("#panel-tipps .card").setAttribute("data-nofold", "");
+  foldCards($("#panel-tipps"));
 }
 function renderSources() {
   $("#sources").innerHTML = "<summary>Quellen</summary>" + SOURCES.map((g) => '<h4 style="margin-top:12px">' + g[0] + "</h4><ul>" + g[1].map((s) => "<li>" + (s[1] ? '<a href="' + s[1] + '" target="_blank" rel="noopener">' + s[0] + "</a>" : s[0]) + "</li>").join("") + "</ul>").join("");
@@ -2180,7 +2220,7 @@ function renderVolume() {
     const sub = (days == null ? "" : days === 0 ? "heute trainiert" : "zuletzt vor " + days + (days === 1 ? " Tag" : " Tagen")) + (pv ? (days == null ? "" : " · ") + "letzte Woche " + nf(pv) : "");
     return '<li class="vrow"><span class="vname">' + m[1] + '</span><span class="vnum">' + nf(n) + '<small> von 10</small></span><span class="vbar" role="img" aria-label="' + nf(n) + ' von 10 Sätzen"><i class="' + cls + '" style="width:' + Math.min(100, Math.round(n / 10 * 100)) + '%"></i></span>' + (sub ? '<span class="vsub muted small">' + sub + "</span>" : "") + "</li>";
   }).join("");
-  $("#volcard").innerHTML = "<h3>Sätze pro Muskel diese Woche</h3><p class=\"muted\">Etwa 10 Sätze pro Muskel und Woche gelten als gutes Ziel. Sätze, die einen Muskel nur mithelfen lassen, zählen halb. Anfänger kommen auch mit 6 bis 9 gut voran.</p>" + (any ? "" : '<p class="note">Diese Woche noch kein Training. Nach der ersten Einheit füllen sich die Balken.</p>') + '<ul class="vol">' + rows + "</ul>";
+  $("#volcard").innerHTML = "<h3>Sätze pro Muskel diese Woche</h3><p class=\"muted small\">Ziel: etwa 10 pro Muskel und Woche. Mithelfende Muskeln zählen halb.</p>" + (any ? "" : '<p class="note">Noch kein Training diese Woche.</p>') + '<ul class="vol">' + rows + "</ul>";
 }
 function badgeList() {
   const n = sessions.length, st = weekStreak(), dd = Object.keys(DIARY), pt = protTarget();
@@ -2764,12 +2804,12 @@ function renderShop() {
       (BUDGET > 0 ? '<div class="meter" role="img" aria-label="Anteil des Budgets"><span class="' + (left < 0 ? "over" : "") + '" style="width:' + Math.min(100, Math.round(calc.total / BUDGET * 100)) + '%"></span></div><p class="small ' + (left < 0 ? "warnt" : "muted") + '">' + (left >= 0 ? "Noch " + eur(left) + " Luft." : eur(-left) + " über dem Budget. Tausch teure Gerichte gegen günstigere aus.") + "</p>" : "") + "</div>";
   }
   $("#panel-einkauf").innerHTML =
-    '<div class="card"><div><h3>Einkaufsliste</h3><p class="muted">Preise sind Richtwerte für Lidl (Stand Nov 2026). Angebote und die Lidl-Plus-App machen vieles günstiger.</p></div>' +
+    '<div class="card" data-nofold><div><h3>Einkaufsliste</h3><p class="muted small">Richtwerte für Lidl, Stand Nov 2026.</p></div>' +
     (CART.length
       ? '<ul class="crows">' + rows + '</ul><div class="row"><button class="btn sm" data-cartclear="1">Liste leeren</button><button class="btn sm" data-tab="rezepte">Rezept hinzufügen</button><button class="btn sm" data-tab="rad">Vom Glücksrad</button></div>' +
         '<div class="stats"><div class="stat"><span class="big">' + eur(calc.total).replace("\u00a0€", "") + '<small>€</small></span><span>Einkauf gesamt, ca.</span></div><div class="stat"><span class="big">' + eur(calc.total / portions).replace("\u00a0€", "") + '<small>€</small></span><span>pro Portion im Schnitt</span></div><div class="stat"><span class="big">' + portions + '</span><span>Portionen</span></div></div>' + budget
-      : '<div class="empty-in"><p>Noch leer. Öffne ein Rezept und tippe auf „Zur Einkaufsliste“, oder übernimm den Plan vom Glücksrad.</p><div class="row"><button class="btn primary" data-tab="rezepte">Zu den Rezepten</button><button class="btn" data-tab="rad">Zum Glücksrad</button></div></div>') + "</div>" +
-    (CART.length ? '<div class="card"><h3>Was du brauchst</h3><div class="slist">' + shopListHTML(calc) + '</div><p class="small muted">Mengen sind auf ganze Lidl-Packungen aufgerundet, lose Ware auf 100 g. Der Rest bleibt für die nächsten Tage.</p></div>' : "") +
+      : '<div class="empty-in"><p class="muted">Noch leer.</p><div class="row"><button class="btn primary" data-tab="rezepte">Zu den Rezepten</button><button class="btn" data-tab="rad">Zum Glücksrad</button></div></div>') + "</div>" +
+    (CART.length ? '<div class="card" data-nofold><h3>Was du brauchst</h3><div class="slist">' + shopListHTML(calc) + '</div><p class="small muted">Auf ganze Packungen aufgerundet.</p></div>' : "") +
     '<div class="card"><h3>So sparst du bei Lidl</h3><ul>' +
     "<li><b>Quark und Skyr zuerst.</b> Ein 500-g-Becher kostet etwa einen Euro und liefert rund 55 bis 60 g Eiweiß. Hähnchenbrust bringt pro Euro nur etwa die Hälfte.</li>" +
     "<li><b>Hähnchen nur im Angebot.</b> Im Oktober gab es Brustfilet im Prospekt für 5,19 € pro 600 g (8,65 € pro kg). Dann gleich mehr kaufen und portionsweise einfrieren.</li>" +
@@ -2782,6 +2822,7 @@ function renderShop() {
     '<div class="card"><h3>Eiweiß pro Euro</h3><p class="muted small">So viel Eiweiß bekommst du für 1 € (Rohgewicht, Lidl-Richtwerte). Je höher, desto günstiger.</p><ol class="ptable">' +
     protTable().map((x) => "<li><span>" + x.name + "</span><b>" + Math.round(x.gpe) + " g</b></li>").join("") + "</ol></div>" +
     '<div class="card"><h3>Grundvorrat für den Anfang</h3><div class="shop">' + SHOP.map((g, gi) => "<div><h4>" + g[0] + "</h4>" + g[1].map((n, i) => '<label><input type="checkbox" data-shop="' + gi + "-" + i + '"' + (shop[gi + "-" + i] ? " checked" : "") + "> " + n + "</label>").join("") + "</div>").join("") + "</div></div>";
+  foldCards($("#panel-einkauf"));
 }
 
 /* ======================= Ziele, Tagebuch, Heute, Protokoll ======================= */
@@ -3021,45 +3062,42 @@ function prepSteps(c) {
   const ovenOf = (it) => it.r.steps.some((s) => /ofen/i.test(s)), nm = (arr) => arr.map((it) => "„" + it.r.title + "“").join(" und ");
   const oven = c.items.filter(ovenOf), stove = mains.filter((it) => !ovenOf(it)), cold = c.items.filter((it) => it.kind !== "Hauptgericht" && !ovenOf(it));
   const out = [];
-  out.push(["setup", "Vorbereiten (etwa 10 Minuten)", "Einkauf auspacken, Boxen und Marker bereitstellen, Arbeitsfläche frei machen. Reis, Nudeln oder Couscous nimmst du erst, wenn das Rezept es verlangt."]);
-  if (oven.length) out.push(["oven", "Zuerst in den Ofen: " + nm(oven), "Heize den Ofen vor und bereite die Zutaten vor, während er aufheizt. Dann stellst du es in den Ofen und kochst nebenher weiter."]);
-  if (stove.length) out.push(["stove", "Auf dem Herd: " + nm(stove), "Fang mit dem an, was am längsten braucht" + (stove[0] ? " („" + stove[0].r.title + "“, etwa " + stove[0].r.time + " Minuten)" : "") + ". Während es köchelt, schneidest du für das nächste Gericht."]);
-  if (cold.length) out.push(["cold", "Nebenbei ansetzen: " + nm(cold), "Das braucht wenig Aufmerksamkeit. Mach es, wenn etwas köchelt oder im Ofen ist."]);
+  out.push(["setup", "Vorbereiten", "Einkauf auspacken, Boxen und Marker bereitlegen."]);
+  if (oven.length) out.push(["oven", "Zuerst in den Ofen: " + nm(oven), "Ofen vorheizen, nebenher Zutaten vorbereiten."]);
+  if (stove.length) out.push(["stove", "Auf dem Herd: " + nm(stove), "Mit dem Längsten anfangen, nebenher fürs nächste schneiden."]);
+  if (cold.length) out.push(["cold", "Nebenbei ansetzen: " + nm(cold), "Braucht kaum Aufmerksamkeit, mach es nebenher."]);
   const fr = c.items.filter((it) => it.keep.freeze && it.later.length), n = (it) => it.later.length * PREP.people;
-  out.push(["pack", "Abkühlen und portionieren (etwa 20 Minuten)", "Fülle alles flach in Boxen, eine Box pro Portion. Lass es höchstens eine Stunde offen auskühlen, dann Deckel drauf und in den Kühlschrank. Beschrifte mit Namen und Datum." + (fr.length ? " Einfrieren: " + fr.map((it) => n(it) + " × " + it.r.title).join(", ") + "." : "")]);
-  if (fr.length) out.push(["thaw", "Unter der Woche", "Die eingefrorenen Portionen stellst du am Abend vorher in den Kühlschrank. Nur einmal richtig heiß machen, nicht mehrfach aufwärmen."]);
+  out.push(["pack", "Abkühlen und einpacken", "Flach in Boxen füllen, höchstens 1 Stunde auskühlen, beschriften." + (fr.length ? " Einfrieren: " + fr.map((it) => n(it) + " × " + it.r.title).join(", ") + "." : "")]);
+  if (fr.length) out.push(["thaw", "Unter der Woche", "Tiefgekühltes am Vorabend in den Kühlschrank stellen."]);
   return out;
 }
 function prepHTML() {
   prepEnsure();
   const c = prepCalc(), P = PREP.people, wk = PREP.week;
-  const step = (id, lab, ch, mode) => '<button class="btn' + (mode ? " sm" : "") + '" type="button" ' + id + ">" + lab + "</button>";
   const seg = (field, vals) => vals.map((v) => '<button class="btn" type="button" data-prepopt="' + field + '" data-v="' + v + '" aria-pressed="' + (PREP[field] === v) + '">' + v + "</button>").join("");
   const tog = (field, lab) => '<button class="btn" type="button" data-prepopt="' + field + '" aria-pressed="' + !!PREP[field] + '">' + lab + "</button>";
-  const week = c.dayMain.map((m, d) => {
-    const b = PREP.brk && byId(PREP.b) && d < 5 ? c.items.find((it) => it.key === "b") : null, s = PREP.snk && byId(PREP.s) && d < 5 ? c.items.find((it) => it.key === "s") : null;
-    const mi = c.items.find((it) => it.r === m), how = (it) => it && it.keep.freeze ? (d >= it.keep.fridge ? "aus dem Tiefkühler" : "aus dem Kühlschrank") : (it && d >= it.keep.fridge ? "frisch machen" : "aus dem Kühlschrank");
-    return '<li><b>' + PREPDAYS[d] + '</b><span>' + (b ? "Frühstück: " + b.r.title + " (" + how(b) + ")<br>" : "") + (m ? "Essen: " + m.title + " (" + how(mi) + ")" : "") + (s ? "<br>Snack: " + s.r.title + " (" + how(s) + ")" : "") + "</span></li>";
-  }).join("");
-  const items = c.items.map((it, idx) => {
-    const per = it.n / P, who = it.kind === "Hauptgericht" ? "m" + c.items.filter((x) => x.kind === "Hauptgericht").indexOf(it) : it.key;
-    const freezeN = it.keep.freeze ? it.later.length * P : 0, fresh = !it.keep.freeze && it.later.length ? it.later.map((i) => PREPDAYS[i]).join(", ") : "";
-    return '<article class="card prepitem"><div class="rday-h"><div><p class="kicker">' + it.kind + "</p><h3>" + it.r.title + '</h3></div><span class="rtot">' + eur(it.r.cost * it.n) + "</span></div>" +
-      '<p class="small">' + it.n + " Portionen kochen (" + per + " pro Person), " + it.r.protein + " g Eiweiß und " + it.r.kcal + " kcal pro Portion, Kochzeit etwa " + it.r.time + " Minuten.</p>" +
-      '<p class="small"><b>Haltbarkeit:</b> ' + it.keep.fridge + " Tage im Kühlschrank" + (it.keep.freeze ? ", bis zu 3 Monate im Tiefkühler" + (freezeN ? " (" + freezeN + " Portionen einfrieren)" : "") : ", nicht zum Einfrieren") + ". " + it.keep.note + (fresh ? " Für " + fresh + " bitte frisch machen." : "") + "</p>" +
-      '<div class="row"><button class="btn" type="button" data-recipe="' + it.r.id + '">Rezept</button><button class="btn" type="button" data-cook="' + it.r.id + '">Kochmodus</button><button class="btn" type="button" data-prepgen="' + who + '">' + ic("repeat") + "<span>Anderes Gericht</span></button></div></article>";
-  }).join("");
-  const steps = prepSteps(c).map((s) => '<li class="' + (PREP.done[s[0]] ? "done" : "") + '"><label class="sline"><input type="checkbox" data-prepchk="' + s[0] + '"' + (PREP.done[s[0]] ? " checked" : "") + '><span class="sname"><b>' + s[1] + "</b><br><span class=\"muted small\">" + s[2] + "</span></span></label></li>").join("");
   const cur = weekStartISO(todayISO()), off = Math.round((new Date(wk + "T12:00:00") - new Date(cur + "T12:00:00")) / 604800000), wkName = off === 0 ? "Diese Woche" : off === 1 ? "Nächste Woche" : "In " + off + " Wochen";
   const picker = '<div class="weekpick" role="group" aria-label="Woche wählen"><button class="btn icon" type="button" data-prepweek="-1" aria-label="Vorherige Woche"' + (off <= 0 ? " disabled" : "") + ">‹</button><div><b>" + wkName + '</b><span class="small muted">' + dateDE(wk) + " bis " + dateDE(shiftDay(wk, 6)) + '</span></div><button class="btn icon" type="button" data-prepweek="1" aria-label="Nächste Woche"' + (off >= 4 ? " disabled" : "") + ">›</button></div>";
-  return '<div class="card"><div><h3>Vorkochplan</h3>' + picker + '<p class="muted">Am Sonntag kochst du ein paar Gerichte in großer Menge und isst sie durch die Woche. Das spart Zeit und meist auch Geld. Gekochtes hält im Kühlschrank etwa 3 Tage, danach kommt es aus dem Tiefkühler.</p></div>' +
+  const tagOf = (it, d) => (d >= it.keep.fridge ? (it.keep.freeze ? "Tiefkühler" : "frisch machen") : "");
+  const once = (it, lab) => { if (!it) return ""; const t = it.later.length ? " ab " + PREPDAYS[it.keep.fridge] + ": " + (it.keep.freeze ? "Tiefkühler" : "frisch machen") : ""; return '<li class="wk-all"><b>' + lab + "</b><span>" + it.r.title + (t ? ' <em class="tag">' + t.trim() + "</em>" : "") + "</span></li>"; };
+  const week = once(c.items.find((it) => it.key === "b"), "Früh") + once(c.items.find((it) => it.key === "s"), "Snack") + c.dayMain.map((m, d) => { const mi = c.items.find((it) => it.r === m), t = m ? tagOf(mi, d) : ""; return "<li><b>" + PREPDAYS[d] + "</b><span>" + (m ? m.title : "") + (t ? ' <em class="tag">' + t + "</em>" : "") + "</span></li>"; }).join("");
+  const items = c.items.map((it) => {
+    const who = it.kind === "Hauptgericht" ? "m" + c.items.filter((x) => x.kind === "Hauptgericht").indexOf(it) : it.key, per = it.n / P;
+    const freezeN = it.keep.freeze ? it.later.length * P : 0, fresh = !it.keep.freeze && it.later.length ? it.later.map((i) => PREPDAYS[i]).join(", ") : "";
+    return '<article class="card prepitem" data-nofold><div class="rday-h"><div><p class="kicker">' + it.kind + "</p><h3>" + it.r.title + '</h3></div><span class="rtot">' + eur(it.r.cost * it.n) + "</span></div>" +
+      '<p class="small muted">' + it.n + " Portionen · " + it.r.protein + " g Eiweiß · " + it.r.kcal + " kcal · " + it.r.time + " Min</p>" +
+      '<details class="exmore"><summary>Haltbarkeit</summary><p class="small">' + it.keep.fridge + " Tage im Kühlschrank" + (it.keep.freeze ? ", bis 3 Monate im Tiefkühler" + (freezeN ? " (" + freezeN + " Portionen einfrieren)" : "") : ", nicht zum Einfrieren") + ". " + it.keep.note + (fresh ? " Für " + fresh + " frisch machen." : "") + "</p></details>" +
+      '<div class="row"><button class="btn" type="button" data-recipe="' + it.r.id + '">Rezept</button><button class="btn" type="button" data-cook="' + it.r.id + '">Kochmodus</button><button class="btn" type="button" data-prepgen="' + who + '" aria-label="Anderes Gericht">' + ic("repeat") + "<span>Anderes</span></button></div></article>";
+  }).join("");
+  const steps = prepSteps(c).map((st) => '<li class="' + (PREP.done[st[0]] ? "done" : "") + '"><label class="sline"><input type="checkbox" data-prepchk="' + st[0] + '"' + (PREP.done[st[0]] ? " checked" : "") + '><span class="sname"><b>' + st[1] + '</b><br><span class="muted small">' + st[2] + "</span></span></label></li>").join("");
+  return '<div class="card" data-nofold><h3>Vorkochplan</h3>' + picker +
     '<div class="prepopts"><div class="row"><span class="small muted">Personen</span><span class="stepper"><button class="btn icon" type="button" data-prepopt="people" data-d="-1" aria-label="Weniger Personen">−</button><b>' + P + '</b><button class="btn icon" type="button" data-prepopt="people" data-d="1" aria-label="Mehr Personen">+</button></span></div>' +
-    '<div class="row pseg"><span class="small muted">Tage (Mo bis …)</span>' + seg("days", [3, 4, 5, 6]) + '</div><div class="row pseg"><span class="small muted">Verschiedene Gerichte</span>' + seg("n", [1, 2, 3]) + '</div><div class="row pseg">' + tog("brk", "Frühstück mitkochen") + tog("snk", "Snack mitkochen") + "</div></div>" +
-    '<p><b>Kosten ca. ' + eur(c.calc.total) + "</b> bei Lidl (pro Person ca. " + eur(c.calc.total / P) + "), am Sonntag etwa " + c.mins + ' Minuten.</p><div class="row"><button class="btn primary" type="button" data-prepcart="1">In meine Einkaufsliste</button><button class="btn" type="button" data-prepgen="all">' + ic("repeat") + "<span>Neu würfeln</span></button></div></div>" +
-    '<div class="card"><h3>Deine Woche</h3><ul class="prepweek">' + week + "</ul></div>" +
-    '<div class="card"><h3>Sonntag: Reihenfolge zum Kochen</h3><ol class="prepsteps">' + steps + "</ol></div>" +
+    '<div class="row pseg"><span class="small muted">Tage</span>' + seg("days", [3, 4, 5, 6]) + '</div><div class="row pseg"><span class="small muted">Gerichte</span>' + seg("n", [1, 2, 3]) + '</div><div class="row pseg">' + tog("brk", "Frühstück") + tog("snk", "Snack") + "</div></div>" +
+    '<p class="prepsum"><b>ca. ' + eur(c.calc.total) + "</b> · " + eur(c.calc.total / P) + " pro Person · " + c.mins + ' Min am Sonntag</p><div class="row"><button class="btn primary" type="button" data-prepcart="1">In die Einkaufsliste</button><button class="btn" type="button" data-prepgen="all" aria-label="Neu würfeln">' + ic("repeat") + "<span>Neu würfeln</span></button></div></div>" +
+    '<div class="card" data-nofold><h3>Deine Woche</h3><ul class="prepweek">' + week + "</ul></div>" +
     '<div class="grid2">' + items + "</div>" +
-    '<section class="card radshop"><div class="rday-h"><h3>Einkauf für den Vorkochplan</h3><span class="rtot">ca. ' + eur(c.calc.total) + "</span></div>" + shopListHTML(c.calc) + '<p class="small muted">Richtwerte für Lidl. Vorrat wie Öl und Gewürze ist nicht mitgerechnet.</p></section>';
+    '<details class="card acc" id="prepsteps" data-nofold' + (new Date().getDay() === 0 ? " open" : "") + '><summary><span class="acct">Sonntag: Reihenfolge zum Kochen</span></summary><div class="accbody"><ol class="prepsteps">' + steps + "</ol></div></details>" +
+    '<details class="card acc radshop" data-nofold><summary><span class="acct">Einkauf ca. ' + eur(c.calc.total) + '</span></summary><div class="accbody">' + shopListHTML(c.calc) + "</div></details>";
 }
 function renderPrep() { $("#panel-vorkochen").innerHTML = prepHTML(); }
 function prepTodayHTML() {
@@ -3094,9 +3132,9 @@ function renderToday() {
     '<div class="card"><div class="rday-h"><h3>Heute gegessen</h3>' + (day.items.length ? '<span class="rtot">ca. ' + eur(e.c) + " bei Lidl</span>" : "") + "</div>" +
     (day.items.length
       ? '<ul class="eatlist">' + day.items.map((x, i) => "<li><div><b>" + x.t + '</b><span class="muted small">' + x.p + " g Eiweiß, " + x.k + ' kcal</span></div><button class="btn icon sm" data-eatdel="' + i + '" aria-label="Eintrag löschen">' + ic("close") + "</button></li>").join("") + "</ul>"
-      : '<p class="muted">Noch nichts eingetragen. Trag ein, was du gegessen hast, oder tippe auf ein Rezept in den Vorschlägen.</p>') +
+      : '<p class="muted">Noch nichts eingetragen.</p>') +
     planHTML(rest, day) + '<div class="row"><button class="btn sm" type="button" data-tab="fortschritt" data-histgo="1">Alle Tage ansehen</button></div></div>' +
-    '<div class="grid2"><div class="card"><div class="rday-h"><h3>Wasser</h3><span class="rtot">' + nf(Math.round(day.water * 25) / 100) + " von " + nf(Math.round(GOALS.water * 25) / 100) + ' Litern</span></div><div class="glasses">' + glasses + '</div><p class="small muted">Ein Glas sind etwa 250 ml. Die DGE nennt rund 1,5 Liter am Tag.</p></div>' +
+    '<div class="grid2"><div class="card"><div class="rday-h"><h3>Wasser</h3><span class="rtot">' + nf(Math.round(day.water * 25) / 100) + " von " + nf(Math.round(GOALS.water * 25) / 100) + ' Litern</span></div><div class="glasses">' + glasses + '</div></div>' +
     '<div class="card"><h3>Serie</h3><div class="stats"><div class="stat"><span class="big">' + streak + '</span><span>Wochen in Folge mit mindestens 2 Einheiten</span></div><div class="stat"><span class="big">' + sessions.length + '</span><span>Einheiten insgesamt</span></div></div></div></div>';
 }
 
