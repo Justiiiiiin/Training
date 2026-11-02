@@ -583,6 +583,12 @@ body[data-coach="0"] .side { display: none; }
 .prepweek li:last-child { border-bottom: 0; }
 .prepsteps li.done .sname { opacity: 0.55; text-decoration: line-through; }
 .prepitem p { margin: 0; }
+.calcrows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.calcrows li { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.calcrows li.cunk { display: grid; }
+.calcrows li > div b { overflow-wrap: anywhere; }
+.calctot { padding: 10px 12px; border-radius: 12px; background: var(--surface-2); display: grid; gap: 2px; }
+.field.sm { max-width: 140px; }
 </style>
 </head>
 <body>
@@ -2980,6 +2986,123 @@ function renderToday() {
     planHTML(rest, day) + "</div>";
 }
 
+/* ======================= Selbst berechnen (Zutaten oder Gericht) ======================= */
+const CNORM = (x) => x.toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[^a-z0-9. ]/g, " ").replace(/\s+/g, " ").trim();
+const CSYN = {
+  haehn: "haehnchenbrust haehnchen haenchen hahnchen huhn huehnchen chicken haehnchenfilet", pute: "putenbrust pute putenfleisch putenschnitzel putenfilet", phack: "putenhack putenhackfleisch", rhack: "rinderhack rinderhackfleisch rindergehacktes",
+  ghack: "hackfleisch hack gehacktes", schink: "schinken kochschinken", paufs: "aufschnitt putenaufschnitt", ei: "ei eier eiern spiegelei ruehrei", skyr: "skyr", quark: "quark magerquark", jog35: "joghurt naturjoghurt", milch: "milch",
+  moz: "mozzarella", gouda: "gouda kaese schnittkaese", parm: "parmesan", hafer: "haferflocken hafer porridge", chia: "chia", mandel: "mandeln mandel", brot: "brot vollkornbrot brotscheibe graubrot mischbrot", wrap: "wrap wraps tortilla",
+  broetchen: "broetchen semmel vollkornbroetchen", nudel: "nudeln pasta spaghetti penne fusilli makkaroni tagliatelle", reis: "reis", couscous: "couscous", honig: "honig", oel: "oel olivenoel rapsoel sonnenblumenoel",
+  soja: "sojasauce", tmark: "tomatenmark", stueck: "stueckige tomaten|passierte tomaten|dosentomaten", tom: "tomate tomaten", gurke: "gurke gurken salatgurke", pap: "paprika", zwie: "zwiebel zwiebeln", karo: "karotte karotten moehre moehren",
+  eisb: "eisbergsalat salat eisberg", spin: "spinat", ruc: "rucola", sgurke: "saure gurke|saure gurken|gewuerzgurke|gewuerzgurken", knob: "knoblauch", banane: "banane bananen", erdb: "erdbeeren erdbeere", kiche: "kichererbsen",
+  bohne: "kidneybohnen bohnen", linse: "linsen", kokos: "kokosmilch", bruehe: "gemuesebruehe bruehe", zitrone: "zitronensaft zitrone", senf: "senf", kakao: "kakao", schnitzel: "schweineschnitzel schnitzel schweinefleisch", curry: "currypulver curry"
+};
+const CDEF = { gouda: 30, moz: 60, parm: 15, schink: 40, paufs: 40, quark: 150, skyr: 150, jog35: 150, hafer: 50, mandel: 20, chia: 15, reis: 80, nudel: 100, couscous: 70, milch: 200, eisb: 80, gurke: 100, spin: 80, ruc: 30, erdb: 150, kiche: 120, bohne: 120, linse: 60, kokos: 100, bruehe: 200, stueck: 200 };
+/* weitere Lebensmittel: [Schlüssel (| getrennt), Name, kcal/100 g, Eiweiß/100 g, Gramm je Stück, Standardmenge in g, ca. € pro 100 g] */
+const CEXTRA = [
+  ["kartoffel|kartoffeln", "Kartoffeln", 77, 2, 120, 200, 0.15], ["pommes|pommes frites", "Pommes (Ofen oder Fritteuse)", 200, 3, 0, 150, 0.35], ["toast|toastbrot", "Toastbrot", 265, 8, 25, 50, 0.18], ["broetchen hell|weissbrot|baguette", "Weißbrot", 265, 8.5, 0, 60, 0.2],
+  ["butter", "Butter", 740, 0.7, 0, 10, 0.9], ["frischkaese", "Frischkäse", 200, 6, 0, 30, 0.45], ["sahne", "Sahne", 300, 2.4, 0, 50, 0.3], ["schmand|creme fraiche", "Schmand", 200, 3, 0, 40, 0.3], ["salami", "Salami", 430, 22, 0, 30, 1.2],
+  ["leberwurst|teewurst", "Streichwurst", 300, 12, 0, 30, 0.7], ["mehl", "Mehl", 350, 10, 0, 50, 0.1], ["muesli", "Müsli", 370, 10, 0, 60, 0.4], ["cornflakes", "Cornflakes", 380, 7, 0, 40, 0.35], ["zucker", "Zucker", 400, 0, 5, 10, 0.12],
+  ["apfel|aepfel", "Apfel", 52, 0.3, 180, 180, 0.3], ["orange|orangen", "Orange", 47, 0.9, 200, 200, 0.3], ["birne|birnen", "Birne", 57, 0.4, 170, 170, 0.35], ["weintrauben|trauben", "Weintrauben", 70, 0.7, 0, 100, 0.5],
+  ["zucchini", "Zucchini", 17, 1.2, 0, 150, 0.2], ["champignons|pilze", "Champignons", 22, 3, 0, 100, 0.4], ["brokkoli", "Brokkoli", 34, 2.8, 0, 150, 0.35], ["mais", "Mais (Dose)", 80, 3, 0, 100, 0.25],
+  ["ketchup", "Ketchup", 110, 1.2, 0, 20, 0.25], ["mayo|mayonnaise", "Mayonnaise", 700, 1, 0, 15, 0.3], ["tomatensauce|tomatensosse", "Tomatensoße (Glas)", 50, 1.6, 0, 150, 0.2],
+  ["schokolade", "Schokolade", 540, 6.5, 0, 25, 0.6], ["nutella|nussnougatcreme", "Nuss-Nougat-Creme", 540, 6, 0, 20, 0.5], ["chips", "Chips", 530, 6, 0, 50, 0.9], ["gummibaerchen|gummibaeren", "Gummibärchen", 340, 7, 0, 30, 0.6],
+  ["cola|limo|limonade", "Cola oder Limonade", 42, 0, 0, 330, 0.1], ["saft|apfelsaft|orangensaft", "Saft", 45, 0.5, 0, 200, 0.12], ["energy|energydrink", "Energy-Drink", 45, 0, 0, 250, 0.2], ["bier", "Bier", 43, 0.5, 0, 500, 0.2],
+  ["proteinpulver|whey|eiweisspulver", "Proteinpulver", 380, 75, 30, 30, 2.5], ["tiefkuehlpizza|pizza tk", "Tiefkühlpizza", 250, 10, 350, 350, 0.55]
+];
+/* Gerichte außer Haus oder Fertiggerichte, Richtwerte je Portion: [Schlüssel, Name, kcal, Eiweiß] */
+const CDISH = [
+  ["doenerteller", "Dönerteller", 950, 45], ["duerum|doener duerum", "Dürüm", 800, 38], ["doener", "Döner", 750, 38], ["big mac", "Big Mac", 510, 26], ["cheeseburger", "Cheeseburger", 310, 16], ["hamburger|burger", "Burger", 450, 22],
+  ["currywurst", "Currywurst mit Pommes", 850, 26], ["bratwurst broetchen|bratwurst im broetchen", "Bratwurst im Brötchen", 450, 17], ["stueck pizza", "Stück Pizza", 280, 11], ["pizza margherita|pizza", "Pizza (ganz, Restaurant)", 850, 32],
+  ["spaghetti bolognese|nudeln bolognese", "Spaghetti Bolognese (Restaurant)", 780, 32], ["lasagne", "Lasagne", 650, 30], ["schnitzel mit pommes|schnitzel pommes", "Schnitzel mit Pommes", 950, 42], ["hirtensalat|salat mit haehnchen", "Salat mit Hähnchen", 450, 32],
+  ["leberkaesbroetchen|leberkaes broetchen|leberkaese", "Leberkäsbrötchen", 520, 20], ["kaesebroetchen|broetchen mit kaese|belegtes broetchen", "Brötchen mit Käse", 380, 17], ["schinkenbroetchen|broetchen mit schinken", "Brötchen mit Schinken", 350, 18],
+  ["croissant", "Croissant", 280, 5], ["latte macchiato", "Latte macchiato", 150, 8], ["cappuccino", "Cappuccino", 90, 5], ["kaffee mit milch", "Kaffee mit Milch", 40, 2], ["eis|eiskugel", "Eiskugel", 90, 1.5], ["muesliriegel", "Müsliriegel", 100, 2]
+];
+const CFOODS = (() => {
+  const L = [], nm = (s) => s.split("|").map((x) => CNORM(x));
+  Object.keys(PRICE).forEach((k) => { const p = PRICE[k]; L.push({ id: k, name: p.n.replace(/ \(.*\)/, "").replace(/^Scheibe /, ""), kcal: p.kcal, p: p.p, per: p.u === "g" || p.u === "ml" ? 0 : p.per, pu: p.u, def: CDEF[k] || (p.u === "g" || p.u === "ml" ? 100 : p.per), eur: p.price / p.pack * 100, keys: (CSYN[k] || "").split(" ").flatMap((x) => x.split("|")).filter(Boolean), raw: ["reis", "nudel", "couscous", "linse"].includes(k) }); });
+  CEXTRA.forEach((x, i) => L.push({ id: "x" + i, name: x[1], kcal: x[2], p: x[3], per: x[4], pu: x[4] ? "Stk" : "g", def: x[5], eur: x[6], keys: nm(x[0]), raw: false }));
+  return L;
+})();
+function cMatch(list, text) {
+  let best = null, bl = 0;
+  list.forEach((it) => it.keys.forEach((k) => {
+    const words = text.split(" ");
+    const hit = k.includes(" ") ? (" " + text + " ").includes(" " + k + " ") : words.some((w) => w === k || (k.length >= 5 && w.includes(k)) || (k.length >= 4 && w.length > k.length && (w === k + "n" || w === k + "s" || w === k + "en" || w === k + "e")));
+    if (hit && k.length > bl) { best = it; bl = k.length; }
+  }));
+  return best;
+}
+const CDISHL = CDISH.map((d) => ({ name: d[1], kcal: d[2], p: d[3], keys: d[0].split("|").map(CNORM) }));
+const CUNIT = { g: "g", gr: "g", gramm: "g", kg: "kg", ml: "ml", l: "l", liter: "l", el: "el", essloeffel: "el", tl: "tl", teeloeffel: "tl", stk: "stk", stueck: "stk", x: "stk", scheibe: "scheibe", scheiben: "scheibe", dose: "dose", dosen: "dose", becher: "becher", packung: "packung", portion: "portion", portionen: "portion" };
+function cGrams(f, n, unit) {
+  const per = f && f.per > 1 ? f.per : 0;
+  switch (unit) {
+    case "g": case "ml": return n; case "kg": case "l": return n * 1000;
+    case "el": return n * (f && f.pu === "EL" ? f.per : 15); case "tl": return n * (f && f.pu === "TL" ? f.per : 5);
+    case "stk": return n * (per || (f && f.def) || 100); case "scheibe": return n * (f && f.pu === "Stk" ? f.per : 30);
+    case "dose": return n * (f && ["kiche", "bohne"].includes(f.id) ? 240 : 400); case "becher": return n * 150; case "packung": return n * 250; case "portion": return n * ((f && f.def) || 150);
+    default: return per && n < 20 ? n * per : n >= 10 ? n : n * ((f && f.def) || 100);
+  }
+}
+function cParse(text) {
+  const pre = text.replace(/½/g, " 0.5 ").replace(/¼/g, " 0.25 ").replace(/(\d),(\d)/g, "$1.$2").replace(/(\d)\/(\d)/g, (m, a, b) => " " + (a / b) + " ");
+  const segs = pre.split(/\n|;|\+|,|\s+und\s+|\s+mit\s+|\s+plus\s+/i).map((x) => x.trim()).filter(Boolean).slice(0, 25);
+  return segs.map((raw) => {
+    let t = CNORM(raw), cooked = /gekocht/.test(t), fried = /gebraten|gegart|gegrillt|gebacken|angebraten/.test(t); t = t.replace(/gekochte[rnms]?|gekocht|gebratene[rnms]?|gebraten|gegarte[rnms]?|gegart|gegrillte[rnms]?|gegrillt|gebackene[rnms]?|angebratene[rnms]?/g, " ").replace(/\s+/g, " ").trim();
+    let n = null, unit = "";
+    const m = t.match(/(\d+(?:\.\d+)?|halbe[rsn]?|halb)\s*(kg|gramm|gr|g|ml|liter|l|el|essloeffel|tl|teeloeffel|stk|stueck|x|scheiben|scheibe|dosen|dose|becher|packung|portionen|portion)?(?![a-z])/);
+    if (m) { n = /^halb/.test(m[1]) ? 0.5 : parseFloat(m[1]); unit = CUNIT[m[2]] || ""; t = (t.slice(0, m.index) + " " + t.slice(m.index + m[0].length)).replace(/\s+/g, " ").trim(); }
+    const mult = n != null && !unit ? n : 1, name = t || raw;
+    const dish = cMatch(CDISHL, t);
+    if (dish && (!n || !unit || unit === "stk" || unit === "portion")) return { raw, kind: "dish", name: dish.name, qty: (n != null ? n : 1) + " Portion" + ((n != null ? n : 1) === 1 ? "" : "en"), k: dish.kcal * (n != null ? n : 1), p: dish.p * (n != null ? n : 1), c: null };
+    const f = cMatch(CFOODS, t);
+    if (!f) return { raw, kind: "unknown", name: raw, g: n != null ? Math.max(1, Math.round(cGrams(null, n, unit))) : 100, k: null, p: null, c: null };
+    let g = n == null ? f.def : cGrams(f, n, unit), note = "";
+    if (cooked && f.raw) { g *= 0.37; note = "gekocht gerechnet"; }
+    else if ((cooked || fried) && ["haehn", "pute", "phack", "rhack", "ghack", "schnitzel"].includes(f.id)) { g *= 1.3; note = "gegart gerechnet, Fleisch verliert beim Garen Wasser"; }
+    g = Math.round(g);
+    return { raw, kind: "food", name: f.name, g, qty: g + " g", k: g * f.kcal / 100, p: g * f.p / 100, c: g * f.eur / 100, note, def: n == null };
+  });
+}
+let CALC = { text: "", rows: null, man: {}, srv: 1, name: "", ai: false, busy: false, err: "" };
+function cRowVals(r, i) {
+  if (r.kind !== "unknown") return r;
+  const m = CALC.man[i]; if (!m || !(m.k >= 0) || !(m.p >= 0) || m.k === "" || m.p === "") return r;
+  return Object.assign({}, r, { kind: "manual", k: r.g * m.k / 100, p: r.g * m.p / 100 });
+}
+function cTotals() {
+  const rows = (CALC.rows || []).map(cRowVals), ok = rows.filter((r) => r.k != null);
+  return { k: ok.reduce((a, r) => a + r.k, 0), p: ok.reduce((a, r) => a + r.p, 0), c: ok.every((r) => r.c != null) && ok.length ? ok.reduce((a, r) => a + r.c, 0) : null, open: rows.filter((r) => r.k == null).length, rows };
+}
+function calcHTML() {
+  let out = "";
+  if (CALC.err) out += '<p class="small warnt" role="status">' + CALC.err + "</p>";
+  if (CALC.rows) {
+    const T = cTotals(), per = Math.max(1, CALC.srv);
+    out += '<ul class="calcrows">' + T.rows.map((r, i) => {
+      if (r.kind === "unknown") return '<li class="cunk"><div><b>' + r.raw + '</b><span class="muted small"> nicht erkannt. Trag Werte pro 100 g ein, dann rechne ich mit ' + r.g + ' g:</span></div><div class="row"><label class="field sm">kcal<input type="number" class="calcman" data-i="' + i + '" data-f="k" min="0" max="900" inputmode="decimal"></label><label class="field sm">Eiweiß g<input type="number" class="calcman" data-i="' + i + '" data-f="p" min="0" max="100" inputmode="decimal"></label></div></li>';
+      return "<li><div><b>" + r.name + '</b><span class="muted small"> ' + (r.qty || "") + (r.note ? ", " + r.note : "") + (r.def ? " (Standardmenge, ändere sie oben)" : "") + '</span></div><span class="small">' + Math.round(r.k) + " kcal, " + (Math.round(r.p * 10) / 10).toLocaleString("de-DE") + " g Eiweiß" + (r.c != null ? ", ca. " + eur(r.c) : "") + "</span></li>";
+    }).join("") + "</ul>";
+    if (CALC.rows.some((r) => r.kind === "unknown")) out += '<div class="row"><button class="btn" type="button" data-calcre="1">Neu rechnen</button></div>';
+    out += '<div class="calctot"><b>Zusammen: ' + Math.round(T.k) + " kcal, " + (Math.round(T.p * 10) / 10).toLocaleString("de-DE") + " g Eiweiß" + (T.c != null ? ", ca. " + eur(T.c) + " bei Lidl" : "") + "</b>" + (T.open ? '<span class="small muted"> ohne ' + T.open + " nicht erkannte Zutat" + (T.open > 1 ? "en" : "") + "</span>" : "") + "</div>" +
+      '<div class="row"><label class="field sm">Aufgeteilt auf Personen<input type="number" id="calc-srv" min="1" max="8" value="' + CALC.srv + '" inputmode="numeric"></label><label class="field">Name im Tagebuch<input type="text" id="calc-name" maxlength="60" value="' + CALC.name.replace(/"/g, "&quot;") + '"></label></div>' +
+      (per > 1 ? '<p class="small">Für dich: ' + Math.round(T.k / per) + " kcal, " + (Math.round(T.p / per * 10) / 10).toLocaleString("de-DE") + " g Eiweiß</p>" : "") +
+      '<div class="row"><button class="btn primary" type="button" data-calcadd="1">Heute eintragen</button></div><p class="small muted">Richtwerte. Reis, Nudeln, Couscous und Linsen gelten als Rohgewicht, außer du schreibst „gekocht“.</p>';
+  }
+  return '<h4>Selbst berechnen</h4><p class="small muted">Schreib Zutaten mit Menge oder ein Gericht, zum Beispiel „200 g Hähnchen, 150 g Reis, 1 Paprika“ oder „Döner“.</p>' +
+    '<label class="field">Zutaten oder Gericht<textarea id="calc-in" rows="3" maxlength="400" placeholder="200 g Hähnchen, 150 g Reis, 1 Paprika">' + CALC.text.replace(/</g, "&lt;") + "</textarea></label>" +
+    '<div class="row"><button class="btn primary" type="button" data-calcgo="1">Berechnen</button></div>' + out;
+}
+function calcGo() { CALC.text = ($("#calc-in") || {}).value || CALC.text; CALC.rows = cParse(CALC.text); CALC.man = {}; CALC.err = ""; CALC.ai = false; CALC.srv = 1; CALC.name = CALC.text.split(/[\n,;]/)[0].slice(0, 40).trim(); drawEat(); }
+function calcRead() { $$(".calcman").forEach((el) => { const i = el.dataset.i; CALC.man[i] = CALC.man[i] || {}; CALC.man[i][el.dataset.f] = el.value === "" ? "" : parseFloat(el.value); }); }
+function calcAdd() {
+  const T = cTotals(), srv = Math.max(1, Math.min(8, parseInt(($("#calc-srv") || {}).value, 10) || 1)), name = ((($("#calc-name") || {}).value) || CALC.name || "Eigenes Gericht").trim() || "Eigenes Gericht";
+  CALC.srv = srv; if (!T.rows.some((r) => r.k != null)) return;
+  dayEns().items.push({ t: name + (srv > 1 ? " (1 von " + srv + ")" : ""), k: Math.round(T.k / srv), p: Math.round(T.p / srv), c: T.c != null ? Math.round(T.c / srv * 100) / 100 : 0 });
+  saveToday(); renderToday(); const ok = name; CALC = { text: "", rows: null, man: {}, srv: 1, name: "", ai: false, busy: false, err: "" }; drawEat("Eingetragen: " + ok);
+}
+
 /* Essen eintragen */
 let EATQ = "";
 function drawEat(msg) {
@@ -2989,7 +3112,7 @@ function drawEat(msg) {
     '<div class="search">' + ic("search") + '<input type="search" id="eatq" placeholder="Rezept suchen, z. B. Quark oder Wrap" value="' + EATQ.replace(/"/g, "&quot;") + '" aria-label="Rezept suchen"></div>' +
     '<p class="small muted" role="status">' + (msg || (q ? l.length + " Treffer" : "Vorschläge für heute")) + "</p>" +
     '<ul class="eatlist">' + (l.length ? l.map((r) => "<li><div><b>" + r.title + '</b><span class="muted small">' + r.protein + " g Eiweiß, " + r.kcal + " kcal, ca. " + eur(r.cost) + '</span></div><button class="btn sm" data-eat="' + r.id + '">Eintragen</button></li>').join("") : '<li class="muted">Kein Rezept gefunden. Trag es unten selbst ein.</li>') + "</ul>" +
-    '<h4>Etwas anderes gegessen?</h4><form id="eatform" class="form"><label class="field">Name<input type="text" id="e-name" maxlength="60" required></label><label class="field">kcal<input type="number" id="e-k" min="0" max="3000" inputmode="numeric" required></label><label class="field">Eiweiß in g<input type="number" id="e-p" min="0" max="300" inputmode="numeric" required></label><button class="btn primary" type="submit">Eintragen</button></form></div>';
+    calcHTML() + '<h4>Etwas anderes gegessen?</h4><form id="eatform" class="form"><label class="field">Name<input type="text" id="e-name" maxlength="60" required></label><label class="field">kcal<input type="number" id="e-k" min="0" max="3000" inputmode="numeric" required></label><label class="field">Eiweiß in g<input type="number" id="e-p" min="0" max="300" inputmode="numeric" required></label><button class="btn primary" type="submit">Eintragen</button></form></div>';
 }
 function openEat() { EATQ = ""; drawEat(); showDialog($("#dlg-eat"), $('[data-eatopen]')); }
 
@@ -3182,6 +3305,7 @@ $("#cmd").addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.pre
 
 /* ======================= Ereignisse ======================= */
 function openSettings() { showDialog($("#dlg-settings"), $("#b-settings")); }
+document.addEventListener("input", (ev) => { const t = ev.target; if (t && t.id === "calc-in") CALC.text = t.value; if (t && t.id === "calc-name") CALC.name = t.value; });
 document.addEventListener("click", (ev) => {
   const t = ev.target.closest("button"); if (!t) return;
   if (t.dataset.v3 != null && t.dataset.v3 !== "") return openV3(t.dataset.v3, t.dataset.i != null && t.dataset.i !== "" ? parseInt(t.dataset.i, 10) : null, t);
@@ -3194,6 +3318,9 @@ document.addEventListener("click", (ev) => {
   }
   if (t.dataset.prepgen) { prepGen(t.dataset.prepgen); return renderPrep(); }
   if (t.dataset.prepcart) { const c = prepCalc(); c.entries.forEach((e) => cartAdd(e.id, e.n)); t.textContent = "Übernommen"; return; }
+  if (t.dataset.calcgo) return calcGo();
+  if (t.dataset.calcre) { calcRead(); return drawEat(); }
+  if (t.dataset.calcadd) { calcRead(); return calcAdd(); }
   if (t.dataset.swapopen) return openSwap(t.dataset.swapopen, t);
   if (t.dataset.swap) return doSwap(t.dataset.swap, t.dataset.mode);
   if (t.dataset.reps) { if (W.phase === "work") setDone(parseInt(t.dataset.reps, 10)); return; }
