@@ -9,54 +9,54 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
 <style>
 /* Layout: links eine dunkle „Stoppuhr“ mit Timer-Ring und Übungsliste, rechts ein Segment-Menü für Übungen, Rezepte, Glücksrad, Ernährung, Tipps, Fortschritt. Unter 980 px eine Spalte. */
-/* Farben: warmes Creme, ruhiges Blaugrün, nichts Grelles */
+/* Farben: warmes Creme, gedämpftes Terrakotta und Salbei, weiche braune Schrift. Kein reines Weiß, kein reines Schwarz. */
 :root {
-  --bg: #f1eee6;
-  --surface: #fbf9f4;
-  --surface-2: #efebe1;
-  --track: #e2ddd0;
-  --ink: #2a2f33;
-  --muted: #646b70;
-  --line: #dcd6c8;
-  --accent: #35788a;
+  --bg: #f6f0e6;
+  --surface: #fffaf1;
+  --surface-2: #f0e7d8;
+  --track: #e6dccb;
+  --ink: #3a3128;
+  --muted: #6f6558;
+  --line: #e3d8c5;
+  --accent: #b05d3f;
   --accent-ink: #ffffff;
-  --accent-soft: #dbe9ee;
-  --good: #2f7d57;
-  --good-soft: #dcefe4;
-  --warn: #9a5b00;
-  --wheel-a: #fffdf8;
-  --wheel-b: #e9e4d6;
+  --accent-soft: #f2dccf;
+  --good: #4e6e4a;
+  --good-soft: #e0e9d4;
+  --warn: #8f5a10;
+  --wheel-a: #fffaf1;
+  --wheel-b: #eadfcc;
   --display: "Bricolage Grotesque", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
   --body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --material: rgba(241, 238, 230, 0.82);
-  --material-line: rgba(60, 50, 30, 0.08);
+  --material: rgba(246, 240, 230, 0.86);
+  --material-line: rgba(90, 70, 40, 0.09);
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --r-lg: 26px;
   --r-md: 18px;
   --r-sm: 12px;
-  --shadow: 0 1px 1px rgba(60, 50, 30, 0.04), 0 8px 24px -10px rgba(60, 50, 30, 0.14);
+  --shadow: 0 1px 0 rgba(90, 70, 40, 0.06), 0 6px 18px -12px rgba(90, 70, 40, 0.18);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1c2226;
-    --surface: #252d32;
-    --surface-2: #2e373d;
-    --track: #384248;
-    --ink: #e9ece7;
-    --muted: #a5afb2;
-    --line: #3b464c;
-    --accent: #86c3d3;
-    --accent-ink: #0e2730;
-    --accent-soft: #244049;
-    --good: #82d1a6;
-    --good-soft: #213f31;
+    --bg: #221f1b;
+    --surface: #2c2823;
+    --surface-2: #36312b;
+    --track: #413a33;
+    --ink: #ece4d8;
+    --muted: #b3a898;
+    --line: #443d35;
+    --accent: #e0a283;
+    --accent-ink: #2a160d;
+    --accent-soft: #4b362b;
+    --good: #a9c79a;
+    --good-soft: #2f3b2b;
     --warn: #e6b866;
-    --wheel-a: #2b343a;
-    --wheel-b: #20282d;
-    --material: rgba(28, 34, 38, 0.82);
+    --wheel-a: #332e28;
+    --wheel-b: #28241f;
+    --material: rgba(34, 31, 27, 0.86);
     --material-line: rgba(255, 255, 255, 0.07);
-    --shadow: 0 1px 1px rgba(0, 0, 0, 0.3), 0 10px 28px -10px rgba(0, 0, 0, 0.45);
+    --shadow: 0 1px 0 rgba(0, 0, 0, 0.25), 0 8px 22px -12px rgba(0, 0, 0, 0.5);
     color-scheme: dark;
   }
 }
@@ -109,7 +109,7 @@ a { color: var(--accent); }
 .card p, .card li { max-width: 68ch; }
 
 /* Coach: immer dunkel, wie eine Stoppuhr */
-.coach { --surface: #34454e; --surface-2: #3f525c; --track: #4c616c; --ink: #f2f4f0; --muted: #b3bfc3; --line: #50656f; --accent: #93cfdd; --accent-ink: #0e2730; --accent-soft: #3a5a66; --good: #86d8ad; --warn: #efc472; background: #2c3b44; color: var(--ink); gap: 18px; padding: 24px; box-shadow: 0 1px 1px rgba(30, 40, 50, 0.2), 0 18px 40px -18px rgba(30, 45, 55, 0.45); }
+.coach { --surface: #536b59; --surface-2: #5a7260; --track: #688170; --ink: #f7f1e6; --muted: #eef2ea; --line: #6b8573; --accent: #f1cba9; --accent-ink: #3a2414; --accent-soft: #7a6c58; --good: #c4e5b4; --warn: #f4d58f; background: #4d6553; color: var(--ink); gap: 18px; padding: 24px; box-shadow: 0 1px 0 rgba(40, 55, 45, 0.2), 0 14px 32px -18px rgba(50, 70, 55, 0.5); }
 .coach .btn { background: var(--surface-2); }
 .coach .btn:hover { background: var(--track); }
 .coach .btn.primary { background: var(--accent); }
@@ -626,12 +626,38 @@ body[data-coach="0"] .side { display: none; }
 .weekpick { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px; border-radius: 16px; background: var(--surface-2); }
 .weekpick > div { display: grid; text-align: center; line-height: 1.25; }
 .weekpick .btn[disabled] { opacity: 0.35; }
+
+/* Ruhigeres Layout: flache Karten mit feiner Linie, mehr Luft, kleinere Titel */
+.card { box-shadow: none; border: 1px solid var(--line); }
+.coach { border: 0; }
+.card h3 { letter-spacing: -0.01em; }
+.hero { background: var(--surface); }
+.plancol > summary { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; cursor: pointer; list-style: none; padding: 10px 14px; border-radius: 14px; background: var(--surface-2); font-weight: 650; }
+.plancol > summary::-webkit-details-marker { display: none; }
+.plancol > summary::after { content: "›"; transform: rotate(90deg); font-size: 1.25rem; line-height: 1; transition: transform 0.2s var(--ease); }
+.plancol[open] > summary::after { transform: rotate(-90deg); }
+.plancol[open] > summary { margin-bottom: 10px; }
+.plancol > summary > span:first-child { white-space: nowrap; }
+.plancol > summary { flex-wrap: wrap; row-gap: 2px; }
+#panel-heute .grid2 .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+#panel-heute .grid2 .stat { padding: 12px 14px; }
+#panel-heute .grid2 .stat .big { font-size: 1.75rem; }
+#panel-heute .grid2 .stat span:last-child { font-size: 0.8125rem; line-height: 1.3; }
+@media (max-width: 640px) {
+  .app { padding-top: 10px; }
+  .pagetitle { font-size: 1.75rem !important; }
+  .pagehead { padding-top: 6px !important; }
+  .btn { min-height: 46px; }
+  .card h3 { font-size: 1.125rem; }
+  .card { gap: 12px; }
+  .eatlist li { padding: 6px 0; }
+}
 </style>
 </head>
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.2 · 02.11. 16:59</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.3 · 02.11. 21:28</span>
 <header class="top">
   <div class="brand"><h1>Fitness Coach</h1><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -2895,6 +2921,7 @@ function planAll() {
   saveToday(); renderToday();
 }
 function planNew() { const day = dayEns(), free = !!(day.plan && day.plan.free), done = day.plan ? day.plan.done : [], ids = makeDayPlan(free); if (ids) { day.plan = { ids, done: ids.map(() => false), free }; saveToday(); renderToday(); } }
+let PLANOPEN = null;
 function planHTML(rest, day) {
   const open = day.plan && day.plan.done.some((d) => !d);
   if (rest <= 8 && !open) return day.items.length ? '<p class="warnt" style="color:var(--good)">Eiweißziel für heute erreicht.</p>' : "";
@@ -2903,10 +2930,11 @@ function planHTML(rest, day) {
   const tp = recs.reduce((a, r) => a + r.protein, 0), tk = recs.reduce((a, r) => a + r.kcal, 0), tc = recs.reduce((a, r) => a + r.cost, 0);
   const rows = recs.map((r, i) => '<li class="pslot' + (pl.done[i] ? " done" : "") + '"><div class="pl-l"><span class="pl-when">' + lab[i] + '</span><button class="pl-title" type="button" data-recipe="' + r.id + '">' + r.title + '</button><span class="muted small">' + r.protein + " g Eiweiß, " + r.kcal + " kcal, ca. " + eur(r.cost) + '</span></div><div class="pl-b">' +
     (pl.done[i] ? '<span class="pl-ok">Eingetragen</span>' : '<button class="btn sm" type="button" data-plan="' + i + '">Eintragen</button><button class="btn icon sm" type="button" data-planre="' + i + '" aria-label="Anderes Gericht für ' + lab[i] + '" title="Anderes Gericht">' + ic("repeat") + "</button>") + "</div></li>").join("");
-  return '<div class="plan"><div class="plan-h"><b>Vorschlag für heute</b><span class="muted small">zusammen ca. ' + tp + " g Eiweiß, " + tk.toLocaleString("de-DE") + " kcal, " + eur(tc) + '</span></div><ul class="planlist">' + rows + "</ul>" +
+  const po = PLANOPEN == null ? !isSheet() : PLANOPEN;
+  return '<details class="plancol" id="plancol"' + (po ? " open" : "") + '><summary><span>Vorschlag für heute</span><span class="muted small">ca. ' + tp + " g Eiweiß, " + tk.toLocaleString("de-DE") + " kcal</span></summary><div class=\"plan\"><ul class=\"planlist\">" + rows + "</ul>" +
     '<div class="row plan-act">' + (open ? '<button class="btn primary" type="button" data-planall="all">Alles eintragen</button>' : "") + '<button class="btn" type="button" data-planall="new">Neu vorschlagen</button></div>' +
     '<label class="check"><input type="checkbox" id="plan-small"' + (GOALS.pause !== "meal" ? " checked" : "") + (pl.free ? " disabled" : "") + '> Pause: nur eine Kleinigkeit zum Mitnehmen</label>' +
-    '<label class="check"><input type="checkbox" id="plan-free"' + (pl.free ? " checked" : "") + "> Heute arbeitsfrei</label></div>";
+    '<label class="check"><input type="checkbox" id="plan-free"' + (pl.free ? " checked" : "") + "> Heute arbeitsfrei</label></div></details>";
 }
 function logEat(r, portions) {
   const n = portions || 1;
@@ -3063,13 +3091,13 @@ function renderToday() {
     ringHTML(wc / trainDays(), "var(--ink)", wc, "von " + trainDays(), "Training") + "</div>" +
     '<p class="small muted">Eiweiß ist für den Muskelaufbau am wichtigsten. Die Ziele änderst du bei den Einstellungen (Zahnrad).</p></div>' +
     prepTodayHTML() +
-    '<div class="grid2"><div class="card"><div class="rday-h"><h3>Wasser</h3><span class="rtot">' + nf(Math.round(day.water * 25) / 100) + " von " + nf(Math.round(GOALS.water * 25) / 100) + ' Litern</span></div><div class="glasses">' + glasses + '</div><p class="small muted">Ein Glas sind etwa 250 ml. Die DGE nennt rund 1,5 Liter am Tag.</p></div>' +
-    '<div class="card"><h3>Serie</h3><div class="stats"><div class="stat"><span class="big">' + streak + '</span><span>Wochen in Folge mit mindestens 2 Einheiten</span></div><div class="stat"><span class="big">' + sessions.length + '</span><span>Einheiten insgesamt</span></div></div></div></div>' +
     '<div class="card"><div class="rday-h"><h3>Heute gegessen</h3>' + (day.items.length ? '<span class="rtot">ca. ' + eur(e.c) + " bei Lidl</span>" : "") + "</div>" +
     (day.items.length
       ? '<ul class="eatlist">' + day.items.map((x, i) => "<li><div><b>" + x.t + '</b><span class="muted small">' + x.p + " g Eiweiß, " + x.k + ' kcal</span></div><button class="btn icon sm" data-eatdel="' + i + '" aria-label="Eintrag löschen">' + ic("close") + "</button></li>").join("") + "</ul>"
       : '<p class="muted">Noch nichts eingetragen. Trag ein, was du gegessen hast, oder tippe auf ein Rezept in den Vorschlägen.</p>') +
-    planHTML(rest, day) + '<div class="row"><button class="btn sm" type="button" data-tab="fortschritt" data-histgo="1">Alle Tage ansehen</button></div></div>';
+    planHTML(rest, day) + '<div class="row"><button class="btn sm" type="button" data-tab="fortschritt" data-histgo="1">Alle Tage ansehen</button></div></div>' +
+    '<div class="grid2"><div class="card"><div class="rday-h"><h3>Wasser</h3><span class="rtot">' + nf(Math.round(day.water * 25) / 100) + " von " + nf(Math.round(GOALS.water * 25) / 100) + ' Litern</span></div><div class="glasses">' + glasses + '</div><p class="small muted">Ein Glas sind etwa 250 ml. Die DGE nennt rund 1,5 Liter am Tag.</p></div>' +
+    '<div class="card"><h3>Serie</h3><div class="stats"><div class="stat"><span class="big">' + streak + '</span><span>Wochen in Folge mit mindestens 2 Einheiten</span></div><div class="stat"><span class="big">' + sessions.length + '</span><span>Einheiten insgesamt</span></div></div></div></div>';
 }
 
 /* ======================= Selbst berechnen (Zutaten oder Gericht) ======================= */
@@ -3499,6 +3527,7 @@ $("#cmd").addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.pre
 
 /* ======================= Ereignisse ======================= */
 function openSettings() { showDialog($("#dlg-settings"), $("#b-settings")); }
+document.addEventListener("click", (ev) => { const sm = ev.target.closest && ev.target.closest("summary"); if (sm && sm.parentElement && sm.parentElement.id === "plancol") { const d = sm.parentElement; setTimeout(() => { PLANOPEN = d.open; }, 0); } });
 document.addEventListener("input", (ev) => { const t = ev.target; if (t && t.id === "calc-in") CALC.text = t.value; if (t && (t.id === "calc-name" || t.id === "calc-name0")) CALC.name = t.value; if (t && t.classList && t.classList.contains("myd-g")) mydFromInput(parseInt(t.dataset.i, 10)); });
 document.addEventListener("click", (ev) => {
   const t = ev.target.closest("button"); if (!t) return;
@@ -4066,11 +4095,11 @@ function makeView(opts) {
   const rgb = (c, a) => "rgba(" + Math.round(c[0]) + "," + Math.round(c[1]) + "," + Math.round(c[2]) + "," + (a == null ? 1 : a) + ")";
   const mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
   function palette() {
-    if (opts.dark) return { acc: [147, 207, 221], ink: [242, 244, 240], bg: [44, 59, 68], muted: [179, 191, 195], dark: true, near: [147, 207, 221], far: [92, 148, 164], hot: [255, 150, 85], nose: [236, 238, 242], torso: [214, 221, 224], head: [235, 239, 239], line: [20, 30, 36], floor: [255, 255, 255], grid: [255, 255, 255], floorA: 0.06, gridA: 0.1 };
+    if (opts.dark) return { acc: [241, 203, 169], ink: [247, 241, 230], bg: [77, 101, 83], muted: [238, 242, 234], dark: true, near: [214, 236, 220], far: [150, 186, 162], hot: [255, 150, 85], nose: [236, 238, 242], torso: [247, 241, 230], head: [250, 245, 236], line: [40, 58, 46], floor: [255, 255, 255], grid: [255, 255, 255], floorA: 0.06, gridA: 0.1 };
     const cs = getComputedStyle(document.documentElement), g = (n, d) => (cs.getPropertyValue(n).trim() || d);
     const acc = rgbOf(g("--accent", "#3b4bd6")), ink = rgbOf(g("--ink", "#111")), bg = rgbOf(g("--surface", "#fff")), muted = rgbOf(g("--muted", "#666"));
     const dark = (bg[0] + bg[1] + bg[2]) / 3 < 128;
-    return { acc, ink, bg, muted, dark, hot: dark ? [255, 146, 80] : [226, 98, 28], nose: mixc(ink, bg, 0.65), near: acc, far: mixc(acc, dark ? [0, 0, 0] : [20, 20, 40], 0.45), torso: mixc(ink, bg, dark ? 0.35 : 0.2), head: mixc(ink, bg, dark ? 0.2 : 0.1), line: dark ? [0, 0, 0] : [255, 255, 255], floor: mixc(bg, ink, 0.07), grid: mixc(bg, ink, 0.18), floorA: 1, gridA: 0.55 };
+    return { acc, ink, bg, muted, dark, hot: dark ? [255, 150, 85] : [226, 98, 28], nose: mixc(ink, bg, 0.65), near: dark ? [170, 206, 184] : [86, 128, 106], far: dark ? [112, 148, 126] : [52, 88, 74], torso: mixc(ink, bg, dark ? 0.35 : 0.2), head: mixc(ink, bg, dark ? 0.2 : 0.1), line: dark ? [0, 0, 0] : [255, 255, 255], floor: mixc(bg, ink, 0.07), grid: mixc(bg, ink, 0.18), floorA: 1, gridA: 0.55 };
   }
 
   /* Kamera */
