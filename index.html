@@ -601,7 +601,7 @@ body[data-coach="0"] .side { display: none; }
 .field.sm { max-width: 140px; }
 .cats { gap: 6px; flex-wrap: wrap; }
 .cats .btn { min-height: 36px; padding: 0 12px; }
-.ver { position: fixed; top: 3px; right: 10px; z-index: 5; font-size: 0.6875rem; line-height: 1; color: var(--muted); opacity: 0.8; pointer-events: none; font-variant-numeric: tabular-nums; }
+.ver { position: fixed; top: 3px; right: 10px; z-index: 5; font-size: 0.6875rem; line-height: 1; color: var(--muted); pointer-events: none; font-variant-numeric: tabular-nums; }
 
 .hday { border-top: 1px solid var(--line); padding: 4px 0; }
 .hday summary { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; cursor: pointer; padding: 8px 0; flex-wrap: wrap; list-style: none; }
@@ -691,12 +691,15 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 .brandrow { display: flex; align-items: center; gap: 10px; }
 .brandmark { width: 28px; height: 28px; flex: none; border-radius: 8px; }
 @media (max-width: 420px) { .brandmark { width: 24px; height: 24px; } }
+.recent { display: grid; gap: 6px; }
+.recentrow { gap: 6px; flex-wrap: wrap; }
+.recentrow .fchip { max-width: 100%; text-align: left; }
 </style>
 </head>
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.8 · 02.11. 22:33</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.9 · 02.11. 23:04</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -2279,8 +2282,8 @@ function renderEatHist() {
   box.innerHTML = '<div class="rday-h"><h3>Essens-Tagebuch</h3><span class="rtot">' + days.length + (days.length === 1 ? " Tag" : " Tage") + "</span></div>" +
     (avg ? '<p class="small muted">Schnitt der letzten 7 Tage mit Einträgen: ' + Math.round(avg.k).toLocaleString("de-DE") + " kcal und " + Math.round(avg.p) + " g Eiweiß pro Tag.</p>" : "") +
     shown.map((d, di) => { const t = sum(d); return '<details class="hday"' + (di === 0 ? " open" : "") + "><summary><span><b>" + wd(d) + ", " + dateDE(d) + "</b></span><span class=\"small muted\">" + t.k.toLocaleString("de-DE") + " kcal · " + t.p + " g Eiweiß" + (t.c ? " · " + eur(t.c) : "") + "</span></summary>" +
-      '<ul class="hitems">' + DIARY[d].items.map((x, i) => '<li><div><b>' + x.t + '</b><span class="small muted"> ' + x.k + " kcal, " + x.p + " g Eiweiß" + (x.c ? ", " + eur(x.c) : "") + "</span>" +
-        (x.det && x.det.length ? '<ul class="hdet">' + x.det.map((l) => "<li>" + String(l).replace(/</g, "&lt;") + "</li>").join("") + "</ul>" : "") +
+      '<ul class="hitems">' + DIARY[d].items.map((x, i) => '<li><div><b>' + esc(x.t) + '</b><span class="small muted"> ' + x.k + " kcal, " + x.p + " g Eiweiß" + (x.c ? ", " + eur(x.c) : "") + "</span>" +
+        (x.det && x.det.length ? '<ul class="hdet">' + x.det.map((l) => "<li>" + esc(l) + "</li>").join("") + "</ul>" : "") +
         (x.id && byId(x.id) ? '<button class="btn sm" type="button" data-recipe="' + x.id + '">Rezept ansehen</button>' : "") + '</div><button class="x" type="button" data-hdel="' + d + ":" + i + '" aria-label="Eintrag löschen">×</button></li>').join("") + "</ul></details>"; }).join("") +
     (days.length > HISTN ? '<div class="row"><button class="btn" type="button" data-histmore="1">Ältere Tage anzeigen</button></div>' : "");
 }
@@ -2735,6 +2738,7 @@ let CART = store.get("fc_cart", []);
 let BUDGET = store.get("fc_budget", 0);
 let CHK = store.get("fc_chk", {});
 const SECS = ["Obst & Gemüse", "Kühlregal", "Fleisch & Wurst", "Brot & Backwaren", "Nudeln, Reis & Trockenes", "Tiefkühl", "Vorrat"];
+const esc = (x) => String(x == null ? "" : x).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const eur = (n) => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "\u00a0€";
 const saveCart = () => { store.set("fc_cart", CART); store.set("fc_budget", BUDGET); store.set("fc_chk", CHK); };
 function needTxt(k, g) {
@@ -2859,7 +2863,7 @@ let WK = store.get("fc_wk", []);
   Object.keys(DIARY).forEach((k) => {
     const d = DIARY[k];
     if (!isObj(d) || !Array.isArray(d.items)) { delete DIARY[k]; return; }
-    d.items = d.items.filter(isObj);
+    d.items = d.items.filter(isObj).map((x) => { const o = Object.assign({}, x, { t: String(x.t == null ? "Eintrag" : x.t).slice(0, 80), k: num(x.k, 0, 20000, 0), p: num(x.p, 0, 2000, 0), c: typeof x.c === "number" && isFinite(x.c) ? x.c : 0 }); if (Array.isArray(x.det)) o.det = x.det.map(String).slice(0, 30); else delete o.det; return o; });
     if (typeof d.water !== "number" || !isFinite(d.water)) d.water = 0;
   });
   Object.keys(levels).forEach((k) => { if (typeof levels[k] !== "number" || !isFinite(levels[k]) || levels[k] < 0) delete levels[k]; });
@@ -3149,7 +3153,7 @@ function renderToday() {
     prepTodayHTML() +
     '<div class="card"><div class="rday-h"><h3>Heute gegessen</h3>' + (day.items.length ? '<span class="rtot">ca. ' + eur(e.c) + " bei Lidl</span>" : "") + "</div>" +
     (day.items.length
-      ? '<ul class="eatlist">' + day.items.map((x, i) => "<li><div><b>" + x.t + '</b><span class="muted small">' + x.p + " g Eiweiß, " + x.k + ' kcal</span></div><button class="btn icon sm" data-eatdel="' + i + '" aria-label="Eintrag löschen">' + ic("close") + "</button></li>").join("") + "</ul>"
+      ? '<ul class="eatlist">' + day.items.map((x, i) => "<li><div><b>" + esc(x.t) + '</b><span class="muted small">' + x.p + " g Eiweiß, " + x.k + ' kcal</span></div><button class="btn icon sm" data-eatdel="' + i + '" aria-label="Eintrag löschen">' + ic("close") + "</button></li>").join("") + "</ul>"
       : '<p class="muted">Noch nichts eingetragen.</p>') +
     planHTML(rest, day) + '<div class="row"><button class="btn sm" type="button" data-tab="fortschritt" data-histgo="1">Alle Tage ansehen</button></div></div>' +
     '<div class="grid2"><div class="card"><div class="rday-h"><h3>Wasser</h3><span class="rtot">' + nf(Math.round(day.water * 25) / 100) + " von " + nf(Math.round(GOALS.water * 25) / 100) + ' Litern</span></div><div class="glasses">' + glasses + '</div></div>' +
@@ -3303,16 +3307,16 @@ function cParse(text) {
     if (m) { n = /^halb/.test(m[1]) ? 0.5 : parseFloat(m[1]); unit = CUNIT[m[2]] || ""; t = (t.slice(0, m.index) + " " + t.slice(m.index + m[0].length)).replace(/\s+/g, " ").trim(); }
     const mult = n != null && !unit ? n : 1, name = t || raw;
     const my = MYD.find((d) => t.includes(CNORM(d.name)));
-    if (my) { const g = n == null ? my.lg : unit === "kg" ? n * 1000 : unit === "portion" || unit === "stk" || (!unit && n < 10) ? n * my.lg : n, f = g / my.w; return { raw, kind: "dish", name: my.name, qty: Math.round(g) + " g", k: my.k * f, p: my.p * f, c: my.c * f }; }
+    if (my) { const g = Math.min(20000, n == null ? my.lg : unit === "kg" ? n * 1000 : unit === "portion" || unit === "stk" || (!unit && n < 10) ? n * my.lg : n), f = g / my.w; return { raw, kind: "dish", name: my.name, qty: Math.round(g) + " g", k: my.k * f, p: my.p * f, c: my.c * f }; }
     const dish = cMatch(CDISHL, t);
-    if (dish && (!n || !unit || unit === "stk" || unit === "portion")) return { raw, kind: "dish", name: dish.name, qty: (n != null ? n : 1) + " Portion" + ((n != null ? n : 1) === 1 ? "" : "en"), k: dish.kcal * (n != null ? n : 1), p: dish.p * (n != null ? n : 1), c: null };
+    if (dish && (!n || !unit || unit === "stk" || unit === "portion")) return { raw, kind: "dish", name: dish.name, qty: Math.min(50, n != null ? n : 1) + " Portion" + (Math.min(50, n != null ? n : 1) === 1 ? "" : "en"), k: dish.kcal * Math.min(50, n != null ? n : 1), p: dish.p * Math.min(50, n != null ? n : 1), c: null };
     let f = cMatch(CFOODS, t) || cFuzzy(CFOODS, t);
     if (f && f.id === "nudel" && /weizen|\bhell|weiss|ohne vollkorn/.test(t)) f = CFOODS.find((x) => x.name.startsWith("Weizennudeln")) || f;
-    if (!f) return { raw, kind: "unknown", name: raw, g: n != null ? Math.max(1, Math.round(cGrams(null, n, unit))) : 100, k: null, p: null, c: null };
+    if (!f) return { raw, kind: "unknown", name: raw, g: n != null ? Math.min(20000, Math.max(1, Math.round(cGrams(null, n, unit)))) : 100, k: null, p: null, c: null };
     let g = n == null ? f.def : cGrams(f, n, unit), note = "";
     if (cooked && f.raw) { g *= 0.37; note = "gekocht gerechnet"; }
     else if ((cooked || fried) && ["haehn", "pute", "phack", "rhack", "ghack", "schnitzel"].includes(f.id)) { g *= 1.3; note = "gegart gerechnet, Fleisch verliert beim Garen Wasser"; }
-    g = Math.round(g);
+    g = Math.min(20000, Math.round(g));
     return { raw, kind: "food", name: f.name, g, qty: g + " g", k: g * f.kcal / 100, p: g * f.p / 100, c: g * f.eur / 100, note, def: n == null };
   });
 }
@@ -3333,18 +3337,18 @@ function calcHTML() {
   if (CALC.rows) {
     const T = cTotals(), per = Math.max(1, CALC.srv);
     out += '<ul class="calcrows">' + T.rows.map((r, i) => {
-      if (r.kind === "unknown") return '<li class="cunk"><div><b>' + r.raw + '</b><span class="muted small"> kenne ich nicht. Wähle, was es am ehesten ist, dann schätze ich für ' + r.g + ' g. Die Menge änderst du, indem du sie vor den Namen schreibst, zum Beispiel „300 g Auflauf“.</span></div><div class="row cats">' + CCATS.map((c) => '<button class="btn sm" type="button" data-calccat="' + i + '" data-c="' + c[0] + '">' + c[0] + "</button>").join("") + '</div><details><summary class="small muted">Oder Werte selbst eintragen</summary><div class="row"><label class="field sm">kcal<input type="number" class="calcman" data-i="' + i + '" data-f="k" min="0" max="900" inputmode="decimal"></label><label class="field sm">Eiweiß g<input type="number" class="calcman" data-i="' + i + '" data-f="p" min="0" max="100" inputmode="decimal"></label></div></details></li>';
-      return "<li><div><b>" + r.name + '</b><span class="muted small"> ' + (r.qty || "") + (r.note ? ", " + r.note : "") + (r.def ? " (Standardmenge, ändere sie oben)" : "") + '</span></div><span class="small">' + Math.round(r.k) + " kcal, " + (Math.round(r.p * 10) / 10).toLocaleString("de-DE") + " g Eiweiß" + (r.c != null ? ", ca. " + eur(r.c) : "") + "</span></li>";
+      if (r.kind === "unknown") return '<li class="cunk"><div><b>' + esc(r.raw) + '</b><span class="muted small"> kenne ich nicht. Wähle, was es am ehesten ist, dann schätze ich für ' + r.g + ' g. Die Menge änderst du, indem du sie vor den Namen schreibst, zum Beispiel „300 g Auflauf“.</span></div><div class="row cats">' + CCATS.map((c) => '<button class="btn sm" type="button" data-calccat="' + i + '" data-c="' + c[0] + '">' + c[0] + "</button>").join("") + '</div><details><summary class="small muted">Oder Werte selbst eintragen</summary><div class="row"><label class="field sm">kcal<input type="number" class="calcman" data-i="' + i + '" data-f="k" min="0" max="900" inputmode="decimal"></label><label class="field sm">Eiweiß g<input type="number" class="calcman" data-i="' + i + '" data-f="p" min="0" max="100" inputmode="decimal"></label></div></details></li>';
+      return "<li><div><b>" + esc(r.name) + '</b><span class="muted small"> ' + esc(r.qty || "") + (r.note ? ", " + esc(r.note) : "") + (r.def ? " (Standardmenge, ändere sie oben)" : "") + '</span></div><span class="small">' + Math.round(r.k) + " kcal, " + (Math.round(r.p * 10) / 10).toLocaleString("de-DE") + " g Eiweiß" + (r.c != null ? ", ca. " + eur(r.c) : "") + "</span></li>";
     }).join("") + "</ul>";
     if (CALC.rows.some((r) => r.kind === "unknown")) out += '<div class="row"><button class="btn" type="button" data-calcre="1">Eigene Werte übernehmen</button></div>';
     out += '<div class="calctot"><b>Zusammen: ' + Math.round(T.k) + " kcal, " + (Math.round(T.p * 10) / 10).toLocaleString("de-DE") + " g Eiweiß" + (T.c != null ? ", ca. " + eur(T.c) + " bei Lidl" : "") + "</b>" + (T.open ? '<span class="small muted"> ohne ' + T.open + " nicht erkannte Zutat" + (T.open > 1 ? "en" : "") + "</span>" : "") + "</div>" +
-      '<div class="row"><label class="field sm">Aufgeteilt auf Personen<input type="number" id="calc-srv" min="1" max="8" value="' + CALC.srv + '" inputmode="numeric"></label><label class="field">Name im Tagebuch<input type="text" id="calc-name" maxlength="60" value="' + CALC.name.replace(/"/g, "&quot;") + '"></label></div>' +
+      '<div class="row"><label class="field sm">Aufgeteilt auf Personen<input type="number" id="calc-srv" min="1" max="8" value="' + CALC.srv + '" inputmode="numeric"></label><label class="field">Name im Tagebuch<input type="text" id="calc-name" maxlength="60" value="' + esc(CALC.name) + '"></label></div>' +
       (per > 1 ? '<p class="small">Für dich: ' + Math.round(T.k / per) + " kcal, " + (Math.round(T.p / per * 10) / 10).toLocaleString("de-DE") + " g Eiweiß</p>" : "") +
       '<div class="row"><button class="btn primary" type="button" data-calcadd="1">Heute eintragen</button></div>' +
-      '<details class="mydsave"><summary>Als Gericht speichern, um später nur Gramm einzugeben</summary><div class="row"><label class="field">Name<input type="text" id="myd-name" maxlength="60" value="' + CALC.name.replace(/"/g, "&quot;") + '"></label><label class="field sm">Fertig gewogen (g)<input type="number" id="myd-w" min="50" max="20000" inputmode="numeric" placeholder="leer = Schätzung"></label></div><p class="small muted">Wiege das fertige Gericht, wenn du kannst. Ohne Angabe schätze ich das Gewicht nach dem Kochen, das ist ungenauer.</p><div class="row"><button class="btn" type="button" data-mydsave="1">Gericht speichern</button></div></details><p class="small muted">Richtwerte. Reis, Nudeln, Couscous und Linsen gelten als Rohgewicht, außer du schreibst „gekocht“.</p>';
+      '<details class="mydsave"><summary>Als Gericht speichern, um später nur Gramm einzugeben</summary><div class="row"><label class="field">Name<input type="text" id="myd-name" maxlength="60" value="' + esc(CALC.name) + '"></label><label class="field sm">Fertig gewogen (g)<input type="number" id="myd-w" min="50" max="20000" inputmode="numeric" placeholder="leer = Schätzung"></label></div><p class="small muted">Wiege das fertige Gericht, wenn du kannst. Ohne Angabe schätze ich das Gewicht nach dem Kochen, das ist ungenauer.</p><div class="row"><button class="btn" type="button" data-mydsave="1">Gericht speichern</button></div></details><p class="small muted">Richtwerte. Reis, Nudeln, Couscous und Linsen gelten als Rohgewicht, außer du schreibst „gekocht“.</p>';
   }
   return '<h4 id="calc-sec">Selbst berechnen</h4><p class="small muted">Schreib Zutaten mit Menge oder ein Gericht, zum Beispiel „200 g Hähnchen, 150 g Reis, 1 Paprika“ oder „Döner“.</p>' +
-    '<label class="field">Name des Gerichts (optional)<input type="text" id="calc-name0" maxlength="60" value="' + CALC.name.replace(/"/g, "&quot;") + '" placeholder="z. B. Spaghetti Bolognese"></label><label class="field">Zutaten mit Mengen<textarea id="calc-in" rows="3" maxlength="400" placeholder="200 g Hähnchen, 150 g Reis, 1 Paprika">' + CALC.text.replace(/</g, "&lt;") + "</textarea></label>" +
+    '<label class="field">Name des Gerichts (optional)<input type="text" id="calc-name0" maxlength="60" value="' + esc(CALC.name) + '" placeholder="z. B. Spaghetti Bolognese"></label><label class="field">Zutaten mit Mengen<textarea id="calc-in" rows="3" maxlength="400" placeholder="200 g Hähnchen, 150 g Reis, 1 Paprika">' + esc(CALC.text) + "</textarea></label>" +
     '<div class="row"><button class="btn primary" type="button" data-calcgo="1">Berechnen</button></div>' + out;
 }
 function calcGo() { CALC.text = ($("#calc-in") || {}).value || CALC.text; const nm = (($("#calc-name0") || {}).value || "").trim(); CALC.rows = cParse(CALC.text); CALC.man = {}; CALC.err = ""; CALC.ai = false; CALC.srv = 1; CALC.name = nm || CALC.text.split(/[\n,;]/)[0].slice(0, 40).trim(); drawEat(); }
@@ -3363,7 +3367,7 @@ function mydWeight(rows) {
   return rows.reduce((a, r) => { if (r.g == null) return a; const raw = /Rohgewicht/.test(r.name || "") || r.note === "gekocht gerechnet"; const meat = /Hähnchen|Pute|hack|Hack|Schnitzel|Rind|Schwein|Bacon|Kassler/.test(r.name || ""); return a + r.g * (raw && r.note !== "gekocht gerechnet" ? 2.4 : meat ? 0.75 : 0.88); }, 0);
 }
 function mydHTML() {
-  const list = MYD.length ? '<ul class="calcrows">' + MYD.map((d, i) => { const f = (d.lg || 250) / d.w; return '<li class="mydli"><div><b>' + d.name + '</b><span class="muted small"> pro 100 g: ' + Math.round(d.k / d.w * 100) + " kcal, " + (Math.round(d.p / d.w * 1000) / 10).toLocaleString("de-DE") + " g Eiweiß. Gericht wiegt fertig " + Math.round(d.w) + " g" + (d.est ? " (geschätzt)" : "") + '</span></div><div class="row mydrow"><label class="field sm">Gegessen (g)<input type="number" class="myd-g" data-i="' + i + '" min="1" max="3000" value="' + (d.lg || 250) + '" inputmode="numeric"></label><span class="small" id="mydv' + i + '">= ' + Math.round(d.k * f) + " kcal, " + (Math.round(d.p * f * 10) / 10).toLocaleString("de-DE") + ' g Eiweiß</span></div><div class="row"><button class="btn primary" type="button" data-mydeat="' + i + '">Eintragen</button><button class="btn sm" type="button" data-mydel="' + i + '" aria-label="' + d.name + ' löschen">Löschen</button></div></li>'; }).join("") + "</ul>" : '<p class="small muted">Noch nichts gespeichert. Gib unten Zutaten ein, rechne sie aus und speichere sie als Gericht.</p>';
+  const list = MYD.length ? '<ul class="calcrows">' + MYD.map((d, i) => { const f = (d.lg || 250) / d.w; return '<li class="mydli"><div><b>' + esc(d.name) + '</b><span class="muted small"> pro 100 g: ' + Math.round(d.k / d.w * 100) + " kcal, " + (Math.round(d.p / d.w * 1000) / 10).toLocaleString("de-DE") + " g Eiweiß. Gericht wiegt fertig " + Math.round(d.w) + " g" + (d.est ? " (geschätzt)" : "") + '</span></div><div class="row mydrow"><label class="field sm">Gegessen (g)<input type="number" class="myd-g" data-i="' + i + '" min="1" max="3000" value="' + (d.lg || 250) + '" inputmode="numeric"></label><span class="small" id="mydv' + i + '">= ' + Math.round(d.k * f) + " kcal, " + (Math.round(d.p * f * 10) / 10).toLocaleString("de-DE") + ' g Eiweiß</span></div><div class="row"><button class="btn primary" type="button" data-mydeat="' + i + '">Eintragen</button><button class="btn sm" type="button" data-mydel="' + i + '" aria-label="' + esc(d.name) + ' löschen">Löschen</button></div></li>'; }).join("") + "</ul>" : '<p class="small muted">Noch nichts gespeichert. Gib unten Zutaten ein, rechne sie aus und speichere sie als Gericht.</p>';
   return '<h4 id="myd-sec">Meine Gerichte</h4><p class="small muted">Gespeicherte Gerichte trägst du mit einer Mengenangabe ein, zum Beispiel 250 g vom Teller.</p>' + list;
 }
 function mydFromInput(i) { const d = MYD[i]; if (!d) return; const el = document.querySelector('.myd-g[data-i="' + i + '"]'), g = Math.max(1, Math.min(3000, parseFloat(el.value) || 0)), f = g / d.w; d.lg = g; const o = document.getElementById("mydv" + i); if (o) o.textContent = "= " + Math.round(d.k * f) + " kcal, " + (Math.round(d.p * f * 10) / 10).toLocaleString("de-DE") + " g Eiweiß"; }
@@ -3383,13 +3387,20 @@ function mydNew() {
 }
 
 /* Essen eintragen */
-let EATQ = "";
+let EATQ = "", RECENT = [];
+function recentEaten() {
+  const out = [], seen = new Set();
+  Object.keys(DIARY).sort().reverse().slice(0, 21).forEach((d) => DIARY[d].items.slice().reverse().forEach((x) => { if (out.length < 6 && !seen.has(x.t)) { seen.add(x.t); out.push(x); } }));
+  return out;
+}
 function drawEat(msg) {
+  RECENT = recentEaten();
   const q = EATQ.trim().toLowerCase();
   const l = q ? RECIPES.filter((r) => (r.title + " " + r.ing.map((i) => i[2]).join(" ")).toLowerCase().includes(q)).slice(0, 8) : suggestList(8);
   $("#dlg-eat").innerHTML = '<div class="dlg"><div class="dlg-head"><h3>Essen eintragen</h3><button class="btn icon" data-close aria-label="Schließen">' + ic("close") + "</button></div>" +
     '<div class="search">' + ic("search") + '<input type="search" id="eatq" placeholder="Rezept suchen, z. B. Quark oder Wrap" value="' + EATQ.replace(/"/g, "&quot;") + '" aria-label="Rezept suchen"></div>' +
-    '<div class="row eatjump"><button class="btn sm" type="button" data-eatjump="calc-sec">Selbst berechnen</button><button class="btn sm" type="button" data-eatjump="myd-sec">Meine Gerichte' + (MYD.length ? " (" + MYD.length + ")" : "") + '</button></div><p class="small muted" role="status">' + (msg || (q ? l.length + " Treffer" : "Vorschläge für heute")) + "</p>" +
+    (RECENT.length ? '<div class="recent"><span class="small muted">Zuletzt gegessen, ein Tipp trägt es nochmal ein:</span><div class="row recentrow">' + RECENT.map((x, i) => '<button class="fchip" type="button" data-eatagain="' + i + '">' + esc(x.t.length > 28 ? x.t.slice(0, 26) + "…" : x.t) + " · " + x.k + " kcal</button>").join("") + "</div></div>" : "") +
+    '<div class="row eatjump"><button class="btn sm" type="button" data-eatjump="calc-sec">Selbst berechnen</button><button class="btn sm" type="button" data-eatjump="myd-sec">Meine Gerichte' + (MYD.length ? " (" + MYD.length + ")" : "") + '</button></div><p class="small muted" role="status">' + esc(msg || (q ? l.length + " Treffer" : "Vorschläge für heute")) + "</p>" +
     '<ul class="eatlist">' + (l.length ? l.map((r) => "<li><div><b>" + r.title + '</b><span class="muted small">' + r.protein + " g Eiweiß, " + r.kcal + " kcal, ca. " + eur(r.cost) + '</span></div><button class="btn sm" data-eat="' + r.id + '">Eintragen</button></li>').join("") : '<li class="muted">Kein Rezept gefunden. Trag es unten selbst ein.</li>') + "</ul>" +
     mydHTML() + calcHTML() + '<h4>Etwas anderes gegessen?</h4><form id="eatform" class="form"><label class="field">Name<input type="text" id="e-name" maxlength="60" required></label><label class="field">kcal<input type="number" id="e-k" min="0" max="3000" inputmode="numeric" required></label><label class="field">Eiweiß in g<input type="number" id="e-p" min="0" max="300" inputmode="numeric" required></label><button class="btn primary" type="submit">Eintragen</button></form></div>';
 }
@@ -3599,6 +3610,7 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.prepweek) { prepEnsure(); const nx = shiftDay(PREP.week, 7 * parseInt(t.dataset.prepweek, 10)), cur = weekStartISO(todayISO()); if (nx >= cur && nx <= shiftDay(cur, 28)) prepSelect(nx); return renderPrep(); }
   if (t.dataset.prepgen) { prepGen(t.dataset.prepgen); return renderPrep(); }
   if (t.dataset.prepcart) { const c = prepCalc(); c.entries.forEach((e) => cartAdd(e.id, e.n)); t.textContent = "Übernommen"; return; }
+  if (t.dataset.eatagain != null) { const x = RECENT[parseInt(t.dataset.eatagain, 10)]; if (x) { const o = Object.assign({}, x, { again: true }); dayEns().items.push(o); saveToday(); renderToday(); drawEat("Nochmal eingetragen: " + x.t); } return; }
   if (t.dataset.calcgo) return calcGo();
   if (t.dataset.eatjump) { const el = document.getElementById(t.dataset.eatjump); if (el) el.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" }); return; }
   if (t.dataset.histmore) { HISTN += 30; return renderEatHist(); }
@@ -3628,7 +3640,7 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.eatopen) return openEat();
   if (t.dataset.eat) { const r = byId(t.dataset.eat); if (r) { logEat(r, 1); t.textContent = "Eingetragen"; t.disabled = true; } return; }
   if (t.dataset.eatrec) { const r = byId(t.dataset.eatrec); if (r) { logEat(r, portions); t.textContent = "Eingetragen"; } return; }
-  if (t.dataset.eatdel != null && t.dataset.eatdel !== "") { const dd = dayEns(), gone = dd.items.splice(parseInt(t.dataset.eatdel, 10), 1)[0]; if (gone && dd.plan) { const ix = dd.plan.ids.indexOf(gone.id); if (ix >= 0) dd.plan.done[ix] = false; } saveToday(); return renderToday(); }
+  if (t.dataset.eatdel != null && t.dataset.eatdel !== "") { const dd = dayEns(), gone = dd.items.splice(parseInt(t.dataset.eatdel, 10), 1)[0]; if (gone && dd.plan && !gone.again) { const ix = dd.plan.ids.indexOf(gone.id); if (ix >= 0) dd.plan.done[ix] = false; } saveToday(); return renderToday(); }
   if (t.dataset.effort) { if (WK[SUMIDX]) { WK[SUMIDX].effort = t.dataset.effort; saveToday(); drawSummary(SUMIDX); } return; }
   if (t.dataset.lvlup || t.dataset.lvldown) { const id = t.dataset.lvlup || t.dataset.lvldown, e = EX.find((x) => x.id === id); levels[id] = Math.max(0, Math.min(e.ladder.length - 1, lvl(e) + (t.dataset.lvlup ? 1 : -1))); store.set("fc_levels", levels); renderEx(); render(); drawSummary(SUMIDX); return; }
   if (dictation && t.id !== "mic") setTimeout(() => { if (!document.querySelector("dialog[open]")) $("#cmd").focus(); }, 0);
