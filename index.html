@@ -444,12 +444,8 @@ body[data-coach="0"] .side { display: none; }
 }
 @media (max-width: 640px) { .hero { padding: 22px; } .hero .rings { gap: 6px; } .pagetitle { font-size: 2.5rem; } }
 .brand { display: flex; flex-direction: column; gap: 2px; }
-.micfab { display: none; position: fixed; right: 16px; bottom: calc(86px + env(safe-area-inset-bottom, 0px)); z-index: 25; width: 60px; height: 60px; border-radius: 50%; border: 0; background: var(--ink); color: var(--bg); box-shadow: 0 8px 24px rgba(0,0,0,.28); cursor: pointer; align-items: center; justify-content: center; }
-.micfab .dot { width: 18px; height: 18px; border-radius: 50%; background: currentColor; }
-.micfab[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.micfab[aria-pressed="true"] .dot { animation: pulse 1.4s ease-in-out infinite; }
-@media (max-width: 979px) { .micfab:not([hidden]) { display: inline-flex; } }
-@media (prefers-reduced-motion: reduce) { .micfab .dot { animation: none !important; } }
+.micfab { display: none; position: fixed; right: 14px; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 25; width: 54px; height: 54px; border-radius: 50%; border: 0; background: var(--ink); color: var(--bg); box-shadow: 0 6px 20px rgba(0,0,0,.28); cursor: pointer; align-items: center; justify-content: center; }
+
 .sbbox { margin: 12px 0; } .sbbox summary { cursor: pointer; font-weight: 650; padding: 6px 0; }
 .syncchip { font-size: 0.75rem; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
 .syncchip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); opacity: 0.6; }
@@ -486,6 +482,52 @@ body[data-coach="0"] .side { display: none; }
 .v3 [aria-pressed="true"]:not(.mic) { background: var(--ink); color: var(--bg); }
 .v3txt p { margin: 0 0 8px; }
 @media (prefers-reduced-motion: reduce) { .v3stage canvas { cursor: default; } }
+.setfab { display: none; }
+.micfab .ic { width: 26px; height: 26px; }
+.micfab[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.micfab[aria-pressed="true"] .ic { animation: pulse 1.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .micfab .ic { animation: none !important; } }
+@media (max-width: 979px) {
+  .micfab:not([hidden]) { display: inline-flex; }
+  body[data-group="essen"] .micfab, body[data-group="fortschritt"] .micfab { display: none; }
+  .setfab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; position: fixed; z-index: 21; left: 8px; bottom: 0; width: calc((100vw - 16px) / 5); min-height: 52px; margin-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); padding: 6px 0; border: 0; border-radius: 12px; background: none; color: var(--muted); font: inherit; font-size: 0.625rem; font-weight: 650; cursor: pointer; white-space: nowrap; overflow: hidden; }
+  .setfab .ic { width: 25px; height: 25px; }
+  .setfab:active { color: var(--accent); }
+  .gnav { padding-left: calc(8px + (100vw - 16px) / 5); }
+  .top-actions #b-settings { display: none; }
+  body.has-sr .top .mic { display: none; }
+  body:not([data-group="heute"]) .pagesub { display: none; }
+  .pagetitle { font-size: 2rem; }
+  .pagehead { padding-top: 6px; }
+  body[data-group="heute"]:not([data-run="1"]) .side { display: none; }
+  .hero .small.muted { display: none; }
+  .tdhead .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); width: 100%; max-width: 100%; }
+  .tdhead .row .btn { min-width: 0; white-space: normal; padding: 0 10px; text-align: center; }
+  .tdhead .row .primary { grid-column: 1 / -1; }
+  .tab { font-size: 0.875rem; padding: 0 10px; }
+  .rcard { padding: 14px 16px; gap: 8px; }
+  .rcard h4 { min-height: 0; font-size: 1.0625rem; }
+  .rnum { flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+  .pro { font-size: 1.75rem; }
+  .pro small { font-size: 0.8125rem; }
+  .ladder li { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .ladder li .v3mini { margin-left: auto; flex: none; }
+  .app { gap: 4px; }
+}
+@media (max-width: 420px) { .top .mic #miclabel { position: static; width: auto; height: auto; overflow: visible; clip: auto; } }
+.plan { display: flex; flex-direction: column; gap: 12px; }
+.plan-h { display: flex; flex-direction: column; gap: 2px; }
+.planlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.card .planlist { padding-left: 0; }
+.pslot { flex-wrap: wrap; display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--surface-2); border-radius: 14px; padding: 12px 14px; }
+.pslot.done { opacity: 0.6; }
+.pl-l { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 170px; }
+.pl-when { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+.pl-title { text-align: left; background: none; border: 0; padding: 0; font: inherit; font-weight: 650; color: var(--ink); cursor: pointer; overflow-wrap: anywhere; }
+.pl-title:hover { text-decoration: underline; }
+.pl-b { display: flex; gap: 6px; align-items: center; flex: none; }
+.pl-ok { color: var(--good); font-weight: 650; font-size: 0.875rem; }
+.plan-act { gap: 8px; }
 </style>
 </head>
 <body>
@@ -505,7 +547,8 @@ body[data-coach="0"] .side { display: none; }
     <button class="btn icon" id="b-settings" aria-label="Einstellungen und Sprachbefehle" title="Einstellungen und Sprachbefehle"></button>
   </div>
 </header>
-<button class="micfab" id="micfab" type="button" aria-label="Sprachbefehl: antippen und sprechen" aria-pressed="false" hidden><span class="dot"></span></button>
+<button class="setfab" id="b-settings2" type="button" aria-label="Einstellungen" title="Einstellungen"></button>
+<button class="micfab" id="micfab" type="button" aria-label="Sprachbefehl: antippen und sprechen" aria-pressed="false" hidden></button>
 <p class="heard" id="heard" role="status" aria-live="polite"></p>
 
 <div class="layout">
@@ -1218,7 +1261,7 @@ const ICONS = {
   back: '<path d="M19 5l-9 7 9 7zM6 5v14"/>',
   repeat: '<path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/>',
   stop: '<rect x="6" y="6" width="12" height="12" rx="2"/>',
-  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
+  gear: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
   close: '<path d="M6 6l12 12M18 6L6 18"/>',
   search: '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/>',
   home: '<path d="M4 11.5L12 4l8 7.5"/><path d="M6 10.5V20h12v-9.5"/><path d="M10 20v-5h4v5"/>',
@@ -1595,7 +1638,7 @@ function renderEx() {
   $("#panel-uebungen").innerHTML =
     '<div class="card"><h3>Ganzkörper, 3 Mal pro Woche</h3><ul>' +
     "<li>Mindestens ein Ruhetag zwischen zwei Einheiten.</li>" +
-    "<li>Wochen 1 und 2: 2 Sätze pro Übung, ab Woche 3: 3 Sätze (Einstellungen oben rechts).</li>" +
+    "<li>Wochen 1 und 2: 2 Sätze pro Übung, ab Woche 3: 3 Sätze (Einstellungen mit dem Zahnrad).</li>" +
     "<li>Beende jeden Satz 1 bis 3 Wiederholungen vor dem Muskelversagen.</li>" +
     "<li>Pausen 60 bis 90 Sekunden.</li>" +
     "<li>Schaffst du bei allen Sätzen die obere Wiederholungszahl sauber, geh eine Stufe weiter und fang wieder unten an.</li></ul></div>" +
@@ -2259,7 +2302,7 @@ function renderShop() {
 }
 
 /* ======================= Ziele, Tagebuch, Heute, Protokoll ======================= */
-let GOALS = Object.assign({ kcal: 1900, protein: 0, water: 6 }, store.get("fc_goals", {}));
+let GOALS = Object.assign({ kcal: 1900, protein: 0, water: 6, pause: "small" }, store.get("fc_goals", {}));
 let DIARY = store.get("fc_diary", {});
 let WK = store.get("fc_wk", []);
 /* Gespeicherte Daten prüfen: falsch geformte Einträge werden aussortiert, statt die App zu stoppen */
@@ -2315,6 +2358,89 @@ function suggestList(n) {
   const score = (r) => Math.min(r.protein, remP || r.protein) / (r.cost + 0.4) - (r.kcal > Math.max(250, remK + 150) ? 25 : 0);
   return RECIPES.filter((r) => !EXC.some((x) => r.contains.includes(x)) && !(RAD.noSpinat && hasSpin(r)) && r.cost <= 3).sort((a, b) => score(b) - score(a)).slice(0, n);
 }
+/* Tagesvorschlag: Essen vor der Arbeit, in der Pause und abends */
+const PLAN_LABELS = { work: ["Vor der Arbeit", "Pause auf der Arbeit", "Abends nach der Arbeit", "Später am Abend, optional"], free: ["Frühstück", "Mittagessen", "Abendessen", "Später am Abend, optional"] };
+function planPool(i, free) {
+  const small = GOALS.pause !== "meal";
+  const base = RECIPES.filter((r) => !EXC.some((x) => r.contains.includes(x)) && !(RAD.noSpinat && hasSpin(r)));
+  const kind = (m, tag) => { const a = base.filter((r) => r.meal === m && (!tag || r.tags.includes(tag))); return a.length ? a : base.filter((r) => r.meal === m); };
+  if (i === 0) { const l = base.filter((r) => r.meal === "Frühstück" && r.time <= 15); return l.length ? l : kind("Frühstück"); }
+  if (i === 1) return free ? kind("Mittag/Abend") : (small ? kind("Snack", "Für die Arbeit") : kind("Mittag/Abend", "Für die Arbeit"));
+  if (i === 2) return kind("Mittag/Abend");
+  return base.filter((r) => r.meal === "Snack");
+}
+function planScore(recs, remP, remK) {
+  const p = recs.reduce((a, r) => a + r.protein, 0), k = recs.reduce((a, r) => a + r.kcal, 0), c = recs.reduce((a, r) => a + r.cost, 0);
+  let sc = Math.max(0, remP * 0.95 - p) * 4 + Math.max(0, k - (remK + 200)) / 8 + Math.max(0, (remK - 500) - k) / 8 + c * 3 + (RAD.maxDay ? Math.max(0, c - RAD.maxDay) * 40 : 0);
+  if (mainKind(recs[1]) === mainKind(recs[2]) && recs[1].meal === "Mittag/Abend") sc += 25;
+  return sc;
+}
+function makeDayPlan(free, keep) {
+  const e = dsum(), remP = Math.max(0, protGoal() - e.p), remK = Math.max(0, GOALS.kcal - e.k);
+  const pools = [0, 1, 2].map((i) => planPool(i, free));
+  if (pools.some((p) => !p.length)) return null;
+  let best = null, bs = Infinity;
+  for (let n = 0; n < 500; n++) {
+    const pick = [], taken = new Set();
+    for (let i = 0; i < 3; i++) {
+      let r = keep && keep[i] ? byId(keep[i]) : null;
+      if (!r) { const c = pools[i].filter((x) => !taken.has(x.id)); r = pickRnd(c.length ? c : pools[i]); }
+      pick.push(r); taken.add(r.id);
+    }
+    const sc = planScore(pick, remP, remK);
+    if (sc < bs) { bs = sc; best = pick; }
+  }
+  const ids = best.map((r) => r.id), sum = best.reduce((a, r) => a + r.protein, 0);
+  if (sum < remP - 12) {
+    const k = best.reduce((a, r) => a + r.kcal, 0), pool = planPool(3, free).filter((r) => !ids.includes(r.id) && k + r.kcal <= remK + 250);
+    if (pool.length) ids.push(pool.sort((a, b) => b.protein / (b.cost + 0.3) - a.protein / (a.cost + 0.3))[0].id);
+  }
+  return ids;
+}
+function planEnsure() {
+  const day = dayEns();
+  if (!day.plan || !Array.isArray(day.plan.ids) || day.plan.ids.some((id) => !byId(id))) {
+    const free = !!(day.plan && day.plan.free), ids = makeDayPlan(free);
+    if (!ids) { delete day.plan; return null; }
+    day.plan = { ids, done: ids.map(() => false), free };
+    saveToday();
+  }
+  return day.plan;
+}
+function planRe(i) {
+  const day = dayEns(), pl = day.plan; if (!pl) return;
+  const cur = pl.ids[i], pool = planPool(i, pl.free).filter((r) => !pl.ids.includes(r.id) || r.id === cur);
+  const others = pool.filter((r) => r.id !== cur);
+  if (!others.length) return;
+  const e = dsum(), remP = Math.max(0, protGoal() - e.p), remK = Math.max(0, GOALS.kcal - e.k), base = pl.ids.slice(0, 3).map((id) => byId(id));
+  const scored = others.map((r) => { const t = base.slice(); if (i < 3) t[i] = r; return { r, sc: i < 3 ? planScore(t, remP, remK) : -r.protein }; }).sort((a, b) => a.sc - b.sc);
+  pl.ids[i] = pickRnd(scored.slice(0, Math.min(5, scored.length))).r.id; pl.done[i] = false;
+  saveToday(); renderToday();
+}
+function planEat(i) {
+  const day = dayEns(), pl = day.plan; if (!pl || pl.done[i]) return;
+  const r = byId(pl.ids[i]); if (!r) return;
+  pl.done[i] = true; logEat(r, 1);
+}
+function planAll() {
+  const day = dayEns(), pl = day.plan; if (!pl) return;
+  pl.ids.forEach((id, i) => { if (!pl.done[i]) { const r = byId(id); if (r) { pl.done[i] = true; day.items.push({ id: r.id, t: r.title, k: r.kcal, p: r.protein, c: Math.round(r.cost * 100) / 100 }); } } });
+  saveToday(); renderToday();
+}
+function planNew() { const day = dayEns(), free = !!(day.plan && day.plan.free), done = day.plan ? day.plan.done : [], ids = makeDayPlan(free); if (ids) { day.plan = { ids, done: ids.map(() => false), free }; saveToday(); renderToday(); } }
+function planHTML(rest, day) {
+  const open = day.plan && day.plan.done.some((d) => !d);
+  if (rest <= 8 && !open) return day.items.length ? '<p class="warnt" style="color:var(--good)">Eiweißziel für heute erreicht.</p>' : "";
+  const pl = planEnsure(); if (!pl) return "";
+  const lab = pl.free ? PLAN_LABELS.free : PLAN_LABELS.work, recs = pl.ids.map((id) => byId(id));
+  const tp = recs.reduce((a, r) => a + r.protein, 0), tk = recs.reduce((a, r) => a + r.kcal, 0), tc = recs.reduce((a, r) => a + r.cost, 0);
+  const rows = recs.map((r, i) => '<li class="pslot' + (pl.done[i] ? " done" : "") + '"><div class="pl-l"><span class="pl-when">' + lab[i] + '</span><button class="pl-title" type="button" data-recipe="' + r.id + '">' + r.title + '</button><span class="muted small">' + r.protein + " g Eiweiß, " + r.kcal + " kcal, ca. " + eur(r.cost) + '</span></div><div class="pl-b">' +
+    (pl.done[i] ? '<span class="pl-ok">Eingetragen</span>' : '<button class="btn sm" type="button" data-plan="' + i + '">Eintragen</button><button class="btn icon sm" type="button" data-planre="' + i + '" aria-label="Anderes Gericht für ' + lab[i] + '" title="Anderes Gericht">' + ic("repeat") + "</button>") + "</div></li>").join("");
+  return '<div class="plan"><div class="plan-h"><b>Vorschlag für heute</b><span class="muted small">zusammen ca. ' + tp + " g Eiweiß, " + tk.toLocaleString("de-DE") + " kcal, " + eur(tc) + '</span></div><ul class="planlist">' + rows + "</ul>" +
+    '<div class="row plan-act">' + (open ? '<button class="btn primary" type="button" data-planall="all">Alles eintragen</button>' : "") + '<button class="btn" type="button" data-planall="new">Neu vorschlagen</button></div>' +
+    '<label class="check"><input type="checkbox" id="plan-small"' + (GOALS.pause !== "meal" ? " checked" : "") + (pl.free ? " disabled" : "") + '> Pause: nur eine Kleinigkeit zum Mitnehmen</label>' +
+    '<label class="check"><input type="checkbox" id="plan-free"' + (pl.free ? " checked" : "") + "> Heute arbeitsfrei</label></div>";
+}
 function logEat(r, portions) {
   const n = portions || 1;
   dayEns().items.push({ id: r.id, t: r.title + (n > 1 ? " ×" + n : ""), k: Math.round(r.kcal * n), p: Math.round(r.protein * n), c: Math.round(r.cost * n * 100) / 100 });
@@ -2336,15 +2462,14 @@ function renderToday() {
     ringHTML(e.p / pg, "var(--good)", e.p, "von " + pg + " g", "Eiweiß") +
     ringHTML(e.k / GOALS.kcal, e.k > GOALS.kcal + 150 ? "var(--warn)" : "var(--accent)", e.k.toLocaleString("de-DE"), "von " + GOALS.kcal.toLocaleString("de-DE") + " kcal", "Kalorien") +
     ringHTML(wc / 3, "var(--ink)", wc, "von 3", "Training") + "</div>" +
-    '<p class="small muted">Eiweiß ist für den Muskelaufbau am wichtigsten. Die Ziele kannst du oben rechts in den Einstellungen ändern.</p></div>' +
+    '<p class="small muted">Eiweiß ist für den Muskelaufbau am wichtigsten. Die Ziele änderst du bei den Einstellungen (Zahnrad).</p></div>' +
     '<div class="grid2"><div class="card"><div class="rday-h"><h3>Wasser</h3><span class="rtot">' + nf(Math.round(day.water * 25) / 100) + " von " + nf(Math.round(GOALS.water * 25) / 100) + ' Litern</span></div><div class="glasses">' + glasses + '</div><p class="small muted">Ein Glas sind etwa 250 ml. Die DGE nennt rund 1,5 Liter am Tag.</p></div>' +
     '<div class="card"><h3>Serie</h3><div class="stats"><div class="stat"><span class="big">' + streak + '</span><span>Wochen in Folge mit mindestens 2 Einheiten</span></div><div class="stat"><span class="big">' + sessions.length + '</span><span>Einheiten insgesamt</span></div></div></div></div>' +
     '<div class="card"><div class="rday-h"><h3>Heute gegessen</h3>' + (day.items.length ? '<span class="rtot">ca. ' + eur(e.c) + " bei Lidl</span>" : "") + "</div>" +
     (day.items.length
       ? '<ul class="eatlist">' + day.items.map((x, i) => "<li><div><b>" + x.t + '</b><span class="muted small">' + x.p + " g Eiweiß, " + x.k + ' kcal</span></div><button class="btn icon sm" data-eatdel="' + i + '" aria-label="Eintrag löschen">' + ic("close") + "</button></li>").join("") + "</ul>"
       : '<p class="muted">Noch nichts eingetragen. Trag ein, was du gegessen hast, oder tippe auf ein Rezept in den Vorschlägen.</p>') +
-    (rest > 8 ? '<div><p><b>Noch ' + rest + " g Eiweiß offen.</b> Das passt gut und ist günstig:</p><div class=\"sugs\">" + sug.map((r) => '<button class="sug" data-eat="' + r.id + '"><b>' + r.title + "</b><span>" + r.protein + " g Eiweiß, " + r.kcal + " kcal, ca. " + eur(r.cost) + "</span></button>").join("") + "</div></div>"
-      : (day.items.length ? '<p class="warnt" style="color:var(--good)">Eiweißziel für heute erreicht.</p>' : "")) + "</div>";
+    planHTML(rest, day) + "</div>";
 }
 
 /* Essen eintragen */
@@ -2552,15 +2677,18 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.v3 != null && t.dataset.v3 !== "") return openV3(t.dataset.v3, t.dataset.i != null && t.dataset.i !== "" ? parseInt(t.dataset.i, 10) : null, t);
   if (t.dataset.reps) { if (W.phase === "work") setDone(parseInt(t.dataset.reps, 10)); return; }
   if (t.dataset.water != null && t.dataset.water !== "") { const i = parseInt(t.dataset.water, 10), day = dayEns(); day.water = day.water === i + 1 ? i : i + 1; saveToday(); return renderToday(); }
+  if (t.dataset.plan != null && t.dataset.plan !== "") return planEat(parseInt(t.dataset.plan, 10));
+  if (t.dataset.planre != null && t.dataset.planre !== "") return planRe(parseInt(t.dataset.planre, 10));
+  if (t.dataset.planall) return t.dataset.planall === "new" ? planNew() : planAll();
   if (t.dataset.eatopen) return openEat();
   if (t.dataset.eat) { const r = byId(t.dataset.eat); if (r) { logEat(r, 1); t.textContent = "Eingetragen"; t.disabled = true; } return; }
   if (t.dataset.eatrec) { const r = byId(t.dataset.eatrec); if (r) { logEat(r, portions); t.textContent = "Eingetragen"; } return; }
-  if (t.dataset.eatdel != null && t.dataset.eatdel !== "") { dayEns().items.splice(parseInt(t.dataset.eatdel, 10), 1); saveToday(); return renderToday(); }
+  if (t.dataset.eatdel != null && t.dataset.eatdel !== "") { const dd = dayEns(), gone = dd.items.splice(parseInt(t.dataset.eatdel, 10), 1)[0]; if (gone && dd.plan) { const ix = dd.plan.ids.indexOf(gone.id); if (ix >= 0) dd.plan.done[ix] = false; } saveToday(); return renderToday(); }
   if (t.dataset.effort) { if (WK[SUMIDX]) { WK[SUMIDX].effort = t.dataset.effort; saveToday(); drawSummary(SUMIDX); } return; }
   if (t.dataset.lvlup || t.dataset.lvldown) { const id = t.dataset.lvlup || t.dataset.lvldown, e = EX.find((x) => x.id === id); levels[id] = Math.max(0, Math.min(e.ladder.length - 1, lvl(e) + (t.dataset.lvlup ? 1 : -1))); store.set("fc_levels", levels); renderEx(); render(); drawSummary(SUMIDX); return; }
   if (dictation && t.id !== "mic") setTimeout(() => { if (!document.querySelector("dialog[open]")) $("#cmd").focus(); }, 0);
   if (t.id === "mic" || t.id === "micfab") return toggleMic();
-  if (t.id === "b-settings") return openSettings();
+  if (t.id === "b-settings" || t.id === "b-settings2") return openSettings();
   if (t.hasAttribute("data-close")) { closeDialog(t.closest("dialog")); return; }
   if (t.dataset.act) {
     if (t.dataset.act === "start" && window.matchMedia && matchMedia("(max-width: 979px)").matches) window.scrollTo({ top: 0, behavior: reduceMotion() ? "auto" : "smooth" });
@@ -2605,6 +2733,15 @@ document.addEventListener("input", (ev) => {
     const v = parseFloat(t.value);
     if (v > 0) { prof[t.id === "b-weight" ? "weight" : "height"] = v; store.set("fc_body", prof); $("#calc").innerHTML = calcStats(bodyCalc()); $("#waistnote").textContent = waistNote(); }
   }
+  if (t.id === "plan-small") {
+    GOALS.pause = t.checked ? "small" : "meal"; const d = dayEns();
+    if (d.plan && !d.plan.free) {
+      const old = d.plan, ids = makeDayPlan(false, [old.ids[0], old.done[1] ? old.ids[1] : null, old.ids[2]]);
+      if (ids) d.plan = { ids, done: ids.map((x, k) => !!(old.done[k] && old.ids[k] === x)), free: false };
+    }
+    saveToday(); return renderToday();
+  }
+  if (t.id === "plan-free") { const d = dayEns(); const ids = makeDayPlan(t.checked); if (ids) { d.plan = { ids, done: ids.map(() => false), free: t.checked }; } saveToday(); return renderToday(); }
   if (t.dataset && t.dataset.shop) { shop[t.dataset.shop] = t.checked; store.set("fc_shop", shop); }
   if (t.dataset && t.dataset.chk) { CHK[t.dataset.chk] = t.checked; saveCart(); const ln = t.closest(".sline"); if (ln) ln.classList.toggle("done", t.checked); }
 });
@@ -3094,7 +3231,7 @@ function bindV3() {
 }
 
 /* ======================= Start ======================= */
-$("#b-settings").innerHTML = ic("gear");
+$("#b-settings").innerHTML = ic("gear"); $("#b-settings2").innerHTML = ic("gear") + "<span>Einstellungen</span>"; $("#micfab").innerHTML = ic("mic"); document.body.classList.toggle("has-sr", !!SR);
 $("#x-settings").innerHTML = ic("close");
 bindV3(); renderEx(); renderRecipes(); renderNutrition(); renderTips(); renderSources(); renderProgress(); bindSettings(); render(); bindGoals(); renderToday();
 function radShowAll() { rad.shown = new Set(); const P = RPL[RAD.mode]; if (P) P.days.forEach((d, di) => d.slots.forEach((x, si) => rad.shown.add(di + ":" + si))); }
