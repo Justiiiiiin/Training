@@ -587,6 +587,10 @@ body[data-coach="0"] .side { display: none; }
 .calcrows li { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--line); }
 .calcrows li.cunk { display: grid; }
 .calcrows li > div b { overflow-wrap: anywhere; }
+.mydsave { margin-top: 6px; }
+.mydsave summary { cursor: pointer; font-weight: 600; padding: 6px 0; }
+.mydli { display: grid !important; gap: 6px; }
+.mydrow { align-items: flex-end; }
 .calctot { padding: 10px 12px; border-radius: 12px; background: var(--surface-2); display: grid; gap: 2px; }
 .field.sm { max-width: 140px; }
 .cats { gap: 6px; flex-wrap: wrap; }
@@ -597,7 +601,7 @@ body[data-coach="0"] .side { display: none; }
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">Stand 02.11. 16:17</span>
+<span class="ver" id="appver" aria-label="Stand der Version">Stand 02.11. 16:23</span>
 <header class="top">
   <div class="brand"><h1>Fitness Coach</h1><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -781,7 +785,7 @@ body[data-coach="0"] .side { display: none; }
 <script>
 window.FC = (function () {
   "use strict";
-  var KEYS = ["fc_settings", "fc_levels", "fc_log", "fc_sessions", "fc_body", "fc_shop", "fc_exc", "fc_rad", "fc_radplans", "fc_cart", "fc_budget", "fc_chk", "fc_goals", "fc_diary", "fc_wk", "fc_fav", "fc_prep"];
+  var KEYS = ["fc_settings", "fc_levels", "fc_log", "fc_sessions", "fc_body", "fc_shop", "fc_exc", "fc_rad", "fc_radplans", "fc_cart", "fc_budget", "fc_chk", "fc_goals", "fc_diary", "fc_wk", "fc_fav", "fc_prep", "fc_dishes"];
   var CH = 90000;
   var embedded = !!(window.claude && typeof window.claude.use === "function");
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -1807,6 +1811,7 @@ function render() {
 const F = { q: "", meal: "", diet: "", time: 0, minProt: false, prep: false, nocook: false, cheap: false, work: false, light: false, fav: false, sort: "protein" };
 let EXC = store.get("fc_exc", []);
 let FAV = store.get("fc_fav", []);
+let MYD = store.get("fc_dishes", []);
 const PREPDEF = { people: 2, days: 6, n: 2, brk: true, snk: true, week: "", main: [], b: "", s: "", done: {} };
 let PREP = Object.assign({}, PREPDEF, store.get("fc_prep", {}));
 const isExc = (r) => EXC.some((x) => (x.startsWith("z:") ? r.ing.some((i) => i[4] === x.slice(2)) : x.startsWith("r:") ? r.id === x.slice(2) : r.contains.includes(x)));
@@ -2725,6 +2730,7 @@ let WK = store.get("fc_wk", []);
   Object.keys(levels).forEach((k) => { if (typeof levels[k] !== "number" || !isFinite(levels[k]) || levels[k] < 0) delete levels[k]; });
   if (!Array.isArray(settings.tdays) || settings.tdays.length !== 7) settings.tdays = [1, 0, 1, 0, 1, 0, 0]; settings.tdays = settings.tdays.map((v) => (v ? 1 : 0));
   if (!isObj(settings.alt)) settings.alt = {}; Object.keys(settings.alt).forEach((k) => { const v = settings.alt[k], e = typeof v === "string" ? exById(v) : null; if (!e || e.slot !== k) delete settings.alt[k]; }); applyAlts();
+  MYD = (Array.isArray(MYD) ? MYD : []).filter((d) => isObj(d) && typeof d.name === "string" && [d.k, d.p, d.w].every((x) => typeof x === "number" && isFinite(x)) && d.w > 0 && d.k >= 0 && d.p >= 0).slice(0, 60).map((d) => ({ id: String(d.id || d.name), name: d.name.slice(0, 60), k: d.k, p: d.p, c: typeof d.c === "number" && isFinite(d.c) ? d.c : 0, w: d.w, est: !!d.est, lg: typeof d.lg === "number" && d.lg > 0 ? d.lg : 250, text: typeof d.text === "string" ? d.text.slice(0, 400) : "" }));
   if (!isObj(PREP)) PREP = Object.assign({}, PREPDEF);
   PREP.people = num(PREP.people, 1, 4, 2); PREP.days = num(PREP.days, 3, 6, 6); PREP.n = num(PREP.n, 1, 3, 2); PREP.brk = !!PREP.brk; PREP.snk = !!PREP.snk;
   if (typeof PREP.week !== "string") PREP.week = ""; if (!isObj(PREP.done)) PREP.done = {};
@@ -3135,6 +3141,8 @@ function cParse(text) {
     const m = t.match(/(\d+(?:\.\d+)?|halbe[rsn]?|halb)\s*(kg|gramm|gr|g|ml|liter|l|el|essloeffel|tl|teeloeffel|stk|stueck|x|scheiben|scheibe|dosen|dose|becher|packung|portionen|portion|messerspitzen|messerspitze|msp|prisen|prise|zehen|zehe|handvoll|tassen|tasse|glaeser|glas|bund|zweige|zweig)?(?![a-z])/);
     if (m) { n = /^halb/.test(m[1]) ? 0.5 : parseFloat(m[1]); unit = CUNIT[m[2]] || ""; t = (t.slice(0, m.index) + " " + t.slice(m.index + m[0].length)).replace(/\s+/g, " ").trim(); }
     const mult = n != null && !unit ? n : 1, name = t || raw;
+    const my = MYD.find((d) => t.includes(CNORM(d.name)));
+    if (my) { const g = n == null ? my.lg : unit === "kg" ? n * 1000 : unit === "portion" || unit === "stk" || (!unit && n < 10) ? n * my.lg : n, f = g / my.w; return { raw, kind: "dish", name: my.name, qty: Math.round(g) + " g", k: my.k * f, p: my.p * f, c: my.c * f }; }
     const dish = cMatch(CDISHL, t);
     if (dish && (!n || !unit || unit === "stk" || unit === "portion")) return { raw, kind: "dish", name: dish.name, qty: (n != null ? n : 1) + " Portion" + ((n != null ? n : 1) === 1 ? "" : "en"), k: dish.kcal * (n != null ? n : 1), p: dish.p * (n != null ? n : 1), c: null };
     let f = cMatch(CFOODS, t) || cFuzzy(CFOODS, t);
@@ -3171,19 +3179,46 @@ function calcHTML() {
     out += '<div class="calctot"><b>Zusammen: ' + Math.round(T.k) + " kcal, " + (Math.round(T.p * 10) / 10).toLocaleString("de-DE") + " g Eiweiß" + (T.c != null ? ", ca. " + eur(T.c) + " bei Lidl" : "") + "</b>" + (T.open ? '<span class="small muted"> ohne ' + T.open + " nicht erkannte Zutat" + (T.open > 1 ? "en" : "") + "</span>" : "") + "</div>" +
       '<div class="row"><label class="field sm">Aufgeteilt auf Personen<input type="number" id="calc-srv" min="1" max="8" value="' + CALC.srv + '" inputmode="numeric"></label><label class="field">Name im Tagebuch<input type="text" id="calc-name" maxlength="60" value="' + CALC.name.replace(/"/g, "&quot;") + '"></label></div>' +
       (per > 1 ? '<p class="small">Für dich: ' + Math.round(T.k / per) + " kcal, " + (Math.round(T.p / per * 10) / 10).toLocaleString("de-DE") + " g Eiweiß</p>" : "") +
-      '<div class="row"><button class="btn primary" type="button" data-calcadd="1">Heute eintragen</button></div><p class="small muted">Richtwerte. Reis, Nudeln, Couscous und Linsen gelten als Rohgewicht, außer du schreibst „gekocht“.</p>';
+      '<div class="row"><button class="btn primary" type="button" data-calcadd="1">Heute eintragen</button></div>' +
+      '<details class="mydsave"><summary>Als Gericht speichern, um später nur Gramm einzugeben</summary><div class="row"><label class="field">Name<input type="text" id="myd-name" maxlength="60" value="' + CALC.name.replace(/"/g, "&quot;") + '"></label><label class="field sm">Fertig gewogen (g)<input type="number" id="myd-w" min="50" max="20000" inputmode="numeric" placeholder="leer = Schätzung"></label></div><p class="small muted">Wiege das fertige Gericht, wenn du kannst. Ohne Angabe schätze ich das Gewicht nach dem Kochen, das ist ungenauer.</p><div class="row"><button class="btn" type="button" data-mydsave="1">Gericht speichern</button></div></details><p class="small muted">Richtwerte. Reis, Nudeln, Couscous und Linsen gelten als Rohgewicht, außer du schreibst „gekocht“.</p>';
   }
-  return '<h4>Selbst berechnen</h4><p class="small muted">Schreib Zutaten mit Menge oder ein Gericht, zum Beispiel „200 g Hähnchen, 150 g Reis, 1 Paprika“ oder „Döner“.</p>' +
-    '<label class="field">Zutaten oder Gericht<textarea id="calc-in" rows="3" maxlength="400" placeholder="200 g Hähnchen, 150 g Reis, 1 Paprika">' + CALC.text.replace(/</g, "&lt;") + "</textarea></label>" +
+  return '<h4 id="calc-sec">Selbst berechnen</h4><p class="small muted">Schreib Zutaten mit Menge oder ein Gericht, zum Beispiel „200 g Hähnchen, 150 g Reis, 1 Paprika“ oder „Döner“.</p>' +
+    '<label class="field">Name des Gerichts (optional)<input type="text" id="calc-name0" maxlength="60" value="' + CALC.name.replace(/"/g, "&quot;") + '" placeholder="z. B. Spaghetti Bolognese"></label><label class="field">Zutaten mit Mengen<textarea id="calc-in" rows="3" maxlength="400" placeholder="200 g Hähnchen, 150 g Reis, 1 Paprika">' + CALC.text.replace(/</g, "&lt;") + "</textarea></label>" +
     '<div class="row"><button class="btn primary" type="button" data-calcgo="1">Berechnen</button></div>' + out;
 }
-function calcGo() { CALC.text = ($("#calc-in") || {}).value || CALC.text; CALC.rows = cParse(CALC.text); CALC.man = {}; CALC.err = ""; CALC.ai = false; CALC.srv = 1; CALC.name = CALC.text.split(/[\n,;]/)[0].slice(0, 40).trim(); drawEat(); }
+function calcGo() { CALC.text = ($("#calc-in") || {}).value || CALC.text; const nm = (($("#calc-name0") || {}).value || "").trim(); CALC.rows = cParse(CALC.text); CALC.man = {}; CALC.err = ""; CALC.ai = false; CALC.srv = 1; CALC.name = nm || CALC.text.split(/[\n,;]/)[0].slice(0, 40).trim(); drawEat(); }
 function calcRead() { $$(".calcman").forEach((el) => { const i = el.dataset.i; CALC.man[i] = CALC.man[i] || {}; CALC.man[i][el.dataset.f] = el.value === "" ? "" : parseFloat(el.value); }); }
 function calcAdd() {
   const T = cTotals(), srv = Math.max(1, Math.min(8, parseInt(($("#calc-srv") || {}).value, 10) || 1)), name = ((($("#calc-name") || {}).value) || CALC.name || "Eigenes Gericht").trim() || "Eigenes Gericht";
   CALC.srv = srv; if (!T.rows.some((r) => r.k != null)) return;
   dayEns().items.push({ t: name + (srv > 1 ? " (1 von " + srv + ")" : ""), k: Math.round(T.k / srv), p: Math.round(T.p / srv), c: T.c != null ? Math.round(T.c / srv * 100) / 100 : 0 });
   saveToday(); renderToday(); const ok = name; CALC = { text: "", rows: null, man: {}, srv: 1, name: "", ai: false, busy: false, err: "" }; drawEat("Eingetragen: " + ok);
+}
+
+
+/* Eigene Gerichte: einmal Zutaten eingeben, danach nur noch die gegessenen Gramm */
+const mydSave = () => store.set("fc_dishes", MYD);
+function mydWeight(rows) {
+  return rows.reduce((a, r) => { if (r.g == null) return a; const raw = /Rohgewicht/.test(r.name || "") || r.note === "gekocht gerechnet"; const meat = /Hähnchen|Pute|hack|Hack|Schnitzel|Rind|Schwein|Bacon|Kassler/.test(r.name || ""); return a + r.g * (raw && r.note !== "gekocht gerechnet" ? 2.4 : meat ? 0.75 : 0.88); }, 0);
+}
+function mydHTML() {
+  const list = MYD.length ? '<ul class="calcrows">' + MYD.map((d, i) => { const f = (d.lg || 250) / d.w; return '<li class="mydli"><div><b>' + d.name + '</b><span class="muted small"> pro 100 g: ' + Math.round(d.k / d.w * 100) + " kcal, " + (Math.round(d.p / d.w * 1000) / 10).toLocaleString("de-DE") + " g Eiweiß. Gericht wiegt fertig " + Math.round(d.w) + " g" + (d.est ? " (geschätzt)" : "") + '</span></div><div class="row mydrow"><label class="field sm">Gegessen (g)<input type="number" class="myd-g" data-i="' + i + '" min="1" max="3000" value="' + (d.lg || 250) + '" inputmode="numeric"></label><span class="small" id="mydv' + i + '">= ' + Math.round(d.k * f) + " kcal, " + (Math.round(d.p * f * 10) / 10).toLocaleString("de-DE") + ' g Eiweiß</span></div><div class="row"><button class="btn primary" type="button" data-mydeat="' + i + '">Eintragen</button><button class="btn sm" type="button" data-mydel="' + i + '" aria-label="' + d.name + ' löschen">Löschen</button></div></li>'; }).join("") + "</ul>" : '<p class="small muted">Noch nichts gespeichert. Gib unten Zutaten ein, rechne sie aus und speichere sie als Gericht.</p>';
+  return '<h4 id="myd-sec">Meine Gerichte</h4><p class="small muted">Gespeicherte Gerichte trägst du mit einer Mengenangabe ein, zum Beispiel 250 g vom Teller.</p>' + list;
+}
+function mydFromInput(i) { const d = MYD[i]; if (!d) return; const el = document.querySelector('.myd-g[data-i="' + i + '"]'), g = Math.max(1, Math.min(3000, parseFloat(el.value) || 0)), f = g / d.w; d.lg = g; const o = document.getElementById("mydv" + i); if (o) o.textContent = "= " + Math.round(d.k * f) + " kcal, " + (Math.round(d.p * f * 10) / 10).toLocaleString("de-DE") + " g Eiweiß"; }
+function mydEat(i) {
+  const d = MYD[i]; if (!d) return; mydFromInput(i); const g = d.lg, f = g / d.w;
+  dayEns().items.push({ t: d.name + " (" + Math.round(g) + " g)", k: Math.round(d.k * f), p: Math.round(d.p * f), c: Math.round(d.c * f * 100) / 100 });
+  mydSave(); saveToday(); renderToday(); drawEat("Eingetragen: " + d.name + ", " + Math.round(g) + " g");
+}
+function mydNew() {
+  const T = cTotals(), name = (($("#myd-name") || {}).value || CALC.name || "").trim();
+  if (!CALC.rows || T.open) { CALC.err = "Zum Speichern müssen alle Zutaten erkannt sein. Wähle bei den unbekannten eine Kategorie."; return drawEat(); }
+  if (!name) { CALC.err = "Gib dem Gericht einen Namen."; return drawEat(); }
+  const wIn = parseFloat(($("#myd-w") || {}).value), est = !(wIn > 0), w = est ? Math.max(50, Math.round(mydWeight(T.rows))) : wIn;
+  const d = { id: String(Date.now()), name: name.slice(0, 60), k: T.k, p: T.p, c: T.c || 0, w, est, lg: 250, text: CALC.text.slice(0, 400) };
+  const ix = MYD.findIndex((x) => CNORM(x.name) === CNORM(d.name)); if (ix >= 0) MYD[ix] = d; else MYD.unshift(d);
+  MYD = MYD.slice(0, 60); mydSave(); CALC = { text: "", rows: null, man: {}, srv: 1, name: "", ai: false, busy: false, err: "" }; drawEat("Gespeichert: " + d.name + (est ? ". Das fertige Gewicht ist geschätzt, wiege das Gericht einmal für genauere Werte." : "."));
 }
 
 /* Essen eintragen */
@@ -3193,9 +3228,9 @@ function drawEat(msg) {
   const l = q ? RECIPES.filter((r) => (r.title + " " + r.ing.map((i) => i[2]).join(" ")).toLowerCase().includes(q)).slice(0, 8) : suggestList(8);
   $("#dlg-eat").innerHTML = '<div class="dlg"><div class="dlg-head"><h3>Essen eintragen</h3><button class="btn icon" data-close aria-label="Schließen">' + ic("close") + "</button></div>" +
     '<div class="search">' + ic("search") + '<input type="search" id="eatq" placeholder="Rezept suchen, z. B. Quark oder Wrap" value="' + EATQ.replace(/"/g, "&quot;") + '" aria-label="Rezept suchen"></div>' +
-    '<p class="small muted" role="status">' + (msg || (q ? l.length + " Treffer" : "Vorschläge für heute")) + "</p>" +
+    '<div class="row eatjump"><button class="btn sm" type="button" data-eatjump="calc-sec">Selbst berechnen</button><button class="btn sm" type="button" data-eatjump="myd-sec">Meine Gerichte' + (MYD.length ? " (" + MYD.length + ")" : "") + '</button></div><p class="small muted" role="status">' + (msg || (q ? l.length + " Treffer" : "Vorschläge für heute")) + "</p>" +
     '<ul class="eatlist">' + (l.length ? l.map((r) => "<li><div><b>" + r.title + '</b><span class="muted small">' + r.protein + " g Eiweiß, " + r.kcal + " kcal, ca. " + eur(r.cost) + '</span></div><button class="btn sm" data-eat="' + r.id + '">Eintragen</button></li>').join("") : '<li class="muted">Kein Rezept gefunden. Trag es unten selbst ein.</li>') + "</ul>" +
-    calcHTML() + '<h4>Etwas anderes gegessen?</h4><form id="eatform" class="form"><label class="field">Name<input type="text" id="e-name" maxlength="60" required></label><label class="field">kcal<input type="number" id="e-k" min="0" max="3000" inputmode="numeric" required></label><label class="field">Eiweiß in g<input type="number" id="e-p" min="0" max="300" inputmode="numeric" required></label><button class="btn primary" type="submit">Eintragen</button></form></div>';
+    mydHTML() + calcHTML() + '<h4>Etwas anderes gegessen?</h4><form id="eatform" class="form"><label class="field">Name<input type="text" id="e-name" maxlength="60" required></label><label class="field">kcal<input type="number" id="e-k" min="0" max="3000" inputmode="numeric" required></label><label class="field">Eiweiß in g<input type="number" id="e-p" min="0" max="300" inputmode="numeric" required></label><button class="btn primary" type="submit">Eintragen</button></form></div>';
 }
 function openEat() { EATQ = ""; drawEat(); showDialog($("#dlg-eat"), $('[data-eatopen]')); }
 
@@ -3388,7 +3423,7 @@ $("#cmd").addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.pre
 
 /* ======================= Ereignisse ======================= */
 function openSettings() { showDialog($("#dlg-settings"), $("#b-settings")); }
-document.addEventListener("input", (ev) => { const t = ev.target; if (t && t.id === "calc-in") CALC.text = t.value; if (t && t.id === "calc-name") CALC.name = t.value; });
+document.addEventListener("input", (ev) => { const t = ev.target; if (t && t.id === "calc-in") CALC.text = t.value; if (t && (t.id === "calc-name" || t.id === "calc-name0")) CALC.name = t.value; if (t && t.classList && t.classList.contains("myd-g")) mydFromInput(parseInt(t.dataset.i, 10)); });
 document.addEventListener("click", (ev) => {
   const t = ev.target.closest("button"); if (!t) return;
   if (t.dataset.v3 != null && t.dataset.v3 !== "") return openV3(t.dataset.v3, t.dataset.i != null && t.dataset.i !== "" ? parseInt(t.dataset.i, 10) : null, t);
@@ -3402,6 +3437,10 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.prepgen) { prepGen(t.dataset.prepgen); return renderPrep(); }
   if (t.dataset.prepcart) { const c = prepCalc(); c.entries.forEach((e) => cartAdd(e.id, e.n)); t.textContent = "Übernommen"; return; }
   if (t.dataset.calcgo) return calcGo();
+  if (t.dataset.eatjump) { const el = document.getElementById(t.dataset.eatjump); if (el) el.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" }); return; }
+  if (t.dataset.mydsave) return mydNew();
+  if (t.dataset.mydeat) return mydEat(parseInt(t.dataset.mydeat, 10));
+  if (t.dataset.mydel) { const d = MYD[parseInt(t.dataset.mydel, 10)]; if (d) { MYD.splice(parseInt(t.dataset.mydel, 10), 1); mydSave(); drawEat("Gelöscht: " + d.name); } return; }
   if (t.dataset.calcre) { calcRead(); return drawEat(); }
   if (t.dataset.calccat) { const c = CCATS.find((x) => x[0] === t.dataset.c); calcRead(); CALC.man[t.dataset.calccat] = { k: c[1], p: c[2], cat: c[0] }; return drawEat(); }
   if (t.dataset.calcadd) { calcRead(); return calcAdd(); }
