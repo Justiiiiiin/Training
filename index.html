@@ -597,7 +597,7 @@ body[data-coach="0"] .side { display: none; }
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">Stand 02.11. 12:38</span>
+<span class="ver" id="appver" aria-label="Stand der Version">Stand 02.11. 13:00</span>
 <header class="top">
   <div class="brand"><h1>Fitness Coach</h1><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -2996,7 +2996,7 @@ const CSYN = {
   haehn: "haehnchenbrust haehnchen haenchen hahnchen huhn huehnchen chicken haehnchenfilet", pute: "putenbrust pute putenfleisch putenschnitzel putenfilet", phack: "putenhack putenhackfleisch", rhack: "rinderhack rinderhackfleisch rindergehacktes",
   ghack: "hackfleisch hack gehacktes", schink: "schinken kochschinken", paufs: "aufschnitt putenaufschnitt", ei: "ei eier eiern spiegelei ruehrei", skyr: "skyr", quark: "quark magerquark", jog35: "joghurt naturjoghurt", milch: "milch",
   moz: "mozzarella", gouda: "gouda kaese schnittkaese", parm: "parmesan", hafer: "haferflocken hafer porridge", chia: "chia", mandel: "mandeln mandel", brot: "brot vollkornbrot brotscheibe graubrot mischbrot", wrap: "wrap wraps tortilla",
-  broetchen: "broetchen semmel vollkornbroetchen", nudel: "nudeln pasta spaghetti penne fusilli makkaroni tagliatelle", reis: "reis", couscous: "couscous", honig: "honig", oel: "oel olivenoel rapsoel sonnenblumenoel",
+  broetchen: "broetchen semmel vollkornbroetchen", nudel: "nudeln pasta spaghetti penne fusilli makkaroni tagliatelle vollkornnudeln", reis: "reis", couscous: "couscous", honig: "honig", oel: "oel olivenoel rapsoel sonnenblumenoel",
   soja: "sojasauce", tmark: "tomatenmark", stueck: "stueckige tomaten|passierte tomaten|dosentomaten", tom: "tomate tomaten", gurke: "gurke gurken salatgurke", pap: "paprika", zwie: "zwiebel zwiebeln", karo: "karotte karotten moehre moehren",
   eisb: "eisbergsalat salat eisberg", spin: "spinat", ruc: "rucola", sgurke: "saure gurke|saure gurken|gewuerzgurke|gewuerzgurken", knob: "knoblauch", banane: "banane bananen", erdb: "erdbeeren erdbeere", kiche: "kichererbsen",
   bohne: "kidneybohnen bohnen", linse: "linsen", kokos: "kokosmilch", bruehe: "gemuesebruehe bruehe", zitrone: "zitronensaft zitrone", senf: "senf", kakao: "kakao", schnitzel: "schweineschnitzel schnitzel schweinefleisch", curry: "currypulver curry"
@@ -3012,7 +3012,7 @@ const CEXTRA = [
   ["ketchup", "Ketchup", 110, 1.2, 0, 20, 0.25], ["mayo|mayonnaise", "Mayonnaise", 700, 1, 0, 15, 0.3], ["tomatensauce|tomatensosse", "Tomatensoße (Glas)", 50, 1.6, 0, 150, 0.2],
   ["schokolade", "Schokolade", 540, 6.5, 0, 25, 0.6], ["nutella|nussnougatcreme", "Nuss-Nougat-Creme", 540, 6, 0, 20, 0.5], ["chips", "Chips", 530, 6, 0, 50, 0.9], ["gummibaerchen|gummibaeren", "Gummibärchen", 340, 7, 0, 30, 0.6],
   ["cola|limo|limonade", "Cola oder Limonade", 42, 0, 0, 330, 0.1], ["saft|apfelsaft|orangensaft", "Saft", 45, 0.5, 0, 200, 0.12], ["energy|energydrink", "Energy-Drink", 45, 0, 0, 250, 0.2], ["bier", "Bier", 43, 0.5, 0, 500, 0.2],
-  ["proteinpulver|whey|eiweisspulver", "Proteinpulver", 380, 75, 30, 30, 2.5], ["tiefkuehlpizza|pizza tk", "Tiefkühlpizza", 250, 10, 350, 350, 0.55],
+  ["weizennudeln|helle nudeln|weisse nudeln", "Weizennudeln (Rohgewicht)", 355, 12.5, 0, 100, 0.2], ["proteinpulver|whey|eiweisspulver", "Proteinpulver", 380, 75, 30, 30, 2.5], ["tiefkuehlpizza|pizza tk", "Tiefkühlpizza", 250, 10, 350, 350, 0.55],
   ["blumenkohl", "Blumenkohl", 25, 2, 0, 150, 0.3], ["kohlrabi", "Kohlrabi", 27, 1.7, 0, 150, 0.3], ["aubergine", "Aubergine", 25, 1, 0, 150, 0.35], ["lauch|porree", "Lauch", 30, 2.1, 0, 100, 0.3], ["sellerie", "Sellerie", 20, 1.5, 0, 50, 0.25],
   ["rotkohl|weisskohl|kohl", "Kohl", 28, 1.5, 0, 150, 0.15], ["erbsen", "Erbsen", 80, 6, 0, 100, 0.3], ["radieschen", "Radieschen", 15, 1, 0, 50, 0.4], ["avocado", "Avocado", 160, 2, 150, 100, 0.8], ["oliven", "Oliven", 150, 1, 0, 30, 0.7],
   ["kiwi", "Kiwi", 50, 1, 80, 80, 0.4], ["mango", "Mango", 60, 0.7, 300, 150, 0.5], ["ananas", "Ananas", 55, 0.5, 0, 150, 0.3], ["melone|wassermelone", "Melone", 30, 0.6, 0, 200, 0.2], ["heidelbeeren|blaubeeren", "Heidelbeeren", 45, 0.7, 0, 100, 0.9],
@@ -3039,7 +3039,7 @@ const CDISH = [
 const CFOODS = (() => {
   const L = [], nm = (s) => s.split("|").map((x) => CNORM(x));
   Object.keys(PRICE).forEach((k) => { const p = PRICE[k]; L.push({ id: k, name: p.n.replace(/ \(.*\)/, "").replace(/^Scheibe /, ""), kcal: p.kcal, p: p.p, per: p.u === "g" || p.u === "ml" ? 0 : p.per, pu: p.u, def: CDEF[k] || (p.u === "g" || p.u === "ml" ? 100 : p.per), eur: p.price / p.pack * 100, keys: (CSYN[k] || "").split(" ").flatMap((x) => x.split("|")).filter(Boolean), raw: ["reis", "nudel", "couscous", "linse"].includes(k) }); });
-  CEXTRA.forEach((x, i) => L.push({ id: "x" + i, name: x[1], kcal: x[2], p: x[3], per: x[4], pu: x[4] ? "Stk" : "g", def: x[5], eur: x[6], keys: nm(x[0]), raw: false }));
+  CEXTRA.forEach((x, i) => L.push({ id: "x" + i,  name: x[1], kcal: x[2], p: x[3], per: x[4], pu: x[4] ? "Stk" : "g", def: x[5], eur: x[6], keys: nm(x[0]), raw: /Rohgewicht/.test(x[1]) }));
   return L;
 })();
 const cLev = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length]; };
@@ -3080,7 +3080,8 @@ function cParse(text) {
     const mult = n != null && !unit ? n : 1, name = t || raw;
     const dish = cMatch(CDISHL, t);
     if (dish && (!n || !unit || unit === "stk" || unit === "portion")) return { raw, kind: "dish", name: dish.name, qty: (n != null ? n : 1) + " Portion" + ((n != null ? n : 1) === 1 ? "" : "en"), k: dish.kcal * (n != null ? n : 1), p: dish.p * (n != null ? n : 1), c: null };
-    const f = cMatch(CFOODS, t) || cFuzzy(CFOODS, t);
+    let f = cMatch(CFOODS, t) || cFuzzy(CFOODS, t);
+    if (f && f.id === "nudel" && /weizen|\bhell|weiss|ohne vollkorn/.test(t)) f = CFOODS.find((x) => x.name.startsWith("Weizennudeln")) || f;
     if (!f) return { raw, kind: "unknown", name: raw, g: n != null ? Math.max(1, Math.round(cGrams(null, n, unit))) : 100, k: null, p: null, c: null };
     let g = n == null ? f.def : cGrams(f, n, unit), note = "";
     if (cooked && f.raw) { g *= 0.37; note = "gekocht gerechnet"; }
