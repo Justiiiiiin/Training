@@ -591,11 +591,13 @@ body[data-coach="0"] .side { display: none; }
 .field.sm { max-width: 140px; }
 .cats { gap: 6px; flex-wrap: wrap; }
 .cats .btn { min-height: 36px; padding: 0 12px; }
+.ver { position: fixed; top: 3px; right: 10px; z-index: 5; font-size: 0.6875rem; line-height: 1; color: var(--muted); opacity: 0.8; pointer-events: none; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
 <div class="app">
 
+<span class="ver" id="appver" aria-label="Stand der Version">Stand 02.11. 12:38</span>
 <header class="top">
   <div class="brand"><h1>Fitness Coach</h1><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
