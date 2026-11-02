@@ -623,12 +623,15 @@ body[data-coach="0"] .side { display: none; }
   .coach[data-idle="1"] .cmd { display: none; }
   .coach[data-idle="1"] .caption:empty { display: none; }
 }
+.weekpick { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px; border-radius: 16px; background: var(--surface-2); }
+.weekpick > div { display: grid; text-align: center; line-height: 1.25; }
+.weekpick .btn[disabled] { opacity: 0.35; }
 </style>
 </head>
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.1 · 02.11. 16:45</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.2 · 02.11. 16:59</span>
 <header class="top">
   <div class="brand"><h1>Fitness Coach</h1><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -1840,7 +1843,7 @@ const F = { q: "", meal: "", diet: "", time: 0, minProt: false, prep: false, noc
 let EXC = store.get("fc_exc", []);
 let FAV = store.get("fc_fav", []);
 let MYD = store.get("fc_dishes", []);
-const PREPDEF = { people: 2, days: 6, n: 2, brk: true, snk: true, week: "", main: [], b: "", s: "", done: {} };
+const PREPDEF = { people: 2, days: 6, n: 2, brk: true, snk: true, week: "", main: [], b: "", s: "", done: {}, plans: {}, autoDay: "" };
 let PREP = Object.assign({}, PREPDEF, store.get("fc_prep", {}));
 const isExc = (r) => EXC.some((x) => (x.startsWith("z:") ? r.ing.some((i) => i[4] === x.slice(2)) : x.startsWith("r:") ? r.id === x.slice(2) : r.contains.includes(x)));
 const zname = (k) => { const n = (PRICE[k] && PRICE[k].n || k).replace(/\s*\(.*?\)/g, "").replace(/^Scheibe /, "").replace(/^stückige /, "Stückige "); return n.charAt(0).toUpperCase() + n.slice(1); };
@@ -2781,6 +2784,9 @@ let WK = store.get("fc_wk", []);
   if (!isObj(PREP)) PREP = Object.assign({}, PREPDEF);
   PREP.people = num(PREP.people, 1, 4, 2); PREP.days = num(PREP.days, 3, 6, 6); PREP.n = num(PREP.n, 1, 3, 2); PREP.brk = !!PREP.brk; PREP.snk = !!PREP.snk;
   if (typeof PREP.week !== "string") PREP.week = ""; if (!isObj(PREP.done)) PREP.done = {};
+  if (!isObj(PREP.plans)) PREP.plans = {}; if (typeof PREP.autoDay !== "string") PREP.autoDay = "";
+  Object.keys(PREP.plans).forEach((k) => { const pl = PREP.plans[k]; if (!/^\d{4}-\d{2}-\d{2}$/.test(k) || !isObj(pl) || !Array.isArray(pl.main)) { delete PREP.plans[k]; return; } pl.main = pl.main.filter((id) => typeof id === "string" && byId(id)); pl.b = typeof pl.b === "string" && byId(pl.b) ? pl.b : ""; pl.s = typeof pl.s === "string" && byId(pl.s) ? pl.s : ""; if (!isObj(pl.done)) pl.done = {}; if (!pl.main.length) delete PREP.plans[k]; });
+  Object.keys(PREP.plans).sort().slice(0, -8).forEach((k) => delete PREP.plans[k]);
   PREP.main = Array.isArray(PREP.main) ? PREP.main.filter((id) => typeof id === "string" && byId(id)) : []; if (typeof PREP.b !== "string" || !byId(PREP.b)) PREP.b = ""; if (typeof PREP.s !== "string" || !byId(PREP.s)) PREP.s = "";
   settings.sets = num(settings.sets, 1, 6, 2); settings.rest = num(settings.rest, 10, 600, 90); settings.hold = num(settings.hold, 5, 180, 30);
   prof.weight = num(prof.weight, 30, 300, 80); prof.height = num(prof.height, 100, 230, 175);
@@ -2945,9 +2951,27 @@ function prepGen(which) {
   if (which === "s") { PREP.s = prepPick("s", [PREP.s]); PREP.done = {}; }
   if (!PREP.b) PREP.b = prepPick("b", []);
   if (!PREP.s) PREP.s = prepPick("s", []);
-  PREP.week = prepWeekISO(); prepSave();
+  PREP.week = PREP.week || prepWeekISO(); prepSave();
 }
-function prepEnsure() { if (!PREP.main.length || PREP.week !== prepWeekISO() || PREP.main.some((id) => !byId(id) || isExc(byId(id)))) prepGen("all"); else if (PREP.main.length !== PREP.n) prepGen(); }
+function prepSelect(iso) {
+  if (PREP.week) PREP.plans[PREP.week] = { main: PREP.main.slice(), b: PREP.b, s: PREP.s, done: Object.assign({}, PREP.done) };
+  const pl = PREP.plans[iso];
+  PREP.week = iso;
+  if (pl && pl.main && pl.main.length) { PREP.main = pl.main.slice(); PREP.b = pl.b || ""; PREP.s = pl.s || ""; PREP.done = Object.assign({}, pl.done); prepSave(); }
+  else { PREP.main = []; PREP.b = ""; PREP.s = ""; PREP.done = {}; prepGen("all"); }
+}
+function prepWith(iso, fn) {
+  if (PREP.week === iso) return fn();
+  const pl = PREP.plans[iso]; if (!pl || !pl.main || !pl.main.length) return null;
+  const keep = { main: PREP.main, b: PREP.b, s: PREP.s, done: PREP.done, week: PREP.week };
+  PREP.main = pl.main; PREP.b = pl.b || ""; PREP.s = pl.s || ""; PREP.done = pl.done || {}; PREP.week = iso;
+  try { return fn(); } finally { Object.assign(PREP, keep); }
+}
+function prepEnsure() {
+  if (!PREP.week || PREP.week < weekStartISO(todayISO()) || PREP.autoDay !== todayISO()) { prepSelect(prepWeekISO()); PREP.autoDay = todayISO(); prepSave(); }
+  else if (!PREP.main.length || PREP.main.some((id) => !byId(id) || isExc(byId(id)))) prepGen("all");
+  else if (PREP.main.length !== PREP.n) prepGen();
+}
 function prepCalc() {
   const P = PREP.people, N = PREP.days, mains = PREP.main.map(byId).filter(Boolean), items = [];
   const dayMain = PREPDAYS.slice(0, N).map((d, i) => (mains.length ? mains[i % mains.length] : null));
@@ -2998,7 +3022,9 @@ function prepHTML() {
       '<div class="row"><button class="btn" type="button" data-recipe="' + it.r.id + '">Rezept</button><button class="btn" type="button" data-cook="' + it.r.id + '">Kochmodus</button><button class="btn" type="button" data-prepgen="' + who + '">' + ic("repeat") + "<span>Anderes Gericht</span></button></div></article>";
   }).join("");
   const steps = prepSteps(c).map((s) => '<li class="' + (PREP.done[s[0]] ? "done" : "") + '"><label class="sline"><input type="checkbox" data-prepchk="' + s[0] + '"' + (PREP.done[s[0]] ? " checked" : "") + '><span class="sname"><b>' + s[1] + "</b><br><span class=\"muted small\">" + s[2] + "</span></span></label></li>").join("");
-  return '<div class="card"><div><h3>Vorkochplan für die Woche ab ' + dateDE(wk) + '</h3><p class="muted">Am Sonntag kochst du ein paar Gerichte in großer Menge und isst sie durch die Woche. Das spart Zeit und meist auch Geld. Gekochtes hält im Kühlschrank etwa 3 Tage, danach kommt es aus dem Tiefkühler.</p></div>' +
+  const cur = weekStartISO(todayISO()), off = Math.round((new Date(wk + "T12:00:00") - new Date(cur + "T12:00:00")) / 604800000), wkName = off === 0 ? "Diese Woche" : off === 1 ? "Nächste Woche" : "In " + off + " Wochen";
+  const picker = '<div class="weekpick" role="group" aria-label="Woche wählen"><button class="btn icon" type="button" data-prepweek="-1" aria-label="Vorherige Woche"' + (off <= 0 ? " disabled" : "") + ">‹</button><div><b>" + wkName + '</b><span class="small muted">' + dateDE(wk) + " bis " + dateDE(shiftDay(wk, 6)) + '</span></div><button class="btn icon" type="button" data-prepweek="1" aria-label="Nächste Woche"' + (off >= 4 ? " disabled" : "") + ">›</button></div>";
+  return '<div class="card"><div><h3>Vorkochplan</h3>' + picker + '<p class="muted">Am Sonntag kochst du ein paar Gerichte in großer Menge und isst sie durch die Woche. Das spart Zeit und meist auch Geld. Gekochtes hält im Kühlschrank etwa 3 Tage, danach kommt es aus dem Tiefkühler.</p></div>' +
     '<div class="prepopts"><div class="row"><span class="small muted">Personen</span><span class="stepper"><button class="btn icon" type="button" data-prepopt="people" data-d="-1" aria-label="Weniger Personen">−</button><b>' + P + '</b><button class="btn icon" type="button" data-prepopt="people" data-d="1" aria-label="Mehr Personen">+</button></span></div>' +
     '<div class="row pseg"><span class="small muted">Tage (Mo bis …)</span>' + seg("days", [3, 4, 5, 6]) + '</div><div class="row pseg"><span class="small muted">Verschiedene Gerichte</span>' + seg("n", [1, 2, 3]) + '</div><div class="row pseg">' + tog("brk", "Frühstück mitkochen") + tog("snk", "Snack mitkochen") + "</div></div>" +
     '<p><b>Kosten ca. ' + eur(c.calc.total) + "</b> bei Lidl (pro Person ca. " + eur(c.calc.total / P) + "), am Sonntag etwa " + c.mins + ' Minuten.</p><div class="row"><button class="btn primary" type="button" data-prepcart="1">In meine Einkaufsliste</button><button class="btn" type="button" data-prepgen="all">' + ic("repeat") + "<span>Neu würfeln</span></button></div></div>" +
@@ -3012,7 +3038,10 @@ function prepTodayHTML() {
   if (!PREP.main.length) { if (((new Date().getDay() + 6) % 7) !== 6) return ""; prepEnsure(); }
   const wd = (new Date().getDay() + 6) % 7;
   if (wd === 6) { prepEnsure(); const c = prepCalc(); return '<div class="card"><div class="tdhead"><div><h3>Heute ist Vorkochtag</h3><p class="muted">' + c.items.length + " Gerichte für die Woche, etwa " + c.mins + " Minuten, ca. " + eur(c.calc.total) + ' bei Lidl.</p></div><div class="row"><button class="btn primary" type="button" data-tab="vorkochen">Plan öffnen</button></div></div></div>'; }
-  if (PREP.week !== weekStartISO(todayISO()) || wd >= PREP.days) return "";
+  if (wd >= PREP.days) return "";
+  return prepWith(weekStartISO(todayISO()), () => prepBoxHTML(wd)) || "";
+}
+function prepBoxHTML(wd) {
   const c = prepCalc(), m = c.dayMain[wd]; if (!m) return "";
   const mi = c.items.find((it) => it.r === m), b = PREP.brk ? c.items.find((it) => it.key === "b") : null, how = wd >= mi.keep.fridge && mi.keep.freeze ? "aus dem Tiefkühler, am Vorabend in den Kühlschrank stellen" : "aus dem Kühlschrank";
   return '<div class="card"><div class="tdhead"><div><h3>Heute aus der Box</h3><p>' + (b && wd < 5 ? "Frühstück: " + b.r.title + ". " : "") + "Essen: " + m.title + ' <span class="muted small">(' + how + ')</span></p></div><div class="row"><button class="btn" type="button" data-tab="vorkochen">Vorkochplan</button></div></div></div>';
@@ -3481,6 +3510,7 @@ document.addEventListener("click", (ev) => {
     else PREP[f] = !PREP[f];
     prepSave(); return renderPrep();
   }
+  if (t.dataset.prepweek) { prepEnsure(); const nx = shiftDay(PREP.week, 7 * parseInt(t.dataset.prepweek, 10)), cur = weekStartISO(todayISO()); if (nx >= cur && nx <= shiftDay(cur, 28)) prepSelect(nx); return renderPrep(); }
   if (t.dataset.prepgen) { prepGen(t.dataset.prepgen); return renderPrep(); }
   if (t.dataset.prepcart) { const c = prepCalc(); c.entries.forEach((e) => cartAdd(e.id, e.n)); t.textContent = "Übernommen"; return; }
   if (t.dataset.calcgo) return calcGo();
