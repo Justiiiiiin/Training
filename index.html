@@ -528,6 +528,30 @@ body[data-coach="0"] .side { display: none; }
 .pl-b { display: flex; gap: 6px; align-items: center; flex: none; }
 .pl-ok { color: var(--good); font-weight: 650; font-size: 0.875rem; }
 .plan-act { gap: 8px; }
+.tdays { display: flex; gap: 6px; flex-wrap: wrap; }
+.dbtn { min-width: 40px; min-height: 40px; padding: 0 10px; border: 0; border-radius: 12px; background: var(--surface-2); color: var(--ink); font: inherit; font-weight: 650; cursor: pointer; }
+.dbtn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.tdays-f { display: flex; flex-direction: column; gap: 6px; }
+.coachfig { height: 150px; border-radius: 16px; background: rgba(255, 255, 255, 0.04); overflow: hidden; }
+.coachfig canvas { width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
+@media (min-width: 980px) { .coachfig { height: 190px; } }
+.vol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.card .vol { padding-left: 0; }
+.vrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+.vname { font-weight: 650; }
+.vnum { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.vnum small { font-weight: 500; color: var(--muted); }
+.vbar { grid-column: 1 / -1; height: 10px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.vbar i { display: block; height: 100%; border-radius: 99px; background: var(--warn); }
+.vbar i.ok { background: var(--accent); }
+.vbar i.good { background: var(--good); }
+.vsub { grid-column: 1 / -1; }
+.badges { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(210px, 100%), 1fr)); gap: 10px; }
+.card .badges { padding-left: 0; }
+.badges li { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 14px; background: var(--surface-2); opacity: 0.6; }
+.badges li.got { opacity: 1; box-shadow: inset 0 0 0 2px var(--good); }
+.badges li b { font-size: 0.9375rem; }
+.badges li span { font-size: 0.8125rem; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -562,6 +586,7 @@ body[data-coach="0"] .side { display: none; }
         <h2 id="title">Training starten</h2>
         <p class="muted small" id="sub"></p>
       </div>
+      <div class="coachfig" id="coachfig" hidden><canvas id="coach-cv" role="img" aria-label="So geht die Übung. Mit dem Finger seitlich ziehen, um die Figur zu drehen."></canvas></div>
       <div class="ringwrap">
         <svg class="ring" viewBox="0 0 200 200" aria-hidden="true"><circle class="trk" cx="100" cy="100" r="88"/><circle class="bar" id="ringbar" data-phase="idle" cx="100" cy="100" r="88"/></svg>
         <div class="ringc"><div class="ringbig" id="ringbig">Bereit</div><div class="ringunit" id="ringunit"></div></div>
@@ -613,6 +638,8 @@ body[data-coach="0"] .side { display: none; }
 
     <section class="panel" id="panel-fortschritt" role="tabpanel" hidden>
       <div class="stats" id="stats"></div>
+      <div class="card" id="volcard"></div>
+      <div class="card" id="badgecard"></div>
       <div class="charts" id="charts"></div>
       <div class="card">
         <h3>Heute eintragen</h3>
@@ -655,7 +682,8 @@ body[data-coach="0"] .side { display: none; }
   <div class="dlg">
     <div class="dlg-head"><h3>Einstellungen</h3><button class="btn icon" data-close aria-label="Schließen" id="x-settings"></button></div>
     <div class="settings">
-      <label class="field">Sätze pro Übung<select id="s-sets"><option value="2">2 (Woche 1 und 2)</option><option value="3">3 (ab Woche 3)</option></select></label>
+      <label class="field">Sätze pro Übung<select id="s-sets"><option value="2">2 (Woche 1 und 2)</option><option value="3">3 (ab Woche 3)</option><option value="4">4 (später, wenn 3 gut klappen)</option></select></label>
+      <div class="field tdays-f"><span>Trainingstage</span><div class="tdays" id="s-tdays" role="group" aria-label="Trainingstage"></div><span class="muted small" id="tdays-note"></span></div>
       <label class="field">Pause<select id="s-rest"><option value="60">60 s</option><option value="75">75 s</option><option value="90">90 s</option><option value="120">120 s</option></select></label>
       <label class="field">Plank halten<select id="s-hold"><option value="20">20 s</option><option value="30">30 s</option><option value="40">40 s</option><option value="60">60 s</option></select></label>
       <label class="field">Kalorienziel pro Tag<input type="number" id="s-kcal" min="1000" max="5000" step="50" inputmode="numeric"></label>
@@ -1010,6 +1038,10 @@ const EX = [
     cue: "Teste vorher, ob der Tisch sicher hält: darunter legen, Kante greifen, vorsichtig ziehen. Kippt, rutscht oder knarzt er, nimm etwas anderes. Brust zur Kante ziehen, Schulterblätter zusammen.",
     mistakes: "Körper sackt in der Mitte durch, der Kopf wandert nach vorn, du ziehst mit Schwung.",
     ladder: ["Unter dem Tisch, Knie gebeugt", "Unter dem Tisch, Beine gestreckt", "Unter dem Tisch, Füße auf einem Stuhl", "Füße erhöht, 3 Sekunden langsam ab"] },
+  { id: "pike", name: "Pike-Liegestütze (Schultern)", reps: "6 bis 10 Wiederholungen", short: "6–10", def: 1,
+    cue: "Hüfte hoch, Körper bildet ein umgedrehtes V, Hände etwa schulterbreit. Kopf zwischen den Händen Richtung Boden senken, dann hochdrücken. Je höher deine Füße stehen, desto mehr Gewicht liegt auf den Schultern.",
+    mistakes: "Hüfte sackt ab und es wird ein normaler Liegestütz, Ellbogen weit nach außen, der Kopf geht nach vorn statt zwischen die Hände.",
+    ladder: ["Pike, Hände auf Sofa oder Tisch (leichter)", "Pike-Liegestütze, Hände am Boden", "Pike, Füße auf einer Stufe (etwa 20 cm)", "Pike, Füße auf einem Stuhl", "Pike, Füße auf dem Stuhl, 3 Sekunden langsam runter"] },
   { id: "bridge", name: "Glute Bridge", reps: "12 bis 15 Wiederholungen", short: "12–15", def: 0,
     cue: "Rücken am Boden, Füße hüftbreit, Fersen nah am Po. Hüfte hochdrücken, oben den Po anspannen, kein Hohlkreuz. Die späteren Stufen trainieren das Hüftbeugen und -strecken im Stand (Hip Hinge).",
     mistakes: "Hohlkreuz statt Hüftstreckung, Füße zu weit weg, Schwung statt Spannung.",
@@ -1126,7 +1158,47 @@ const RECIPES = [
   {"id":"cremige-tomatensuppe-mit-parmesan-und-brot","title":"Cremige Tomatensuppe mit Parmesan und Brot","meal":"Mittag/Abend","time":25,"kcal":535,"protein":32,"cost":1.76,"veg":480,"diet":"vegetarisch","tags":["Meal-Prep","Günstig"],"contains":[],"ing":[[400,"g","stückige Tomaten (Dose)",null,"stueck"],[1,"","Zwiebel","Zwiebeln","zwie"],[1,"","Knoblauchzehe","Knoblauchzehen","knob"],[200,"ml","Gemüsebrühe",null,"bruehe"],[100,"g","Magerquark",null,"quark"],[15,"g","Parmesan",null,"parm"],[2,"","Scheibe Vollkornbrot","Scheiben Vollkornbrot","brot"],[1,"TL","Rapsöl",null,"oel"],[null,"","Salz und Pfeffer",null,null]],"steps":["Zwiebel und Knoblauch im Öl glasig anbraten.","Tomaten und Brühe zugeben und 10 Minuten köcheln lassen, dann fein pürieren.","Quark unterrühren (nicht mehr kochen) und würzen.","Mit Parmesan bestreuen und mit dem Brot essen."]},
   {"id":"frikadellen-mit-tomaten-gurken-salat","title":"Frikadellen mit Tomaten-Gurken-Salat","meal":"Mittag/Abend","time":25,"kcal":685,"protein":38,"cost":2.17,"veg":340,"diet":"omni","tags":[],"contains":["Rindfleisch","Schwein","Ei"],"ing":[[120,"g","Hackfleisch (gemischt)",null,"ghack"],[1,"","Ei","Eier","ei"],[0.5,"","Zwiebel","Zwiebeln","zwie"],[20,"g","Haferflocken",null,"hafer"],[1,"TL","Senf",null,"senf"],[1,"TL","Rapsöl",null,"oel"],[2,"","Tomate","Tomaten","tom"],[100,"g","Gurke",null,"gurke"],[1,"","Scheibe Vollkornbrot","Scheiben Vollkornbrot","brot"],[null,"","Salz und Pfeffer",null,null]],"steps":["Hack mit Ei, klein geschnittener Zwiebel, Haferflocken, Senf, Salz und Pfeffer gut verkneten und zu flachen Frikadellen formen.","Im Öl bei mittlerer Hitze von jeder Seite 6 bis 7 Minuten braten, bis sie innen ganz durch sind.","Tomaten und Gurke in Stücke schneiden und mit Salz und Pfeffer mischen.","Mit dem Brot essen."],"tip":"Die Haferflocken ersetzen das Brötchen im Teig und binden zusätzlich Saft."},
   {"id":"haehnchen-reis-suppe-mit-paprika","title":"Hähnchen-Reis-Suppe mit Paprika","meal":"Mittag/Abend","time":25,"kcal":360,"protein":33,"cost":2.01,"veg":230,"diet":"omni","tags":["Meal-Prep"],"contains":["Geflügel"],"ing":[[400,"ml","Gemüsebrühe",null,"bruehe"],[120,"g","Hähnchenbrust",null,"haehn"],[40,"g","Reis (Rohgewicht)",null,"reis"],[1,"","Paprika","Paprika","pap"],[1,"","Zwiebel","Zwiebeln","zwie"],[null,"","Salz und Pfeffer",null,null]],"steps":["Zwiebel und Paprika in Stücken mit der Brühe aufkochen, den Reis zugeben und 10 Minuten köcheln lassen.","Hähnchen in kleinen Würfeln dazugeben und weitere 8 bis 10 Minuten garen, bis es innen durch ist.","Mit Salz und Pfeffer abschmecken."],"note":"Zum Vorkochen: Reis, Nudeln und Couscous nach dem Kochen schnell abkühlen, im Kühlschrank aufbewahren, am besten am nächsten Tag essen (spätestens nach 2 Tagen) und vollständig erhitzen."},
-  {"id":"spaghetti-carbonara-light-mit-tomatensalat","title":"Spaghetti Carbonara light mit Tomatensalat","meal":"Mittag/Abend","time":20,"kcal":600,"protein":41,"cost":2.27,"veg":240,"diet":"omni","tags":[],"contains":["Schwein","Ei"],"ing":[[70,"g","Vollkornnudeln (Rohgewicht)",null,"nudel"],[2,"","Ei","Eier","ei"],[40,"g","Kochschinken",null,"schink"],[20,"g","Parmesan",null,"parm"],[0.5,"","Zwiebel","Zwiebeln","zwie"],[2,"","Tomate","Tomaten","tom"],[null,"","Pfeffer",null,null]],"steps":["Nudeln nach Packungsanleitung kochen und eine Tasse Nudelwasser aufheben.","Schinken und Zwiebel klein schneiden, ohne Öl anbraten.","Eier mit Parmesan und Pfeffer verrühren.","Die heißen Nudeln mit der Pfanne mischen, vom Herd nehmen, die Eimischung mit einem Schuss Nudelwasser unterrühren, bis eine cremige Sauce entsteht.","Tomaten in Stücken mit Pfeffer als Salat dazu essen."]}
+  {"id":"spaghetti-carbonara-light-mit-tomatensalat","title":"Spaghetti Carbonara light mit Tomatensalat","meal":"Mittag/Abend","time":20,"kcal":600,"protein":41,"cost":2.27,"veg":240,"diet":"omni","tags":[],"contains":["Schwein","Ei"],"ing":[[70,"g","Vollkornnudeln (Rohgewicht)",null,"nudel"],[2,"","Ei","Eier","ei"],[40,"g","Kochschinken",null,"schink"],[20,"g","Parmesan",null,"parm"],[0.5,"","Zwiebel","Zwiebeln","zwie"],[2,"","Tomate","Tomaten","tom"],[null,"","Pfeffer",null,null]],"steps":["Nudeln nach Packungsanleitung kochen und eine Tasse Nudelwasser aufheben.","Schinken und Zwiebel klein schneiden, ohne Öl anbraten.","Eier mit Parmesan und Pfeffer verrühren.","Die heißen Nudeln mit der Pfanne mischen, vom Herd nehmen, die Eimischung mit einem Schuss Nudelwasser unterrühren, bis eine cremige Sauce entsteht.","Tomaten in Stücken mit Pfeffer als Salat dazu essen."]},
+  {"id":"skyr-haferbrei-mit-banane-und-mandeln","title":"Skyr-Haferbrei mit Banane und Mandeln","meal":"Frühstück","time":8,"kcal":490,"protein":28,"cost":0.79,"veg":0,"diet":"vegetarisch","tags":["Günstig"],"contains":["Nüsse"],"ing":[[50,"g","Haferflocken",null,"hafer"],[200,"ml","Milch (1,5 %)",null,"milch"],[1,"","Banane","Bananen","banane"],[100,"g","Skyr",null,"skyr"],[10,"g","Mandeln",null,"mandel"],[null,"","Zimt",null,null]],"steps":["Haferflocken mit der Milch im Topf unter Rühren aufkochen und 3 Minuten quellen lassen.","Banane in Stücken zerdrücken und unterrühren.","Den Brei in eine Schüssel geben, Skyr daraufsetzen, Mandeln hacken und mit Zimt darüberstreuen."],"tip":"Warm macht er auch an kalten Morgen satt. Skyr erst am Ende zugeben, so bleibt er cremig."},
+  {"id":"broetchen-mit-ruehrei-und-gouda","title":"Brötchen mit Rührei und Gouda","meal":"Frühstück","time":8,"kcal":445,"protein":26,"cost":1.3,"veg":100,"diet":"vegetarisch","tags":["Für die Arbeit"],"contains":["Ei"],"ing":[[1,"","Vollkornbrötchen","Vollkornbrötchen","broetchen"],[2,"","Ei","Eier","ei"],[20,"g","Gouda",null,"gouda"],[1,"","Tomate","Tomaten","tom"],[1,"TL","Rapsöl",null,"oel"],[null,"","Salz und Pfeffer",null,null]],"steps":["Eier verquirlen und im Öl bei mittlerer Hitze unter Rühren stocken lassen, bis nichts Flüssiges mehr zu sehen ist.","Brötchen aufschneiden, mit Gouda und Tomatenscheiben belegen.","Das Rührei daraufgeben und zuklappen."],"tip":"Lässt sich in Papier gewickelt gut mit zur Arbeit nehmen."},
+  {"id":"quark-pfannkuchen-mit-erdbeeren","title":"Quark-Pfannkuchen mit Erdbeeren","meal":"Frühstück","time":15,"kcal":520,"protein":39,"cost":1.34,"veg":0,"diet":"vegetarisch","tags":[],"contains":["Ei"],"ing":[[150,"g","Magerquark",null,"quark"],[2,"","Ei","Eier","ei"],[40,"g","Haferflocken",null,"hafer"],[1,"TL","Rapsöl",null,"oel"],[100,"g","Erdbeeren (frisch oder Tiefkühl)",null,"erdb"],[1,"TL","Honig",null,"honig"]],"steps":["Erdbeeren mit einem Esslöffel Wasser im Topf kurz aufkochen, mindestens 2 Minuten sprudelnd, und abkühlen lassen.","Quark, Eier und Haferflocken zu einem glatten Teig verrühren.","Das Öl in einer Pfanne erhitzen, den Teig in zwei kleinen Portionen bei mittlerer Hitze von jeder Seite 3 bis 4 Minuten backen.","Mit den Erdbeeren und dem Honig servieren."],"tip":"Viel Eiweiß ohne Mehl. Die Pfannkuchen sind weich, wende sie erst, wenn der Rand fest ist."},
+  {"id":"tassen-omelett-aus-der-mikrowelle","title":"Tassen-Omelett aus der Mikrowelle","meal":"Frühstück","time":5,"kcal":370,"protein":30,"cost":1.33,"veg":100,"diet":"vegetarisch","tags":[],"contains":["Ei"],"ing":[[3,"","Ei","Eier","ei"],[30,"ml","Milch (1,5 %)",null,"milch"],[20,"g","Gouda",null,"gouda"],[1,"","Tomate","Tomaten","tom"],[null,"","Salz und Pfeffer",null,null]],"steps":["Eier mit der Milch in einer großen mikrowellengeeigneten Schüssel oder Tasse verquirlen, Gouda und Tomate in kleinen Stücken unterrühren, würzen.","Bei 600 bis 800 Watt 1 Minute erhitzen, durchrühren und weitere 45 bis 60 Sekunden erhitzen, bis das Ei ganz fest ist.","Kurz stehen lassen und aus der Tasse essen."],"tip":"Der schnellste warme Start, wenn es vor der Arbeit eilig ist. Das Ei muss durch und fest sein."},
+  {"id":"putenbroetchen-mit-quark-senf-aufstrich","title":"Putenbrötchen mit Quark-Senf-Aufstrich","meal":"Frühstück","time":5,"kcal":240,"protein":22,"cost":1.23,"veg":80,"diet":"omni","tags":["Ohne Kochen","Für die Arbeit"],"contains":["Geflügel"],"ing":[[1,"","Vollkornbrötchen","Vollkornbrötchen","broetchen"],[50,"g","Putenbrust-Aufschnitt",null,"paufs"],[50,"g","Magerquark",null,"quark"],[80,"g","Gurke",null,"gurke"],[1,"TL","Senf",null,"senf"],[null,"","Pfeffer",null,null]],"steps":["Quark mit Senf und Pfeffer verrühren.","Brötchen aufschneiden und mit dem Aufstrich bestreichen.","Mit Putenaufschnitt und Gurkenscheiben belegen."],"tip":"Der Quark macht das Brötchen saftig und bringt zusätzliches Eiweiß."},
+  {"id":"overnight-oats-mit-quark-banane-und-honig","title":"Overnight Oats mit Quark, Banane und Honig","meal":"Frühstück","time":5,"kcal":540,"protein":33,"cost":0.82,"veg":0,"diet":"vegetarisch","tags":["Ohne Kochen","Meal-Prep","Für die Arbeit","Günstig"],"contains":[],"ing":[[60,"g","Haferflocken",null,"hafer"],[10,"g","Chia-Samen",null,"chia"],[120,"ml","Milch (1,5 %)",null,"milch"],[150,"g","Magerquark",null,"quark"],[1,"","Banane","Bananen","banane"],[1,"TL","Honig",null,"honig"]],"steps":["Haferflocken, Chia, Milch und Quark im Glas verrühren.","Abgedeckt über Nacht in den Kühlschrank stellen.","Vor dem Essen die Banane in Scheiben und den Honig daraufgeben."],"tip":"Am Abend vorbereitet ist das Frühstück morgens in einer Minute fertig und passt in eine Tasche."},
+  {"id":"fruehstuecks-wrap-mit-quark-ei-und-tomate","title":"Frühstücks-Wrap mit Quark, Ei und Tomate","meal":"Frühstück","time":10,"kcal":440,"protein":28,"cost":1.2,"veg":100,"diet":"vegetarisch","tags":["Für die Arbeit"],"contains":["Ei"],"ing":[[1,"","Vollkorn-Wrap","Vollkorn-Wraps","wrap"],[2,"","Ei","Eier","ei"],[50,"g","Magerquark",null,"quark"],[1,"","Tomate","Tomaten","tom"],[1,"TL","Rapsöl",null,"oel"],[null,"","Salz und Pfeffer",null,null]],"steps":["Eier im Öl rühren, bis sie ganz fest sind.","Wrap mit dem Quark bestreichen und mit Tomatenscheiben belegen.","Rührei daraufgeben, würzen, einrollen und halbieren."]},
+  {"id":"ei-im-brot-mit-mozzarella-und-tomate","title":"Ei im Brot mit Mozzarella und Tomate","meal":"Frühstück","time":10,"kcal":540,"protein":29,"cost":1.3,"veg":100,"diet":"vegetarisch","tags":[],"contains":["Ei"],"ing":[[2,"","Scheibe Vollkornbrot","Scheiben Vollkornbrot","brot"],[2,"","Ei","Eier","ei"],[30,"g","Mozzarella",null,"moz"],[1,"TL","Rapsöl",null,"oel"],[1,"","Tomate","Tomaten","tom"],[null,"","Salz und Pfeffer",null,null]],"steps":["In jede Brotscheibe mit einem Glas ein Loch drücken oder schneiden.","Öl in der Pfanne erhitzen, die Brotscheiben und die ausgestochenen Kreise hineinlegen und in jedes Loch ein Ei schlagen.","Bei mittlerer Hitze 3 Minuten braten, wenden und mit Mozzarella in Stücken belegen, bis das Eigelb und das Eiweiß fest sind.","Mit Tomatenscheiben servieren."]},
+  {"id":"pizza-muffins-aus-ei-mit-tomate-und-mozzarella","title":"Pizza-Muffins aus Ei mit Tomate und Mozzarella","meal":"Snack","time":25,"kcal":280,"protein":22,"cost":1.07,"veg":100,"diet":"vegetarisch","tags":["Meal-Prep","Für die Arbeit"],"contains":["Ei"],"ing":[[2,"","Ei","Eier","ei"],[1,"","Tomate","Tomaten","tom"],[30,"g","Mozzarella",null,"moz"],[20,"ml","Milch (1,5 %)",null,"milch"],[null,"","Oregano, Salz und Pfeffer",null,null]],"steps":["Ofen auf 180 °C Ober- und Unterhitze vorheizen und zwei Mulden einer Muffinform fetten.","Eier mit der Milch und den Gewürzen verquirlen, Tomate und Mozzarella in kleinen Stücken unterrühren.","In die Mulden füllen und 15 bis 18 Minuten backen, bis die Muffins gestockt und leicht gebräunt sind."],"tip":"Für mehrere Tage verdoppelst du die Menge. Gekühlt halten sich die Muffins 2 bis 3 Tage, kalt oder aufgewärmt essen."},
+  {"id":"haferriegel-mit-banane-quark-und-kakao","title":"Haferriegel mit Banane, Quark und Kakao","meal":"Snack","time":30,"kcal":380,"protein":21,"cost":0.62,"veg":0,"diet":"vegetarisch","tags":["Meal-Prep","Für die Arbeit","Günstig"],"contains":["Ei"],"ing":[[40,"g","Haferflocken",null,"hafer"],[1,"","Banane","Bananen","banane"],[1,"","Ei","Eier","ei"],[50,"g","Magerquark",null,"quark"],[1,"TL","Kakao",null,"kakao"]],"steps":["Ofen auf 180 °C Ober- und Unterhitze vorheizen.","Banane zerdrücken und mit Ei, Quark, Haferflocken und Kakao verrühren.","Den Teig etwa 2 cm dick auf ein Blech mit Backpapier streichen und 18 bis 20 Minuten backen.","Abkühlen lassen und in Riegel schneiden."],"tip":"Hält sich gekühlt 2 bis 3 Tage und passt in die Jackentasche."},
+  {"id":"kleiner-bohnen-wrap-mit-quark","title":"Kleiner Bohnen-Wrap mit Quark","meal":"Snack","time":5,"kcal":280,"protein":15,"cost":0.8,"veg":100,"diet":"vegetarisch","tags":["Ohne Kochen","Für die Arbeit","Günstig"],"contains":["Hülsenfrüchte"],"ing":[[1,"","Vollkorn-Wrap","Vollkorn-Wraps","wrap"],[60,"g","Kidneybohnen (Dose, abgetropft)",null,"bohne"],[40,"g","Magerquark",null,"quark"],[1,"","Tomate","Tomaten","tom"],[null,"","Paprikapulver, Salz und Pfeffer",null,null]],"steps":["Bohnen abtropfen lassen und mit der Gabel grob zerdrücken.","Wrap mit Quark bestreichen, Bohnen und Tomatenscheiben darauf verteilen und würzen.","Einrollen und halbieren."]},
+  {"id":"kichererbsen-aufstrich-mit-gurke-auf-brot","title":"Kichererbsen-Aufstrich mit Gurke auf Brot","meal":"Snack","time":10,"kcal":285,"protein":11,"cost":0.61,"veg":50,"diet":"vegan","tags":["Ohne Kochen","Für die Arbeit","Günstig"],"contains":["Hülsenfrüchte"],"ing":[[100,"g","Kichererbsen (Dose, abgetropft)",null,"kiche"],[1,"EL","Zitronensaft",null,"zitrone"],[1,"TL","Rapsöl",null,"oel"],[0.5,"","Knoblauchzehe","Knoblauchzehen","knob"],[1,"","Scheibe Vollkornbrot","Scheiben Vollkornbrot","brot"],[50,"g","Gurke",null,"gurke"],[null,"","Salz, Pfeffer und Paprikapulver",null,null]],"steps":["Kichererbsen mit Zitronensaft, Öl, Knoblauch und Gewürzen fein pürieren oder mit der Gabel sehr fein zerdrücken.","Brot dick bestreichen und mit Gurkenscheiben belegen."],"tip":"Der Aufstrich hält abgedeckt 3 bis 4 Tage im Kühlschrank."},
+  {"id":"putenbrot-mit-quark-und-gurke","title":"Putenbrot mit Quark und Gurke","meal":"Snack","time":5,"kcal":305,"protein":21,"cost":1.0,"veg":60,"diet":"omni","tags":["Ohne Kochen","Für die Arbeit"],"contains":["Geflügel"],"ing":[[2,"","Scheibe Vollkornbrot","Scheiben Vollkornbrot","brot"],[40,"g","Magerquark",null,"quark"],[40,"g","Putenbrust-Aufschnitt",null,"paufs"],[60,"g","Gurke",null,"gurke"],[null,"","Pfeffer",null,null]],"steps":["Die Brotscheiben mit Quark bestreichen.","Mit Putenaufschnitt und Gurkenscheiben belegen, pfeffern und zusammenklappen."]},
+  {"id":"quark-haferglas-mit-banane","title":"Quark-Haferglas mit Banane","meal":"Snack","time":3,"kcal":335,"protein":25,"cost":0.59,"veg":0,"diet":"vegetarisch","tags":["Ohne Kochen","Für die Arbeit","Günstig"],"contains":[],"ing":[[150,"g","Magerquark",null,"quark"],[50,"g","Naturjoghurt",null,"jog35"],[30,"g","Haferflocken",null,"hafer"],[1,"","Banane","Bananen","banane"],[null,"","Zimt",null,null]],"steps":["Quark und Joghurt im Glas glatt rühren.","Haferflocken unterheben, Banane in Scheiben darauflegen und mit Zimt bestreuen."],"tip":"Wenn du es morgens zubereitest und zur Arbeit mitnimmst, ziehen die Haferflocken bis zur Pause schön an."},
+  {"id":"brotzeit-box-mit-ei-putenaufschnitt-und-gurke","title":"Brotzeit-Box mit Ei, Putenaufschnitt und Gurke","meal":"Snack","time":5,"kcal":275,"protein":21,"cost":1.53,"veg":200,"diet":"omni","tags":["Ohne Kochen","Für die Arbeit"],"contains":["Geflügel","Ei"],"ing":[[1,"","Ei","Eier","ei"],[40,"g","Putenbrust-Aufschnitt",null,"paufs"],[1,"","Scheibe Vollkornbrot","Scheiben Vollkornbrot","brot"],[60,"g","Gurke",null,"gurke"],[1,"","Tomate","Tomaten","tom"],[1,"","Saure Gurke","Saure Gurken","sgurke"]],"steps":["Das Ei vorher hart kochen (mindestens 8 Minuten) und pellen.","Alles in Stücke schneiden und in einer Box verpacken.","Das Brot dazulegen."],"tip":"Kalt gedacht, kein Aufwärmen nötig. Koch gleich mehrere Eier für die ganze Woche vor."},
+  {"id":"schinken-kaese-broetchen-mit-gurke","title":"Schinken-Käse-Brötchen mit Gurke","meal":"Snack","time":3,"kcal":250,"protein":18,"cost":0.98,"veg":60,"diet":"omni","tags":["Ohne Kochen","Für die Arbeit"],"contains":["Schwein"],"ing":[[1,"","Vollkornbrötchen","Vollkornbrötchen","broetchen"],[40,"g","Kochschinken",null,"schink"],[15,"g","Gouda",null,"gouda"],[60,"g","Gurke",null,"gurke"],[1,"TL","Senf",null,"senf"]],"steps":["Brötchen aufschneiden und mit Senf bestreichen.","Mit Schinken, Gouda und Gurkenscheiben belegen."]},
+  {"id":"mozzarella-broetchen-mit-tomate-und-rucola","title":"Mozzarella-Brötchen mit Tomate und Rucola","meal":"Snack","time":5,"kcal":290,"protein":16,"cost":1.04,"veg":110,"diet":"vegetarisch","tags":["Ohne Kochen","Für die Arbeit"],"contains":[],"ing":[[1,"","Vollkornbrötchen","Vollkornbrötchen","broetchen"],[50,"g","Mozzarella",null,"moz"],[1,"","Tomate","Tomaten","tom"],[10,"g","Rucola",null,"ruc"],[null,"","Salz und Pfeffer",null,null]],"steps":["Brötchen aufschneiden.","Mozzarella und Tomate in Scheiben schneiden, mit Rucola auf dem Brötchen verteilen und würzen."]},
+  {"id":"reissalat-mit-haehnchen-paprika-und-gurke","title":"Reissalat mit Hähnchen, Paprika und Gurke","meal":"Mittag/Abend","time":25,"kcal":460,"protein":36,"cost":2.24,"veg":270,"diet":"omni","tags":["Meal-Prep","Für die Arbeit"],"contains":["Geflügel"],"ing":[[130,"g","Hähnchenbrust",null,"haehn"],[60,"g","Reis (Rohgewicht)",null,"reis"],[1,"","Paprika","Paprika","pap"],[80,"g","Gurke",null,"gurke"],[0.5,"","Zwiebel","Zwiebeln","zwie"],[1,"TL","Rapsöl",null,"oel"],[1,"EL","Zitronensaft",null,"zitrone"],[1,"TL","Senf",null,"senf"],[null,"","Salz und Pfeffer",null,null]],"steps":["Reis nach Packungsanleitung kochen und abkühlen lassen.","Hähnchen in Würfeln im Öl rundherum anbraten, bis es innen ganz durch ist, und auskühlen lassen.","Paprika, Gurke und Zwiebel klein schneiden, mit Zitronensaft, Senf, Salz und Pfeffer anmachen.","Alles mit Reis und Hähnchen vermengen."],"tip":"Als Box zur Arbeit gut geeignet. Gekühlt aufbewahren und spätestens am nächsten Tag essen.","note":"Zum Vorkochen: Reis, Nudeln und Couscous nach dem Kochen schnell abkühlen, im Kühlschrank aufbewahren, am besten am nächsten Tag essen (spätestens nach 2 Tagen) und vollständig erhitzen."},
+  {"id":"haehnchen-broetchen-mit-quark-senf-creme","title":"Hähnchen-Brötchen mit Quark-Senf-Creme","meal":"Mittag/Abend","time":15,"kcal":465,"protein":39,"cost":2.09,"veg":120,"diet":"omni","tags":["Für die Arbeit"],"contains":["Geflügel"],"ing":[[100,"g","Hähnchenbrust",null,"haehn"],[0.5,"TL","Rapsöl",null,"oel"],[2,"","Vollkornbrötchen","Vollkornbrötchen","broetchen"],[40,"g","Magerquark",null,"quark"],[20,"g","Rucola",null,"ruc"],[1,"","Tomate","Tomaten","tom"],[1,"TL","Senf",null,"senf"],[null,"","Salz und Pfeffer",null,null]],"steps":["Hähnchen in dünne Streifen schneiden und im Öl rundherum anbraten, bis es innen ganz durch ist.","Quark mit Senf, Salz und Pfeffer verrühren.","Brötchen aufschneiden, mit der Creme bestreichen, mit Rucola, Tomatenscheiben und Hähnchen belegen."]},
+  {"id":"burrito-wrap-mit-hack-und-bohnen","title":"Burrito-Wrap mit Hack und Bohnen","meal":"Mittag/Abend","time":25,"kcal":545,"protein":28,"cost":1.79,"veg":230,"diet":"omni","tags":["Meal-Prep","Für die Arbeit","Günstig"],"contains":["Hülsenfrüchte","Rindfleisch","Schwein"],"ing":[[80,"g","Hackfleisch (gemischt)",null,"ghack"],[80,"g","Kidneybohnen (Dose, abgetropft)",null,"bohne"],[1,"","Vollkorn-Wrap","Vollkorn-Wraps","wrap"],[1,"EL","Tomatenmark",null,"tmark"],[1,"","Zwiebel","Zwiebeln","zwie"],[1,"","Paprika","Paprika","pap"],[null,"","Paprikapulver, Salz und Pfeffer",null,null]],"steps":["Zwiebel und Paprika klein schneiden und mit dem Hack krümelig anbraten, bis nichts Rosa mehr zu sehen ist.","Bohnen und Tomatenmark zugeben, würzen und 5 Minuten köcheln lassen.","Die Füllung auf den Wrap geben, einrollen und in Folie wickeln."],"tip":"Schmeckt warm und kalt. Gewickelt hält er im Kühlschrank 2 Tage."},
+  {"id":"asia-nudelpfanne-mit-haehnchen-und-paprika","title":"Asia-Nudelpfanne mit Hähnchen und Paprika","meal":"Mittag/Abend","time":20,"kcal":535,"protein":42,"cost":2.42,"veg":230,"diet":"omni","tags":[],"contains":["Geflügel"],"ing":[[130,"g","Hähnchenbrust",null,"haehn"],[70,"g","Vollkornnudeln (Rohgewicht)",null,"nudel"],[1,"","Paprika","Paprika","pap"],[1,"","Zwiebel","Zwiebeln","zwie"],[1,"","Knoblauchzehe","Knoblauchzehen","knob"],[2,"EL","Sojasauce",null,"soja"],[1,"TL","Honig",null,"honig"],[1,"TL","Rapsöl",null,"oel"]],"steps":["Nudeln nach Packungsanleitung kochen.","Hähnchen in Streifen im Öl rundherum anbraten, bis es innen durch ist. Paprika und Zwiebel in Streifen sowie klein geschnittenen Knoblauch zugeben und 4 Minuten mitbraten.","Sojasauce und Honig verrühren, mit den Nudeln in die Pfanne geben und alles gut vermengen."]},
+  {"id":"putenhack-reis-bowl-mit-gurke-und-joghurt","title":"Putenhack-Reis-Bowl mit Gurke und Joghurt","meal":"Mittag/Abend","time":20,"kcal":515,"protein":35,"cost":2.17,"veg":250,"diet":"omni","tags":["Meal-Prep"],"contains":["Geflügel"],"ing":[[130,"g","Putenhack",null,"phack"],[60,"g","Reis (Rohgewicht)",null,"reis"],[100,"g","Gurke",null,"gurke"],[50,"g","Naturjoghurt",null,"jog35"],[1,"","Paprika","Paprika","pap"],[1,"TL","Rapsöl",null,"oel"],[1,"TL","Currypulver",null,"curry"],[null,"","Salz und Pfeffer",null,null]],"steps":["Reis nach Packungsanleitung kochen.","Putenhack mit Curry im Öl krümelig durchbraten, bis nichts Rosa mehr zu sehen ist. Paprika in Würfeln kurz mitbraten.","Gurke würfeln. Reis, Hack und Gurke in eine Schüssel geben und mit Joghurt toppen."],"note":"Zum Vorkochen: Reis, Nudeln und Couscous nach dem Kochen schnell abkühlen, im Kühlschrank aufbewahren, am besten am nächsten Tag essen (spätestens nach 2 Tagen) und vollständig erhitzen."},
+  {"id":"hack-quesadilla-mit-paprika-und-gouda","title":"Hack-Quesadilla mit Paprika und Gouda","meal":"Mittag/Abend","time":20,"kcal":550,"protein":29,"cost":1.82,"veg":190,"diet":"omni","tags":["Für die Arbeit","Günstig"],"contains":["Rindfleisch","Schwein"],"ing":[[1,"","Vollkorn-Wrap","Vollkorn-Wraps","wrap"],[80,"g","Hackfleisch (gemischt)",null,"ghack"],[1,"","Paprika","Paprika","pap"],[30,"g","Gouda",null,"gouda"],[0.5,"","Zwiebel","Zwiebeln","zwie"],[1,"EL","Tomatenmark",null,"tmark"],[null,"","Paprikapulver, Salz und Pfeffer",null,null]],"steps":["Hack mit klein geschnittener Zwiebel und Paprika in einer Pfanne krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Tomatenmark und Gewürze zugeben.","Den Wrap in eine Pfanne legen, auf einer Hälfte Füllung und Gouda verteilen und zuklappen.","Von jeder Seite 2 bis 3 Minuten braten, bis der Käse geschmolzen ist."]},
+  {"id":"nudel-hack-auflauf-mit-tomate-und-mozzarella","title":"Nudel-Hack-Auflauf mit Tomate und Mozzarella","meal":"Mittag/Abend","time":45,"kcal":660,"protein":37,"cost":1.78,"veg":280,"diet":"omni","tags":["Meal-Prep","Günstig"],"contains":["Rindfleisch","Schwein"],"ing":[[90,"g","Hackfleisch (gemischt)",null,"ghack"],[60,"g","Vollkornnudeln (Rohgewicht)",null,"nudel"],[200,"g","stückige Tomaten (Dose)",null,"stueck"],[1,"","Zwiebel","Zwiebeln","zwie"],[40,"g","Mozzarella",null,"moz"],[10,"g","Parmesan",null,"parm"],[1,"","Knoblauchzehe","Knoblauchzehen","knob"],[null,"","Oregano, Salz und Pfeffer",null,null]],"steps":["Nudeln 2 Minuten kürzer als auf der Packung angegeben kochen. Ofen auf 200 °C Ober- und Unterhitze vorheizen.","Hack mit Zwiebel und Knoblauch krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Tomaten und Gewürze zugeben und 5 Minuten köcheln lassen.","Nudeln und Sauce in eine Form geben, mit Mozzarella und Parmesan bestreuen und 20 Minuten überbacken."],"tip":"Ein Auflauf für mehrere Tage: gekühlt 2 Tage haltbar, vor dem Essen vollständig erhitzen.","note":"Zum Vorkochen: Reis, Nudeln und Couscous nach dem Kochen schnell abkühlen, im Kühlschrank aufbewahren, am besten am nächsten Tag essen (spätestens nach 2 Tagen) und vollständig erhitzen."},
+  {"id":"hack-kichererbsen-eintopf-mit-tomate","title":"Hack-Kichererbsen-Eintopf mit Tomate","meal":"Mittag/Abend","time":30,"kcal":500,"protein":28,"cost":2.23,"veg":480,"diet":"omni","tags":["Meal-Prep"],"contains":["Hülsenfrüchte","Rindfleisch","Schwein"],"ing":[[80,"g","Hackfleisch (gemischt)",null,"ghack"],[120,"g","Kichererbsen (Dose, abgetropft)",null,"kiche"],[250,"g","stückige Tomaten (Dose)",null,"stueck"],[1,"","Zwiebel","Zwiebeln","zwie"],[1,"","Paprika","Paprika","pap"],[1,"EL","Tomatenmark",null,"tmark"],[1,"","Knoblauchzehe","Knoblauchzehen","knob"],[null,"","Paprikapulver, Kreuzkümmel, Salz und Pfeffer",null,null]],"steps":["Hack mit Zwiebel und Knoblauch krümelig anbraten, bis nichts Rosa mehr zu sehen ist.","Paprika in Würfeln und Tomatenmark zugeben und 2 Minuten mitbraten.","Tomaten, Kichererbsen und Gewürze zugeben und 15 Minuten köcheln lassen."],"tip":"Eintöpfe wie dieser schmecken am nächsten Tag noch besser und lassen sich gut einfrieren."},
+  {"id":"haehnchen-curry-mit-kokosmilch-und-reis","title":"Hähnchen-Curry mit Kokosmilch und Reis","meal":"Mittag/Abend","time":30,"kcal":620,"protein":39,"cost":2.86,"veg":330,"diet":"omni","tags":[],"contains":["Geflügel"],"ing":[[130,"g","Hähnchenbrust",null,"haehn"],[150,"ml","leichte Kokosmilch",null,"kokos"],[60,"g","Reis (Rohgewicht)",null,"reis"],[1,"","Paprika","Paprika","pap"],[1,"","Zwiebel","Zwiebeln","zwie"],[2,"TL","Currypulver",null,"curry"],[1,"","Knoblauchzehe","Knoblauchzehen","knob"],[1,"TL","Rapsöl",null,"oel"],[100,"g","stückige Tomaten (Dose)",null,"stueck"]],"steps":["Reis nach Packungsanleitung kochen.","Hähnchen in Würfeln im Öl rundherum anbraten, bis es innen ganz durch ist. Zwiebel, Paprika und Knoblauch zugeben und 3 Minuten mitbraten.","Curry kurz mitrösten, Tomaten und Kokosmilch zugießen und 10 Minuten köcheln lassen.","Mit dem Reis servieren."]},
+  {"id":"mexikanische-bohnen-eier-pfanne-mit-brot","title":"Mexikanische Bohnen-Eier-Pfanne mit Brot","meal":"Mittag/Abend","time":20,"kcal":565,"protein":32,"cost":1.99,"veg":380,"diet":"vegetarisch","tags":["Günstig"],"contains":["Hülsenfrüchte","Ei"],"ing":[[120,"g","Kidneybohnen (Dose, abgetropft)",null,"bohne"],[2,"","Ei","Eier","ei"],[150,"g","stückige Tomaten (Dose)",null,"stueck"],[1,"","Zwiebel","Zwiebeln","zwie"],[1,"","Paprika","Paprika","pap"],[1,"TL","Rapsöl",null,"oel"],[1,"","Scheibe Vollkornbrot","Scheiben Vollkornbrot","brot"],[null,"","Paprikapulver, Salz und Pfeffer",null,null]],"steps":["Zwiebel und Paprika klein schneiden und im Öl 4 Minuten anbraten.","Tomaten, Bohnen und Gewürze zugeben und 6 Minuten köcheln lassen.","Zwei Mulden formen, die Eier hineinschlagen und mit Deckel 6 bis 8 Minuten garen, bis Eiweiß und Eigelb fest sind.","Mit dem Brot essen."]},
+  {"id":"haehnchen-nudeln-mit-paprika-quark-sauce","title":"Hähnchen-Nudeln mit Paprika-Quark-Sauce","meal":"Mittag/Abend","time":25,"kcal":590,"protein":51,"cost":2.94,"veg":300,"diet":"omni","tags":[],"contains":["Geflügel"],"ing":[[120,"g","Hähnchenbrust",null,"haehn"],[70,"g","Vollkornnudeln (Rohgewicht)",null,"nudel"],[2,"","Paprika","Paprika","pap"],[80,"g","Magerquark",null,"quark"],[1,"","Knoblauchzehe","Knoblauchzehen","knob"],[1,"TL","Rapsöl",null,"oel"],[10,"g","Parmesan",null,"parm"],[null,"","Salz und Pfeffer",null,null]],"steps":["Nudeln nach Packungsanleitung kochen und etwas Kochwasser aufheben.","Hähnchen in Streifen im Öl rundherum anbraten, bis es innen durch ist. Paprika in Würfeln und Knoblauch 5 Minuten mitbraten.","Quark mit einem Schuss Kochwasser glatt rühren, mit den Nudeln und der Pfanne vermengen, kurz erwärmen, nicht kochen.","Mit Parmesan bestreuen."]},
+  {"id":"knusprige-putenbrust-mit-haferkruste-und-salat","title":"Knusprige Putenbrust mit Haferkruste und Salat","meal":"Mittag/Abend","time":25,"kcal":440,"protein":47,"cost":2.61,"veg":280,"diet":"omni","tags":[],"contains":["Geflügel","Ei"],"ing":[[130,"g","Putenbrust",null,"pute"],[1,"","Ei","Eier","ei"],[25,"g","Haferflocken",null,"hafer"],[10,"g","Parmesan",null,"parm"],[1,"TL","Rapsöl",null,"oel"],[100,"g","Eisbergsalat",null,"eisb"],[1,"","Tomate","Tomaten","tom"],[80,"g","Gurke",null,"gurke"],[1,"EL","Zitronensaft",null,"zitrone"],[null,"","Salz und Pfeffer",null,null]],"steps":["Ofen auf 200 °C Ober- und Unterhitze vorheizen.","Pute flach klopfen und würzen. Ei verquirlen, Haferflocken mit Parmesan mischen.","Pute erst im Ei, dann in der Haferflockenmischung wenden, auf einem Blech mit Öl beträufeln und 15 bis 18 Minuten backen, bis sie innen ganz durch ist.","Salat, Tomate und Gurke mit Zitronensaft anmachen und dazu essen."]},
+  {"id":"kichererbsen-wrap-mit-quark-dip","title":"Kichererbsen-Wrap mit Quark-Dip","meal":"Mittag/Abend","time":20,"kcal":445,"protein":25,"cost":1.53,"veg":180,"diet":"vegetarisch","tags":["Für die Arbeit","Günstig"],"contains":["Hülsenfrüchte"],"ing":[[1,"","Vollkorn-Wrap","Vollkorn-Wraps","wrap"],[120,"g","Kichererbsen (Dose, abgetropft)",null,"kiche"],[80,"g","Magerquark",null,"quark"],[60,"g","Gurke",null,"gurke"],[1,"","Tomate","Tomaten","tom"],[20,"g","Rucola",null,"ruc"],[1,"EL","Zitronensaft",null,"zitrone"],[1,"TL","Rapsöl",null,"oel"],[null,"","Paprikapulver, Salz und Pfeffer",null,null]],"steps":["Kichererbsen im Öl mit Paprikapulver 5 Minuten anbraten.","Quark mit Zitronensaft, Salz und Pfeffer verrühren.","Wrap mit dem Dip bestreichen, mit Gurke, Tomate, Rucola und Kichererbsen füllen und einrollen."]},
+  {"id":"hack-paprika-suppe-mit-nudeln","title":"Hack-Paprika-Suppe mit Nudeln","meal":"Mittag/Abend","time":35,"kcal":550,"protein":29,"cost":2.69,"veg":580,"diet":"omni","tags":["Meal-Prep"],"contains":["Rindfleisch","Schwein"],"ing":[[100,"g","Hackfleisch (gemischt)",null,"ghack"],[2,"","Paprika","Paprika","pap"],[1,"","Zwiebel","Zwiebeln","zwie"],[200,"g","stückige Tomaten (Dose)",null,"stueck"],[400,"ml","Gemüsebrühe",null,"bruehe"],[1,"EL","Tomatenmark",null,"tmark"],[30,"g","Vollkornnudeln (Rohgewicht)",null,"nudel"],[null,"","Paprikapulver, Salz und Pfeffer",null,null]],"steps":["Hack mit Zwiebel krümelig anbraten, bis nichts Rosa mehr zu sehen ist.","Paprika in Würfeln, Tomatenmark und Paprikapulver zugeben und kurz mitbraten.","Tomaten und Brühe zugießen, 15 Minuten köcheln lassen, die Nudeln zugeben und weitere 8 bis 10 Minuten garen."],"tip":"Die Suppe ist günstig und lässt sich gut vorkochen und einfrieren.","note":"Zum Vorkochen: Reis, Nudeln und Couscous nach dem Kochen schnell abkühlen, im Kühlschrank aufbewahren, am besten am nächsten Tag essen (spätestens nach 2 Tagen) und vollständig erhitzen."},
+  {"id":"joghurt-haehnchen-aus-dem-ofen-mit-reis-und-gurkensalat","title":"Joghurt-Hähnchen aus dem Ofen mit Reis und Gurkensalat","meal":"Mittag/Abend","time":35,"kcal":480,"protein":40,"cost":2.21,"veg":220,"diet":"omni","tags":[],"contains":["Geflügel"],"ing":[[140,"g","Hähnchenbrust",null,"haehn"],[60,"g","Naturjoghurt",null,"jog35"],[1,"TL","Currypulver",null,"curry"],[60,"g","Reis (Rohgewicht)",null,"reis"],[120,"g","Gurke",null,"gurke"],[1,"","Tomate","Tomaten","tom"],[1,"EL","Zitronensaft",null,"zitrone"],[1,"TL","Rapsöl",null,"oel"],[null,"","Salz und Pfeffer",null,null]],"steps":["Hähnchen mit Joghurt, Curry, Salz und Pfeffer mindestens 15 Minuten marinieren. Ofen auf 200 °C Ober- und Unterhitze vorheizen.","Reis nach Packungsanleitung kochen.","Hähnchen auf ein geöltes Blech legen und 20 bis 25 Minuten backen, bis es innen ganz durch ist.","Gurke und Tomate würfeln, mit Zitronensaft und Salz anmachen."]},
+  {"id":"hack-paprika-pfanne-mit-ruehrei","title":"Hack-Paprika-Pfanne mit Rührei","meal":"Mittag/Abend","time":20,"kcal":545,"protein":36,"cost":2.58,"veg":380,"diet":"omni","tags":[],"contains":["Rindfleisch","Schwein","Ei"],"ing":[[100,"g","Hackfleisch (gemischt)",null,"ghack"],[2,"","Ei","Eier","ei"],[2,"","Paprika","Paprika","pap"],[1,"","Zwiebel","Zwiebeln","zwie"],[null,"","Paprikapulver, Salz und Pfeffer",null,null]],"steps":["Hack mit Zwiebel krümelig anbraten, bis nichts Rosa mehr zu sehen ist.","Paprika in Streifen zugeben und 5 Minuten mitbraten, würzen.","Die Eier darüber verquirlen und unter Rühren stocken lassen, bis sie fest sind."]},
+  {"id":"kichererbsen-reispfanne-mit-ei","title":"Kichererbsen-Reispfanne mit Ei","meal":"Mittag/Abend","time":20,"kcal":675,"protein":32,"cost":2.19,"veg":330,"diet":"vegetarisch","tags":[],"contains":["Hülsenfrüchte","Ei"],"ing":[[120,"g","Kichererbsen (Dose, abgetropft)",null,"kiche"],[60,"g","Reis (Rohgewicht)",null,"reis"],[2,"","Ei","Eier","ei"],[1,"","Paprika","Paprika","pap"],[1,"","Zwiebel","Zwiebeln","zwie"],[1,"","Tomate","Tomaten","tom"],[1,"EL","Sojasauce",null,"soja"],[1,"TL","Rapsöl",null,"oel"],[null,"","Pfeffer",null,null]],"steps":["Reis nach Packungsanleitung kochen.","Zwiebel und Paprika klein schneiden und im Öl 4 Minuten anbraten. Kichererbsen zugeben und 3 Minuten mitbraten.","Die Eier am Rand verrühren und fest werden lassen, dann alles mit Reis und Sojasauce vermengen.","Tomate in Stücken zum Schluss unterheben."]},
+  {"id":"putenhack-baellchen-mit-joghurt-sauce-und-couscous","title":"Putenhack-Bällchen mit Joghurt-Sauce und Couscous","meal":"Mittag/Abend","time":25,"kcal":605,"protein":44,"cost":2.01,"veg":220,"diet":"omni","tags":[],"contains":["Geflügel","Ei"],"ing":[[130,"g","Putenhack",null,"phack"],[0.5,"","Ei","Eier","ei"],[15,"g","Haferflocken",null,"hafer"],[60,"g","Couscous (Rohgewicht)",null,"couscous"],[60,"g","Naturjoghurt",null,"jog35"],[80,"g","Gurke",null,"gurke"],[1,"","Tomate","Tomaten","tom"],[0.5,"","Zwiebel","Zwiebeln","zwie"],[1,"TL","Rapsöl",null,"oel"],[null,"","Salz und Pfeffer",null,null]],"steps":["Putenhack mit Ei, Haferflocken, klein geschnittener Zwiebel und Gewürzen verkneten und zu kleinen Bällchen formen.","Im Öl bei mittlerer Hitze rundherum 8 bis 10 Minuten braten, bis sie innen ganz durch sind.","Couscous mit der gleichen Menge heißem Wasser übergießen und 5 Minuten quellen lassen.","Gurke und Tomate würfeln, mit dem Joghurt vermischen und dazu servieren."]},
+  {"id":"haehnchen-caesar-salat-mit-joghurt-dressing","title":"Hähnchen-Caesar-Salat mit Joghurt-Dressing","meal":"Mittag/Abend","time":20,"kcal":465,"protein":46,"cost":2.31,"veg":150,"diet":"omni","tags":["Für die Arbeit"],"contains":["Geflügel","Ei"],"ing":[[120,"g","Hähnchenbrust",null,"haehn"],[1,"","Ei","Eier","ei"],[150,"g","Eisbergsalat",null,"eisb"],[15,"g","Parmesan",null,"parm"],[1,"","Scheibe Vollkornbrot","Scheiben Vollkornbrot","brot"],[40,"g","Naturjoghurt",null,"jog35"],[1,"EL","Zitronensaft",null,"zitrone"],[1,"TL","Senf",null,"senf"],[0.5,"TL","Rapsöl",null,"oel"],[null,"","Salz und Pfeffer",null,null]],"steps":["Ei 8 Minuten hart kochen, pellen und vierteln.","Hähnchen in Streifen im Öl rundherum anbraten, bis es innen ganz durch ist. Brot würfeln und in der Pfanne rösten.","Joghurt mit Zitronensaft, Senf, Salz und Pfeffer zum Dressing verrühren.","Salat mit Hähnchen, Ei, Brotwürfeln und Parmesan mischen und das Dressing darübergeben."]},
+  {"id":"tomaten-haehnchen-reis-auflauf","title":"Tomaten-Hähnchen-Reis-Auflauf","meal":"Mittag/Abend","time":40,"kcal":605,"protein":45,"cost":2.71,"veg":430,"diet":"omni","tags":["Meal-Prep"],"contains":["Geflügel"],"ing":[[130,"g","Hähnchenbrust",null,"haehn"],[60,"g","Reis (Rohgewicht)",null,"reis"],[200,"g","stückige Tomaten (Dose)",null,"stueck"],[1,"","Paprika","Paprika","pap"],[1,"","Zwiebel","Zwiebeln","zwie"],[40,"g","Mozzarella",null,"moz"],[1,"TL","Rapsöl",null,"oel"],[null,"","Oregano, Salz und Pfeffer",null,null]],"steps":["Reis nach Packungsanleitung kochen. Ofen auf 200 °C Ober- und Unterhitze vorheizen.","Hähnchen in Würfeln mit Zwiebel und Paprika im Öl anbraten, bis das Fleisch außen gar ist.","Alles mit Reis, Tomaten und Gewürzen in eine Form geben, mit Mozzarella bestreuen und 20 Minuten überbacken, bis das Hähnchen innen ganz durch ist."],"tip":"Zum Vorkochen: gekühlt 2 Tage haltbar, vor dem Essen vollständig erhitzen.","note":"Zum Vorkochen: Reis, Nudeln und Couscous nach dem Kochen schnell abkühlen, im Kühlschrank aufbewahren, am besten am nächsten Tag essen (spätestens nach 2 Tagen) und vollständig erhitzen."},
+  {"id":"eier-nudeln-mit-tomate-rucola-und-parmesan","title":"Eier-Nudeln mit Tomate, Rucola und Parmesan","meal":"Mittag/Abend","time":20,"kcal":570,"protein":32,"cost":2.05,"veg":230,"diet":"vegetarisch","tags":[],"contains":["Ei"],"ing":[[70,"g","Vollkornnudeln (Rohgewicht)",null,"nudel"],[2,"","Ei","Eier","ei"],[2,"","Tomate","Tomaten","tom"],[30,"g","Rucola",null,"ruc"],[15,"g","Parmesan",null,"parm"],[1,"TL","Rapsöl",null,"oel"],[1,"","Knoblauchzehe","Knoblauchzehen","knob"],[null,"","Salz und Pfeffer",null,null]],"steps":["Nudeln nach Packungsanleitung kochen.","Knoblauch und Tomatenstücke im Öl 3 Minuten anbraten. Die Nudeln zugeben.","Eier verquirlen, in die Pfanne geben und unter Rühren fest werden lassen.","Mit Rucola und Parmesan servieren."]},
+  {"id":"hackbraten-muffins-mit-salat","title":"Hackbraten-Muffins mit Salat","meal":"Mittag/Abend","time":35,"kcal":555,"protein":35,"cost":1.94,"veg":300,"diet":"omni","tags":["Meal-Prep","Für die Arbeit","Günstig"],"contains":["Rindfleisch","Schwein","Ei"],"ing":[[120,"g","Hackfleisch (gemischt)",null,"ghack"],[1,"","Ei","Eier","ei"],[25,"g","Haferflocken",null,"hafer"],[0.5,"","Zwiebel","Zwiebeln","zwie"],[1,"TL","Senf",null,"senf"],[1,"EL","Tomatenmark",null,"tmark"],[100,"g","Eisbergsalat",null,"eisb"],[1,"","Tomate","Tomaten","tom"],[60,"g","Gurke",null,"gurke"],[null,"","Salz und Pfeffer",null,null]],"steps":["Ofen auf 190 °C Ober- und Unterhitze vorheizen.","Hack mit Ei, Haferflocken, klein geschnittener Zwiebel, Senf, Tomatenmark und Gewürzen verkneten und in zwei große Muffinmulden drücken.","20 bis 25 Minuten backen, bis sie innen ganz durch sind und nichts Rosa mehr zu sehen ist.","Mit Salat, Tomate und Gurke essen."],"tip":"Kalt wie warm gut, am nächsten Tag in der Box zur Arbeit."},
+  {"id":"honig-senf-haehnchen-mit-paprika-und-couscous","title":"Honig-Senf-Hähnchen mit Paprika und Couscous","meal":"Mittag/Abend","time":30,"kcal":530,"protein":40,"cost":2.78,"veg":380,"diet":"omni","tags":[],"contains":["Geflügel"],"ing":[[130,"g","Hähnchenbrust",null,"haehn"],[1,"TL","Senf",null,"senf"],[1,"TL","Honig",null,"honig"],[2,"","Paprika","Paprika","pap"],[1,"","Zwiebel","Zwiebeln","zwie"],[60,"g","Couscous (Rohgewicht)",null,"couscous"],[1,"TL","Rapsöl",null,"oel"],[null,"","Salz und Pfeffer",null,null]],"steps":["Senf mit Honig verrühren und das gewürzte Hähnchen damit bestreichen. Ofen auf 200 °C Ober- und Unterhitze vorheizen.","Paprika und Zwiebel in Stücken mit dem Öl auf einem Blech mischen, das Hähnchen dazulegen und 20 bis 25 Minuten backen, bis es innen ganz durch ist.","Couscous mit der gleichen Menge heißem Wasser übergießen, 5 Minuten quellen lassen und lockern."]}
 ];
 
 const DAYS = [{"name":"Arbeitstag mit kleinem Frühstück","items":[{"id":"skyr-mit-banane-und-mandeln","title":"Skyr mit Banane und Mandeln","meal":"Frühstück","kcal":275,"protein":25},{"id":"haehnchen-wrap","title":"Hähnchen-Wrap","meal":"Mittag/Abend","kcal":395,"protein":35},{"id":"erdbeer-quark-shake","title":"Erdbeer-Quark-Shake","meal":"Snack","kcal":230,"protein":26},{"id":"spaghetti-bolognese-mit-vollkornnudeln","title":"Spaghetti Bolognese mit Vollkornnudeln","meal":"Mittag/Abend","kcal":620,"protein":40},{"id":"quark-kakao-creme","title":"Quark-Kakao-Creme","meal":"Snack","kcal":175,"protein":25}],"kcal":1695,"protein":151},{"name":"Arbeitstag ohne Frühstück","items":[{"id":"overnight-oats-dein-rezept","title":"Overnight Oats (dein Rezept)","meal":"Frühstück","kcal":845,"protein":40},{"id":"gouda-mit-gurke-und-tomate","title":"Gouda mit Gurke und Tomate","meal":"Snack","kcal":170,"protein":12},{"id":"haehnchen-reis-pfanne","title":"Hähnchen-Reis-Pfanne","meal":"Mittag/Abend","kcal":520,"protein":41},{"id":"skyr-mit-erdbeeren","title":"Skyr mit Erdbeeren","meal":"Snack","kcal":160,"protein":23},{"id":"quark-kakao-creme","title":"Quark-Kakao-Creme","meal":"Snack","kcal":175,"protein":25}],"kcal":1870,"protein":141},{"name":"Wochenende mit Frühstück","items":[{"id":"ruehrei-mit-paprika-und-brot","title":"Rührei mit Paprika und Brot","meal":"Frühstück","kcal":575,"protein":32},{"id":"linsen-curry","title":"Linsen-Curry","meal":"Mittag/Abend","kcal":495,"protein":25},{"id":"skyr-mit-mandeln-und-zimt","title":"Skyr mit Mandeln und Zimt","meal":"Snack","kcal":210,"protein":21},{"id":"nudelauflauf-mit-tomate-paprika-und-mozzarella","title":"Nudelauflauf mit Tomate, Paprika und Mozzarella","meal":"Mittag/Abend","kcal":580,"protein":30},{"id":"quark-kakao-creme","title":"Quark-Kakao-Creme","meal":"Snack","kcal":175,"protein":25}],"kcal":2035,"protein":133}];
@@ -1142,6 +1214,9 @@ const TIPS = [
     "Ganzkörper, 2 bis 3 Mal pro Woche, mit mindestens einem Ruhetag dazwischen. So trainiert jede Muskelgruppe mehrmals pro Woche.",
     "Wochen 1 und 2: 2 Sätze pro Übung. Ab Woche 3: 3 Sätze. Das ergibt etwa 6 bis 9 Sätze pro Muskelgruppe und Woche. Auswertungen vieler Studien sehen bei rund 10 Sätzen deutlich mehr Wachstum als bei unter 5. Anfänger kommen mit etwas weniger schon weit.",
     "Beende die Sätze 1 bis 3 Wiederholungen vor dem Muskelversagen, als Anfänger eher 2 bis 3. Das reicht für Wachstum und schont die Technik.",
+    "Bis zum Muskelversagen musst du nicht gehen. Eine Auswertung von 2021 fand bei Sätzen mit 1 bis 3 Wiederholungen im Tank ähnlich viel Muskelwachstum wie bis zum Versagen, bei weniger Erschöpfung. Bei reinen Körpergewichtsübungen darf der letzte Satz ruhig sehr nah ans Limit gehen.",
+    "Nutze den vollen Bewegungsumfang und kontrolliere die Bewegung, vor allem das Runtergehen. Eine verbreitete Empfehlung, die Studienlage dazu ist noch dünner als bei Umfang und Nähe zum Versagen.",
+    "Eine feste Pausenwoche musst du als Anfänger nicht einplanen. In der einzigen kontrollierten Studie dazu (2024, mit Trainierten) brachte eine geplante Woche ohne Training keinen zusätzlichen Muskelaufbau. Wird dein Training über mehrere Einheiten schwächer, nimm eine Woche mit einem Satz weniger.",
     "Pausen von 60 bis 90 Sekunden genügen. Eine Auswertung von 2024 sah einen kleinen Vorteil für Pausen über 60 Sekunden, aber keinen messbaren Unterschied jenseits von 90 Sekunden.",
     "Steigere dich so: erst Wiederholungen bis zum oberen Ende des Bereichs, dann die nächste Variante und wieder unten anfangen. Haltezeiten wie beim Plank pro Training um etwa 5 Sekunden erhöhen.",
     "Liegestütze wirken: In einer Studie mit untrainierten Männern brachten Liegestütze, an die gleiche Last wie das Bankdrücken angepasst, ähnlich viel Muskelzuwachs. Wichtig ist, dass die Variante schwer genug ist."] },
@@ -1164,6 +1239,8 @@ const TIPS = [
     "Bei stechendem Schmerz aufhören und eine leichtere Variante nehmen."] }
 ];
 
+const weekPlan = () => WEEK.map((d, i) => { const on = settings.tdays[i] ? 1 : 0; return [d[0], on ? "Training" : (d[2] ? "Spaziergang" : d[1]), on]; });
+const trainDays = () => Math.max(1, settings.tdays.reduce((a, v) => a + v, 0));
 const WEEK = [["Mo", "Training", 1], ["Di", "Spaziergang", 0], ["Mi", "Training", 1], ["Do", "Spaziergang", 0], ["Fr", "Training", 1], ["Sa", "Aktiv: Rad, Wandern", 0], ["So", "Pause, Vorkochen", 0]];
 
 const SHOP = [
@@ -1179,6 +1256,9 @@ const SOURCES = [
     ["Recommended Routine (r/bodyweightfitness): Aufbau und Progressionsleitern", "https://www.liftosaur.com/programs/recommended-routine"],
     ["Kikuchi und Nakazato 2017: Liegestütze und Bankdrücken bei gleicher Last", "https://pubmed.ncbi.nlm.nih.gov/29541130/"],
     ["Singer et al. 2024: Pausendauer und Muskelwachstum", "https://doi.org/10.3389/fspor.2024.1429789"],
+    ["Grgic et al. 2021: Training bis zum Versagen oder knapp davor (Journal of Sport and Health Science)", "https://pubmed.ncbi.nlm.nih.gov/33301248/"],
+    ["Coleman et al. 2024: Geplante Pausenwoche und Muskelwachstum (PeerJ)", "https://doi.org/10.7717/peerj.16777"],
+    ["StrongFirst: Pike-Stütz und Pike-Progressionen auf dem Weg zum Handstand-Liegestütz", "https://www.strongfirst.com/journey-handstand-push-part-2/"],
     ["Schoenfeld, Ogborn und Krieger 2017: Trainingsumfang und Muskelwachstum (Journal of Sports Sciences)", ""],
     ["NASM: Wiederholungen im Tank (RIR)", "https://www.nasm.org/resource-center/blog/training/reps-in-reserve-coaching-intensity-with-rir"],
     ["Tisch-Rows sicher ausführen", "https://www.findyouredge.app/news/how-to-do-inverted-rows-beginners-uk-2026"]]],
@@ -1240,7 +1320,7 @@ const store = {
 };
 const $ = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
-let settings = Object.assign({ sets: 2, rest: 90, hold: 30, speak: true, handsfree: false }, store.get("fc_settings", {}));
+let settings = Object.assign({ sets: 2, rest: 90, hold: 30, speak: true, handsfree: false, tdays: [1, 0, 1, 0, 1, 0, 0] }, store.get("fc_settings", {}));
 let levels = store.get("fc_levels", {});
 let log = store.get("fc_log", []);
 let sessions = store.get("fc_sessions", []);
@@ -1333,30 +1413,38 @@ function clearTimer() { clearInterval(tm.id); tm.id = null; tm.running = false; 
 function skipTimer() { const cb = tm.onDone; clearTimer(); if (cb) cb(); else render(); }
 
 /* ======================= Trainingsablauf ======================= */
-const W = { phase: "idle", ex: 0, set: 1 };
+const W = { phase: "idle", ex: 0, set: 1, quick: false };
+const setsN = () => (W.quick ? 1 : settings.sets);
 const isActive = () => ["warmup", "prep", "work", "hold", "rest"].includes(W.phase);
-function nextPos() { return W.set < settings.sets ? { ex: W.ex, set: W.set + 1 } : { ex: W.ex + 1, set: 1 }; }
-function estMinutes() {
-  const sets = EX.length * settings.sets;
-  const sec = 180 + sets * 45 + (sets - 1) * settings.rest;
+function nextPos() { return W.set < setsN() ? { ex: W.ex, set: W.set + 1 } : { ex: W.ex + 1, set: 1 }; }
+function estMinutes(q) {
+  const sets = EX.length * (q ? 1 : settings.sets);
+  const sec = (q ? 90 : 180) + sets * 45 + (sets - 1) * settings.rest;
   return Math.round(sec / 60 / 5) * 5;
 }
+function lastTime(e) {
+  const lv = lvl(e);
+  for (let i = WK.length - 1; i >= 0; i--) { const m = WK[i].sets.filter((x) => x.ex === e.id && x.lvl === lv && (e.type === "hold" ? x.secs > 0 : x.reps != null)); if (m.length) return e.type === "hold" ? m.map((x) => x.secs + " s") : m.map((x) => x.reps); }
+  return null;
+}
+const lastTxt = (e) => { const l = lastTime(e); return l ? l.join(", ") : ""; };
 function instruction() {
   const e = EX[W.ex];
-  return e.name + ", Satz " + W.set + " von " + settings.sets + ". " + (e.type === "hold" ? "Halten." : e.reps + ".");
+  return e.name + ", Satz " + W.set + " von " + setsN() + ". " + (e.type === "hold" ? "Halten." : e.reps + ".");
 }
 function instructionLong() {
   const e = EX[W.ex];
-  const head = "Übung " + (W.ex + 1) + " von " + EX.length + ": " + e.name + ". Satz " + W.set + " von " + settings.sets + ". " + levelName(e) + ".";
-  if (e.type === "hold") return head + " Halte " + settings.hold + " Sekunden.";
-  return head + " " + e.reps + ". Lass 1 bis 3 Wiederholungen übrig. Sag fertig, wenn du den Satz geschafft hast.";
+  const head = "Übung " + (W.ex + 1) + " von " + EX.length + ": " + e.name + ". Satz " + W.set + " von " + setsN() + ". " + levelName(e) + ".";
+  if (e.type === "hold") return head + " Halte " + settings.hold + " Sekunden." + (lastTxt(e) ? " Letztes Mal: " + lastTxt(e) + "." : "");
+  const lt = lastTxt(e);
+  return head + " " + e.reps + ". " + (lt ? "Letztes Mal: " + lt + ". Versuch eine Wiederholung mehr. " : "") + "Lass 1 bis 3 Wiederholungen übrig. Sag fertig, wenn du den Satz geschafft hast.";
 }
-function startWorkout() {
-  W.ex = 0; W.set = 1; W.phase = "warmup";
+function startWorkout(quick) {
+  W.quick = !!quick; W.ex = 0; W.set = 1; W.phase = "warmup";
   SESS = { date: todayISO(), t0: Date.now(), sets: [] };
   wake();
-  say("Aufwärmen, drei Minuten.", "Aufwärmen: Handgelenke und Schultern kreisen, Hampelmänner, ein paar Dead Bugs und langsame Kniebeugen. Sag weiter, wenn du früher fertig bist.");
-  startTimer(180, beginWork);
+  say(W.quick ? "Kurz-Training. Aufwärmen, anderthalb Minuten." : "Aufwärmen, drei Minuten.", "Aufwärmen: Handgelenke und Schultern kreisen, Hampelmänner, ein paar Dead Bugs und langsame Kniebeugen. Sag weiter, wenn du früher fertig bist.");
+  startTimer(W.quick ? 90 : 180, beginWork);
 }
 function beginWork() {
   clearTimer();
@@ -1364,7 +1452,7 @@ function beginWork() {
   if (SESS) SESS.sets = SESS.sets.filter((x) => !(x.ex === e.id && x.set === W.set));
   if (e.type === "hold") {
     W.phase = "prep";
-    say(e.name + ", Satz " + W.set + " von " + settings.sets + ". Gleich halten.", "Übung " + (W.ex + 1) + " von " + EX.length + ": " + e.name + ", " + levelName(e) + ". Ich zähle fünf Sekunden, dann halten.");
+    say(e.name + ", Satz " + W.set + " von " + setsN() + ". Gleich halten.", "Übung " + (W.ex + 1) + " von " + EX.length + ": " + e.name + ", " + levelName(e) + ". Ich zähle fünf Sekunden, dann halten.");
     startTimer(5, beginHold);
   } else {
     W.phase = "work"; say(instruction(), instructionLong()); render();
@@ -1375,7 +1463,7 @@ function setDone(reps) {
   const held = W.phase === "hold" ? Math.max(0, Math.round(tm.total - Math.max(0, tm.left) / 1000)) : null;
   if (SESS && (W.phase === "work" || W.phase === "hold")) { const ce = EX[W.ex]; SESS.sets.push({ ex: ce.id, lvl: lvl(ce), set: W.set, reps: typeof reps === "number" ? reps : null, secs: held }); }
   clearTimer(); buzz(20);
-  if (W.ex === EX.length - 1 && W.set === settings.sets) return finish();
+  if (W.ex === EX.length - 1 && W.set === setsN()) return finish();
   const nx = nextPos();
   W.phase = "rest";
   say("Pause. Danach " + EX[nx.ex].name + ".", "Gut gemacht. Pause, " + settings.rest + " Sekunden. Als Nächstes: " + EX[nx.ex].name + ", Satz " + nx.set + ".");
@@ -1385,7 +1473,7 @@ function finish() {
   clearTimer(); W.phase = "done"; buzz([40, 60, 40]);
   sessions.push(todayISO()); store.set("fc_sessions", sessions);
   let recIdx = -1;
-  if (SESS && SESS.sets.length) { WK.push({ date: SESS.date, min: Math.max(1, Math.round((Date.now() - SESS.t0) / 60000)), sets: SESS.sets, effort: "" }); recIdx = WK.length - 1; saveToday(); }
+  if (SESS && SESS.sets.length) { WK.push({ date: SESS.date, min: Math.max(1, Math.round((Date.now() - SESS.t0) / 60000)), sets: SESS.sets, effort: "", q: W.quick ? 1 : 0 }); recIdx = WK.length - 1; saveToday(); }
   SESS = null;
   unwake();
   say("Geschafft. Jetzt kurz dehnen.", "Geschafft! Dehne jetzt noch zwei Minuten Brust, Oberschenkel und Rücken. Trag danach deine Werte unter Fortschritt ein.", true);
@@ -1405,6 +1493,14 @@ function act(name) {
     case "start":
       if (active) return say("Das Training läuft schon.");
       return startWorkout();
+    case "startquick":
+      if (active) return say("Das Training läuft schon.");
+      return startWorkout(true);
+    case "skipex":
+      if (!active || p === "warmup") return say("Gerade gibt es keine Übung zum Auslassen.");
+      if (W.ex >= EX.length - 1) { if (SESS && SESS.sets.length) return finish(); return stopWorkout(); }
+      clearTimer(); W.ex++; W.set = 1; say("Übung ausgelassen.");
+      return beginWork();
     case "done":
     case "next":
       if (p === "warmup") return beginWork();
@@ -1416,7 +1512,7 @@ function act(name) {
       if (p === "warmup") return say("Du bist noch beim Aufwärmen.");
       if (p !== "rest") {
         if (W.set > 1) W.set--;
-        else if (W.ex > 0) { W.ex--; W.set = settings.sets; }
+        else if (W.ex > 0) { W.ex--; W.set = setsN(); }
       }
       return beginWork();
     case "pause":
@@ -1463,7 +1559,7 @@ function renderTimer() {
   $("#ringunit").textContent = unit;
 }
 function renderSteps() {
-  const sets = settings.sets;
+  const sets = setsN();
   const started = isActive() && W.phase !== "warmup";
   const done = W.phase === "done" ? EX.length * sets : (started ? W.ex * sets + (W.set - 1) + (W.phase === "rest" ? 1 : 0) : 0);
   $("#steps").innerHTML = EX.map((e, i) => {
@@ -1489,12 +1585,13 @@ function renderActions() {
   let h = "";
   if (!active) {
     h += btn("start", p === "done" ? "Noch mal starten" : "Training starten", "play", "primary lg");
+    h += btn("startquick", "Kurz, ca. " + estMinutes(true) + " Min", "play");
     if (tm.id) h += btn("stop", "Timer stoppen", "stop");
   } else {
     if (p === "work" && EX[W.ex].type !== "hold") h += repChips(EX[W.ex]);
     if (p === "work" || p === "hold") h += btn("done", "Fertig", "check", "primary lg");
     else h += btn("next", p === "warmup" ? "Aufwärmen beenden" : "Überspringen", "next", "primary lg");
-    h += '<div class="mini">' + (p !== "warmup" ? btn("back", "Zurück", "back") : "") + (tm.id ? btn("pause", paused ? "Fortsetzen" : "Pause", paused ? "play" : "pause") : "") + btn("repeat", "Ansage", "repeat") + techBtn() + btn("stop", "Stopp", "stop") + "</div>";
+    h += '<div class="mini">' + (p !== "warmup" ? btn("back", "Zurück", "back") + btn("skipex", "Auslassen", "next") : "") + (tm.id ? btn("pause", paused ? "Fortsetzen" : "Pause", paused ? "play" : "pause") : "") + btn("repeat", "Ansage", "repeat") + techBtn() + btn("stop", "Stopp", "stop") + "</div>";
   }
   $("#actions").innerHTML = h;
 }
@@ -1510,13 +1607,13 @@ function render() {
   else if (p === "done") { title = "Training geschafft"; sub = "Dehnen nicht vergessen und Werte eintragen"; }
   else if (["prep", "work", "hold", "rest"].includes(p)) {
     title = (p === "rest" ? "Als Nächstes: " : "") + e.name;
-    sub = levelName(e);
-    info = "Übung " + (shown.ex + 1) + "/" + EX.length + ", Satz " + shown.set + "/" + settings.sets;
+    sub = levelName(e) + (lastTxt(e) ? " · zuletzt " + lastTxt(e) : "") + (W.quick ? " · Kurz-Training" : "");
+    info = "Übung " + (shown.ex + 1) + "/" + EX.length + ", Satz " + shown.set + "/" + setsN();
   }
   $("#title").textContent = title;
   $("#sub").textContent = sub;
   $("#setinfo").textContent = info;
-  renderSteps(); renderActions(); renderTimer();
+  renderSteps(); renderActions(); renderTimer(); coachFig();
   if ($("#panel-heute") && !$("#panel-heute").hidden) renderToday();
 }
 
@@ -1634,9 +1731,21 @@ function drawRecipe() {
 function readRecipe(r) { say(r.title); }
 
 /* ======================= Übungen, Ernährung, Tipps ======================= */
+const weekNo = () => { if (!sessions.length) return 1; const first = sessions.slice().sort()[0], d = (new Date(todayISO() + "T12:00:00") - new Date(first + "T12:00:00")) / 86400000; return Math.max(1, Math.floor(d / 7) + 1); };
+function fatigueHint() {
+  const tot = (w) => w.sets.reduce((a, x) => a + (x.reps || 0) + (x.secs || 0) / 5, 0), k = WK.filter((x) => !x.q).slice(-3);
+  if (k.length < 3) return "";
+  const t2 = tot(k[0]), t1 = tot(k[1]), t0 = tot(k[2]);
+  return t0 < t1 && t1 < t2 && t0 < 0.85 * t2 ? '<p class="note">Deine letzten Einheiten wurden schwächer. Prüfe Schlaf, Essen und Stress. Wenn es so bleibt, mach eine Woche mit einem Satz weniger pro Übung. Feste Pausenwochen bringen laut einer Studie von 2024 keinen Vorteil, sie sind nur bei Bedarf sinnvoll.</p>' : "";
+}
+function phaseHTML() {
+  const w = weekNo(), rec = w <= 2 ? 2 : 3, cur = settings.sets;
+  const txt = w <= 2 ? "Technik lernen: 2 Sätze, bei jedem Satz noch etwa 3 Wiederholungen übrig lassen." : w <= 8 ? "Aufbau: 3 Sätze, 1 bis 3 Wiederholungen übrig lassen. Steigere erst die Wiederholungen, dann die Stufe." : "Weiter aufbauen: Klappen 3 Sätze sauber, nimm die nächste Stufe. Einen vierten Satz nur bei einer Übung, die hinterherhinkt.";
+  return '<div class="card"><h3>Woche ' + w + "</h3><p>" + txt + "</p>" + (w <= 8 && cur !== rec ? '<div class="row"><button class="btn primary" type="button" data-setsrec="' + rec + '">Auf ' + rec + " Sätze stellen</button></div>" : '<p class="small muted">Aktuell: ' + cur + " Sätze pro Übung.</p>") + fatigueHint() + "</div>";
+}
 function renderEx() {
-  $("#panel-uebungen").innerHTML =
-    '<div class="card"><h3>Ganzkörper, 3 Mal pro Woche</h3><ul>' +
+  $("#panel-uebungen").innerHTML = phaseHTML() +
+    '<div class="card"><h3>Ganzkörper, ' + trainDays() + ' Mal pro Woche</h3><ul>' +
     "<li>Mindestens ein Ruhetag zwischen zwei Einheiten.</li>" +
     "<li>Wochen 1 und 2: 2 Sätze pro Übung, ab Woche 3: 3 Sätze (Einstellungen mit dem Zahnrad).</li>" +
     "<li>Beende jeden Satz 1 bis 3 Wiederholungen vor dem Muskelversagen.</li>" +
@@ -1712,7 +1821,7 @@ function renderNutrition() {
 }
 function renderTips() {
   $("#panel-tipps").innerHTML =
-    '<div class="card"><h3>Beispielwoche</h3><div class="week">' + WEEK.map((d) => '<div class="' + (d[2] ? "on" : "") + '"><b>' + d[0] + "</b>" + d[1] + "</div>").join("") + "</div></div>" +
+    '<div class="card"><h3>Deine Woche</h3><div class="week">' + weekPlan().map((d) => '<div class="' + (d[2] ? "on" : "") + '"><b>' + d[0] + "</b>" + d[1] + "</div>").join("") + "</div></div>" +
     '<div class="grid2">' + TIPS.map((g) => '<article class="card"><h3>' + g.h + "</h3><ul>" + g.items.map((i) => "<li>" + i + "</li>").join("") + "</ul></article>").join("") + "</div>" ;
 }
 function renderSources() {
@@ -1754,6 +1863,55 @@ function progressSummary() {
   if (c != null) bits.push("Taille seit dem Start: " + (c > 0 ? "plus " : "minus ") + nf(Math.abs(c)) + " Zentimeter.");
   return bits.join(" ");
 }
+const MUSC = [["chest", "Brust"], ["shoulder", "Schultern"], ["tri", "Trizeps"], ["back", "Rücken"], ["bi", "Bizeps"], ["quad", "Oberschenkel"], ["glute", "Po und Beinrückseite"], ["core", "Bauch und Rumpf"]];
+const MAPX = { squat: { quad: 1, glute: 0.5 }, push: { chest: 1, shoulder: 0.5, tri: 0.5 }, row: { back: 1, bi: 0.5 }, pike: { shoulder: 1, tri: 0.5 }, bridge: { glute: 1 }, plank: { core: 1 } };
+function weekSets(startISO) {
+  const end = shiftDay(startISO, 7), out = {};
+  MUSC.forEach((m) => { out[m[0]] = 0; });
+  WK.forEach((w) => { if (w.date >= startISO && w.date < end) w.sets.forEach((x) => { const mp = MAPX[x.ex]; if (mp) for (const k in mp) out[k] += mp[k]; }); });
+  return out;
+}
+function lastTrained(key) {
+  for (let i = WK.length - 1; i >= 0; i--) if (WK[i].sets.some((x) => MAPX[x.ex] && MAPX[x.ex][key])) return WK[i].date;
+  return null;
+}
+function renderVolume() {
+  const ws = weekStartISO(todayISO()), cur = weekSets(ws), prev = weekSets(shiftDay(ws, -7)), today = new Date(todayISO() + "T12:00:00");
+  const any = MUSC.some((m) => cur[m[0]] > 0);
+  const rows = MUSC.map((m) => {
+    const n = cur[m[0]], pv = prev[m[0]], lt = lastTrained(m[0]);
+    const days = lt ? Math.round((today - new Date(lt + "T12:00:00")) / 86400000) : null;
+    const cls = n >= 10 ? "good" : n >= 6 ? "ok" : "low";
+    const sub = (days == null ? "" : days === 0 ? "heute trainiert" : "zuletzt vor " + days + (days === 1 ? " Tag" : " Tagen")) + (pv ? (days == null ? "" : " · ") + "letzte Woche " + nf(pv) : "");
+    return '<li class="vrow"><span class="vname">' + m[1] + '</span><span class="vnum">' + nf(n) + '<small> von 10</small></span><span class="vbar" role="img" aria-label="' + nf(n) + ' von 10 Sätzen"><i class="' + cls + '" style="width:' + Math.min(100, Math.round(n / 10 * 100)) + '%"></i></span>' + (sub ? '<span class="vsub muted small">' + sub + "</span>" : "") + "</li>";
+  }).join("");
+  $("#volcard").innerHTML = "<h3>Sätze pro Muskel diese Woche</h3><p class=\"muted\">Etwa 10 Sätze pro Muskel und Woche gelten als gutes Ziel. Sätze, die einen Muskel nur mithelfen lassen, zählen halb. Anfänger kommen auch mit 6 bis 9 gut voran.</p>" + (any ? "" : '<p class="note">Diese Woche noch kein Training. Nach der ersten Einheit füllen sich die Balken.</p>') + '<ul class="vol">' + rows + "</ul>";
+}
+function badgeList() {
+  const n = sessions.length, st = weekStreak(), dd = Object.keys(DIARY), pt = protTarget();
+  const protDays = dd.filter((k) => DIARY[k].items.reduce((a, x) => a + (x.p || 0), 0) >= pt).length;
+  const waterDays = dd.filter((k) => DIARY[k].water >= GOALS.water).length;
+  const lvlUp = EX.some((e) => levels[e.id] != null && levels[e.id] > e.def);
+  const full = WK.some((w) => EX.every((e) => w.sets.some((x) => x.ex === e.id)));
+  const wts = log.filter((x) => x.weight != null).length;
+  return [
+    { t: "Erste Einheit", d: "Du hast dein erstes Training geschafft.", v: n, g: 1 },
+    { t: "10 Einheiten", d: "Zehn Trainings, das ist eine Gewohnheit im Aufbau.", v: n, g: 10 },
+    { t: "25 Einheiten", d: "Fünfundzwanzig Trainings.", v: n, g: 25 },
+    { t: "3 Wochen in Folge", d: "Drei Wochen hintereinander mit mindestens 2 Einheiten.", v: st, g: 3 },
+    { t: "Eine Stufe weiter", d: "Du bist bei einer Übung auf die nächste Stufe gegangen.", v: lvlUp ? 1 : 0, g: 1 },
+    { t: "Alle Übungen an einem Tag", d: "Eine Einheit mit allen " + EX.length + " Übungen.", v: full ? 1 : 0, g: 1 },
+    { t: "Kurz, aber dabei", d: "Ein Kurz-Training geschafft, an einem stressigen Tag zählt das.", v: WK.some((w) => w.q) ? 1 : 0, g: 1 },
+    { t: "Eiweißziel 5 Tage", d: "An 5 Tagen das Eiweißziel erreicht.", v: protDays, g: 5 },
+    { t: "Wasser 3 Tage", d: "An 3 Tagen dein Wasserziel erreicht.", v: waterDays, g: 3 },
+    { t: "Trend sichtbar", d: "Mindestens 2 Gewichtswerte eingetragen.", v: wts, g: 2 }
+  ];
+}
+function renderBadges() {
+  const l = badgeList(), got = l.filter((b) => b.v >= b.g).length;
+  $("#badgecard").innerHTML = "<h3>Erfolge</h3><p class=\"muted\">" + got + " von " + l.length + " erreicht. Alles bleibt auf deinem Gerät, kein Vergleich mit anderen.</p><ul class=\"badges\">" +
+    l.map((b) => '<li class="' + (b.v >= b.g ? "got" : "") + '"><b>' + b.t + "</b><span>" + (b.v >= b.g ? b.d : "noch " + (b.g - b.v > 0 ? nf(Math.ceil(b.g - b.v)) : 0) + " bis dahin") + "</span></li>").join("") + "</ul>";
+}
 function renderProgress() {
   const w = change("weight"), c = change("waist");
   const sign = (n) => (n == null ? "–" : (n > 0 ? "+" : n < 0 ? "−" : "") + nf(Math.abs(n)));
@@ -1763,6 +1921,7 @@ function renderProgress() {
     '<div class="stat"><span class="big">' + sign(w) + "</span><span>kg seit Start</span></div>" +
     '<div class="stat"><span class="big">' + sign(c) + "</span><span>cm Taille seit Start</span></div>";
   $("#waistnote").textContent = waistNote();
+  renderVolume(); renderBadges();
   renderCharts();
   if (!log.length) { $("#logtable").innerHTML = '<p class="muted">Noch keine Einträge. Miss heute Gewicht und Taille und trag sie oben ein.</p>'; return; }
   const rows = log.slice().reverse().map((e) =>
@@ -1779,7 +1938,7 @@ const GROUPS = [
   { id: "fortschritt", title: "Fortschritt", tabs: ["fortschritt"] }
 ];
 const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", rezepte: "Rezepte", rad: "Glücksrad", einkauf: "Einkauf", ernaehrung: "Ernährung", fortschritt: "Fortschritt" };
-const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", rezepte: "100 Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf" };
+const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", rezepte: "140 Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf" };
 const LAST = {};
 let CUR = "heute";
 const greeting = () => { const h = new Date().getHours(); return h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend"; };
@@ -1801,6 +1960,8 @@ function showTab(name, quiet) {
   const g = GROUPS.find((x) => x.tabs.includes(name)); if (!g) return;
   const prevG = (GROUPS.find((x) => x.tabs.includes(CUR)) || {}).id;
   CUR = name; LAST[g.id] = name;
+  if (name === "fortschritt" && typeof renderProgress === "function" && !quiet) renderProgress();
+  if (name === "uebungen" && typeof renderEx === "function" && !quiet) renderEx();
   $$(".gbtn").forEach((b) => b.setAttribute("aria-selected", b.dataset.group === g.id ? "true" : "false"));
   $$(".panel").forEach((p) => { p.hidden = p.id !== "panel-" + name; });
   const sn = $("#subnav");
@@ -1902,6 +2063,8 @@ function handle(raw) {
     return say("Okay.");
   }
   if (/\b(technik|3d|dreidee|übung zeigen|zeig mir die übung|wie geht das)\b/.test(t)) { const e = isActive() ? EX[Math.min(W.ex, EX.length - 1)] : EX[0]; openV3(e.id, lvl(e)); return say("Hier siehst du die Technik: " + e.name + "."); }
+  if (/\b(auslassen|übung überspringen|nächste übung)\b/.test(t)) return act("skipex");
+  if (/(kurz[ -]?training|kurze einheit|kurz starten|kurzes training)/.test(t)) return act("startquick");
   if (/\b(stopp|stop|beenden|abbrechen|aufhören)\b/.test(t)) return act("stop");
   if (/(fortsetzen|weitermachen|weiter machen)/.test(t)) return act("resume");
   if (/\b(pause|pausieren|warte|moment)\b/.test(t)) return act("pause");
@@ -2321,6 +2484,7 @@ let WK = store.get("fc_wk", []);
     if (typeof d.water !== "number" || !isFinite(d.water)) d.water = 0;
   });
   Object.keys(levels).forEach((k) => { if (typeof levels[k] !== "number" || !isFinite(levels[k]) || levels[k] < 0) delete levels[k]; });
+  if (!Array.isArray(settings.tdays) || settings.tdays.length !== 7) settings.tdays = [1, 0, 1, 0, 1, 0, 0]; settings.tdays = settings.tdays.map((v) => (v ? 1 : 0));
   settings.sets = num(settings.sets, 1, 6, 2); settings.rest = num(settings.rest, 10, 600, 90); settings.hold = num(settings.hold, 5, 180, 30);
   prof.weight = num(prof.weight, 30, 300, 80); prof.height = num(prof.height, 100, 230, 175);
   GOALS.kcal = num(GOALS.kcal, 800, 6000, 1900); GOALS.protein = num(GOALS.protein, 0, 400, 0); GOALS.water = num(GOALS.water, 1, 30, 6);
@@ -2449,19 +2613,19 @@ function logEat(r, portions) {
 function addWater(d) { const day = dayEns(); day.water = Math.max(0, Math.min(20, day.water + d)); saveToday(); renderToday(); }
 
 function renderToday() {
-  const now = new Date(), plan = WEEK[(now.getDay() + 6) % 7], pg = protGoal(), e = dsum(), day = dayGet();
+  const now = new Date(), plan = weekPlan()[(now.getDay() + 6) % 7], pg = protGoal(), e = dsum(), day = dayGet();
   const wc = weekCountISO(weekStartISO(todayISO())), streak = weekStreak(), doneToday = sessions.includes(todayISO());
   const title = plan[2] ? (doneToday ? "Training für heute geschafft" : "Heute ist Trainingstag") : "Heute: " + plan[1];
   const rest = Math.max(0, pg - e.p);
   const sug = suggestList(3);
   const glasses = Array.from({ length: GOALS.water }, (_, i) => '<button class="gl' + (i < day.water ? " on" : "") + '" data-water="' + i + '" aria-pressed="' + (i < day.water) + '" aria-label="Glas ' + (i + 1) + '"></button>').join("");
   $("#panel-heute").innerHTML =
-    '<div class="card hero"><div class="tdhead"><div><h3>' + title + '</h3><p class="muted">' + (plan[2] ? "Ganzkörper, etwa 25 Minuten" : plan[1]) + "</p></div>" +
+    '<div class="card hero"><div class="tdhead"><div><h3>' + title + '</h3><p class="muted">' + (plan[2] ? "Ganzkörper, etwa " + estMinutes() + " Minuten" : plan[1]) + "</p></div>" +
     '<div class="row">' + (plan[2] && !doneToday && !isActive() ? '<button class="btn primary" data-act="start">Training starten</button>' : "") + '<button class="btn" data-eatopen="1">Essen eintragen</button><button class="btn" data-tab="rad">Essen auswählen</button></div></div>' +
     '<div class="rings">' +
     ringHTML(e.p / pg, "var(--good)", e.p, "von " + pg + " g", "Eiweiß") +
     ringHTML(e.k / GOALS.kcal, e.k > GOALS.kcal + 150 ? "var(--warn)" : "var(--accent)", e.k.toLocaleString("de-DE"), "von " + GOALS.kcal.toLocaleString("de-DE") + " kcal", "Kalorien") +
-    ringHTML(wc / 3, "var(--ink)", wc, "von 3", "Training") + "</div>" +
+    ringHTML(wc / trainDays(), "var(--ink)", wc, "von " + trainDays(), "Training") + "</div>" +
     '<p class="small muted">Eiweiß ist für den Muskelaufbau am wichtigsten. Die Ziele änderst du bei den Einstellungen (Zahnrad).</p></div>' +
     '<div class="grid2"><div class="card"><div class="rday-h"><h3>Wasser</h3><span class="rtot">' + nf(Math.round(day.water * 25) / 100) + " von " + nf(Math.round(GOALS.water * 25) / 100) + ' Litern</span></div><div class="glasses">' + glasses + '</div><p class="small muted">Ein Glas sind etwa 250 ml. Die DGE nennt rund 1,5 Liter am Tag.</p></div>' +
     '<div class="card"><h3>Serie</h3><div class="stats"><div class="stat"><span class="big">' + streak + '</span><span>Wochen in Folge mit mindestens 2 Einheiten</span></div><div class="stat"><span class="big">' + sessions.length + '</span><span>Einheiten insgesamt</span></div></div></div></div>' +
@@ -2516,6 +2680,7 @@ function drawSummary(idx) {
   const w = WK[idx]; if (!w) return;
   const rows = EX.map((e) => {
     const ev = evalEx(e, w.sets); if (!ev) return "";
+    if (w.q && ev.status === "up") ev.status = "ok";
     const lv = (w.sets.find((s) => s.ex === e.id) || {}).lvl, r = repRange(e), pb = prevBest(e, lv, idx);
     const nxt = e.ladder[lv + 1], now = lvl(e);
     let msg = "", btn = "";
@@ -2680,6 +2845,7 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.plan != null && t.dataset.plan !== "") return planEat(parseInt(t.dataset.plan, 10));
   if (t.dataset.planre != null && t.dataset.planre !== "") return planRe(parseInt(t.dataset.planre, 10));
   if (t.dataset.planall) return t.dataset.planall === "new" ? planNew() : planAll();
+  if (t.dataset.setsrec) { settings.sets = parseInt(t.dataset.setsrec, 10); store.set("fc_settings", settings); $("#s-sets").value = String(settings.sets); render(); renderEx(); renderToday(); return; }
   if (t.dataset.eatopen) return openEat();
   if (t.dataset.eat) { const r = byId(t.dataset.eat); if (r) { logEat(r, 1); t.textContent = "Eingetragen"; t.disabled = true; } return; }
   if (t.dataset.eatrec) { const r = byId(t.dataset.eatrec); if (r) { logEat(r, portions); t.textContent = "Eingetragen"; } return; }
@@ -2776,7 +2942,17 @@ function bindSettings() {
     store.set("fc_settings", settings); render();
   };
   ["#s-sets", "#s-rest", "#s-hold", "#s-speak", "#s-hands"].forEach((s) => $(s).addEventListener("change", save));
-  bindSync();
+  bindSync(); bindDays();
+}
+function bindDays() {
+  const box = $("#s-tdays"), names = WEEK.map((d) => d[0]);
+  const draw = () => {
+    box.innerHTML = names.map((n, i) => '<button type="button" class="dbtn" data-day="' + i + '" aria-pressed="' + !!settings.tdays[i] + '">' + n + "</button>").join("");
+    const t = settings.tdays, adj = t.some((v, i) => v && t[(i + 1) % 7]), cnt = trainDays();
+    $("#tdays-note").textContent = adj ? "Tipp: Plane zwischen zwei Einheiten einen Ruhetag ein." : cnt > 4 ? "Für den Anfang reichen 3 Tage." : cnt < 2 ? "Mindestens 2 Tage pro Woche wären gut." : "";
+  };
+  box.addEventListener("click", (e) => { const b = e.target.closest("[data-day]"); if (!b) return; const i = parseInt(b.dataset.day, 10); settings.tdays[i] = settings.tdays[i] ? 0 : 1; store.set("fc_settings", settings); draw(); renderToday(); renderEx(); });
+  draw();
 }
 function bindSync() {
   const msg = (t) => { $("#restoremsg").textContent = t; };
@@ -2895,6 +3071,7 @@ const V3 = (() => {
 })();
 
 /* Bewegungsabläufe: je Stufe ein Zyklus aus Schlüsselposen */
+/* Bewegungsabläufe: je Stufe ein Zyklus aus Schlüsselposen */
 const V3A = (() => {
   const { POSE, reach, armsDown, line, thForShoulder, kf, dir, RAD, chair, chairBack, wall, block, table, bar, mat, add, mul } = V3;
   const feet = (p, x, y) => { p.la = [x, y == null ? 0.08 : y, -0.13]; p.ra = [x, y == null ? 0.08 : y, 0.13]; return p; };
@@ -2942,6 +3119,30 @@ const V3A = (() => {
   const push4 = push({ ax: 0, ay: 0.18, hy: 0.035, sp: 0.19, low: 0.2, props: mat(-0.5, 1.9), cam: { cx: 0.65, cy: 0.45, R: 1.5 } });
   const push5 = push({ ax: 0, ay: 0.58, hy: 0.035, sp: 0.19, low: 0.2, props: chair(0, 0.4), cam: { cx: 0.65, cy: 0.5, R: 1.5 } });
   const push6 = push({ ax: 0, ay: 0.18, hy: 0.035, sp: 0.05, low: 0.2, dx: -0.04, el: [-1, -0.3, 0.9], props: mat(-0.5, 1.9), cam: { cx: 0.65, cy: 0.45, R: 1.5 } });
+
+
+  /* ---------- Pike-Liegestütze (Schultern) ---------- */
+  function pike(c) {
+    const A = [c.ax, 0.08 + (c.fh || 0)], hh = c.hh || 0, clampv = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const build = (beta, neckY, hx) => {
+      const P = [A[0] + 0.855 * Math.cos(beta * RAD), A[1] + 0.855 * Math.sin(beta * RAD)];
+      const t = Math.asin(clampv((neckY - P[1]) / 0.5, -1, -0.05)), tor = t / RAD;
+      const neck = [P[0] + 0.5 * Math.cos(t), P[1] + 0.5 * Math.sin(t)];
+      const x = hx == null ? neck[0] : hx;
+      const p = POSE({ pel: [P[0], P[1], 0], tor, hd: tor - 12, la: [A[0], A[1], -0.1], ra: [A[0], A[1], 0.1], lfa: -26, rfa: -26, lkp: [1, 0, 0], rkp: [1, 0, 0], lha: 0, rha: 0, lep: [-1, -0.2, -0.5], rep: [-1, -0.2, 0.5] });
+      p.lw = [x, hh + 0.035, -0.19]; p.rw = [x, hh + 0.035, 0.19];
+      return { p, x: neck[0] };
+    };
+    const top = build(c.beta, hh + 0.035 + 0.53), bot = build(c.beta - (c.drop || 7), hh + 0.035 + 0.17, top.x);
+    top.p.lw[0] = top.p.rw[0] = top.x;
+    return { top: top.p, bot: bot.p };
+  }
+  const pk = (c, down, label) => { const q = pike(c); return { kf: seq(q.top, q.bot, down, 1.2, 0.4, label || "Kopf zwischen den Händen senken, Hüfte bleibt hoch", "Hochdrücken", "Oben: Hüfte hoch, Arme gestreckt", "Unten kurz halten"), props: c.props || [], cam: c.cam || { cx: 0.5, cy: 0.6, R: 1.3 } }; };
+  const pike0 = pk({ ax: 0.1, fh: 0, hh: 0.45, beta: 52, props: block(0.62, 1.1, 0.45), cam: { cx: 0.55, cy: 0.65, R: 1.35 } }, 1.5);
+  const pike1 = pk({ ax: 0.1, fh: 0, hh: 0, beta: 62, props: mat(-0.3, 1.2) }, 1.5);
+  const pike2 = pk({ ax: 0.1, fh: 0.2, hh: 0, beta: 55, props: block(-0.1, 0.4, 0.2).concat(mat(-0.3, 1.2)), cam: { cx: 0.5, cy: 0.7, R: 1.35 } }, 1.5);
+  const pike3 = pk({ ax: 0.1, fh: 0.42, hh: 0, beta: 42, props: chair(0.12, 0.42).concat(mat(-0.3, 1.3)), cam: { cx: 0.55, cy: 0.8, R: 1.5 } }, 1.6);
+  const pike4 = pk({ ax: 0.1, fh: 0.42, hh: 0, beta: 42, props: chair(0.12, 0.42).concat(mat(-0.3, 1.3)), cam: { cx: 0.55, cy: 0.8, R: 1.5 } }, 3.0, "Langsam runter, 3 Sekunden");
 
   /* ---------- Rows unter dem Tisch ---------- */
   const TAB = table(-0.85, 1.05, 0.78);
@@ -3040,11 +3241,11 @@ const V3A = (() => {
   const pu2 = { kf: [kf(pull(1.93), 0.6, "Start oben: Kinn über der Stange (Stuhl oder Sprung)"), kf(pull(1.93), 4.0, "Langsam absenken, 3 bis 5 Sekunden"), kf(pull(1.53), 0.6, "Unten kurz hängen"), kf(pull(1.53), 1.0, "Wieder nach oben helfen")], props: bar(BARX, 2.1), cam: pcam };
   const pu3 = { kf: [kf(pull(1.53), 0.6, "Hängen, Schulterblätter aktiv"), kf(pull(1.53), 1.8, "Hochziehen, Ellbogen nach unten"), kf(pull(1.93), 0.6, "Oben: Kinn über der Stange"), kf(pull(1.93), 2.2, "Kontrolliert absenken")], props: bar(BARX, 2.1), cam: pcam };
 
-  return { squat: [squat0, squat1, squat2, squat3, squat4], push: [push0, push1, push2, push3, push4, push5, push6], row: [row0, row1, row2, row3], bridge: [br0, br1, br2, br3, br4], plank: [pl0, pl1, pl2, pl3], deadbug: [deadbug], wrist: [wrist], pullup: [pu0, pu1, pu2, pu3] };
+  return { squat: [squat0, squat1, squat2, squat3, squat4], push: [push0, push1, push2, push3, push4, push5, push6], pike: [pike0, pike1, pike2, pike3, pike4], row: [row0, row1, row2, row3], bridge: [br0, br1, br2, br3, br4], plank: [pl0, pl1, pl2, pl3], deadbug: [deadbug], wrist: [wrist], pullup: [pu0, pu1, pu2, pu3] };
 })();
 
-/* Zeichnen und Bedienung */
-const V3View = (() => {
+function makeView(opts) {
+  opts = opts || {};
   const { add, sub, mul, solve, mixPose, ease, RAD } = V3;
   const G = { id: null, idx: 0, anim: null, t: 0, T: 1, playing: true, speed: 1, yaw: 0, pitch: 8 * RAD, auto: false, raf: 0, last: 0, cv: null, ctx: null, W: 0, H: 0, pal: null };
 
@@ -3055,17 +3256,18 @@ const V3View = (() => {
   const rgb = (c, a) => "rgba(" + Math.round(c[0]) + "," + Math.round(c[1]) + "," + Math.round(c[2]) + "," + (a == null ? 1 : a) + ")";
   const mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
   function palette() {
+    if (opts.dark) return { acc: [142, 162, 255], ink: [240, 242, 241], bg: [18, 22, 25], muted: [155, 165, 171], dark: true, near: [142, 162, 255], far: [88, 102, 190], torso: [205, 210, 218], head: [228, 231, 236], line: [8, 10, 14], floor: [255, 255, 255], grid: [255, 255, 255], floorA: 0.06, gridA: 0.1 };
     const cs = getComputedStyle(document.documentElement), g = (n, d) => (cs.getPropertyValue(n).trim() || d);
     const acc = rgbOf(g("--accent", "#3b4bd6")), ink = rgbOf(g("--ink", "#111")), bg = rgbOf(g("--surface", "#fff")), muted = rgbOf(g("--muted", "#666"));
     const dark = (bg[0] + bg[1] + bg[2]) / 3 < 128;
-    return { acc, ink, bg, muted, dark, near: acc, far: mixc(acc, dark ? [0, 0, 0] : [20, 20, 40], 0.45), torso: mixc(ink, bg, dark ? 0.35 : 0.2), head: mixc(ink, bg, dark ? 0.2 : 0.1), line: dark ? [0, 0, 0] : [255, 255, 255], floor: mixc(bg, ink, 0.07), grid: mixc(bg, ink, 0.18) };
+    return { acc, ink, bg, muted, dark, near: acc, far: mixc(acc, dark ? [0, 0, 0] : [20, 20, 40], 0.45), torso: mixc(ink, bg, dark ? 0.35 : 0.2), head: mixc(ink, bg, dark ? 0.2 : 0.1), line: dark ? [0, 0, 0] : [255, 255, 255], floor: mixc(bg, ink, 0.07), grid: mixc(bg, ink, 0.18), floorA: 1, gridA: 0.55 };
   }
 
   /* Kamera */
   let C = [0, 0.8, 0], D = 5, F = 600;
   function setCam(anim) {
     const cam = anim.cam || { cx: 0.2, cy: 0.8, R: 1.4 };
-    C = [cam.cx, cam.cy, 0]; const R = cam.R * 0.8; D = R * 4; F = (Math.min(G.W, G.H * 1.2) * 0.5 / 1.12) * D / R;
+    C = [cam.cx, cam.cy, 0]; const R = cam.R * (opts.zoom || 0.8); D = R * 4; F = (Math.min(G.W, G.H * 1.2) * 0.5 / 1.12) * D / R;
   }
   function proj(p) {
     const x = p[0] - C[0], y = p[1] - C[1], z = p[2] - C[2], cy = Math.cos(G.yaw), sy = Math.sin(G.yaw), cp = Math.cos(G.pitch), sp = Math.sin(G.pitch);
@@ -3090,14 +3292,14 @@ const V3View = (() => {
 
   function draw() {
     const { ctx, W, H, pal } = G; if (!ctx) return;
-    ctx.clearRect(0, 0, W, H); ctx.fillStyle = rgb(pal.bg); ctx.fillRect(0, 0, W, H);
+    ctx.clearRect(0, 0, W, H); if (!opts.transparent) { ctx.fillStyle = rgb(pal.bg); ctx.fillRect(0, 0, W, H); }
     const fr = frame(G.t), J = solve(fr.pose), items = [];
     /* Boden */
     const gx = C[0], R = (G.anim.cam && G.anim.cam.R) || 1.4, ext = Math.ceil(R * 2.2 * 2) / 2 + 0.5;
-    ctx.fillStyle = rgb(pal.floor);
+    ctx.fillStyle = rgb(pal.floor, pal.floorA);
     const fl = [[gx - ext, 0, -ext], [gx + ext, 0, -ext], [gx + ext, 0, ext], [gx - ext, 0, ext]].map(proj);
     ctx.beginPath(); fl.forEach((q, n) => (n ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y))); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = rgb(pal.grid, 0.55); ctx.lineWidth = 1;
+    ctx.strokeStyle = rgb(pal.grid, pal.gridA); ctx.lineWidth = 1;
     const x0 = Math.ceil((gx - ext) * 2) / 2;
     for (let x = x0; x <= gx + ext; x += 0.5) { const a = proj([x, 0, -ext]), b = proj([x, 0, ext]); ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
     for (let z = -ext; z <= ext + 1e-6; z += 0.5) { const a = proj([gx - ext, 0, z]), b = proj([gx + ext, 0, z]); ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
@@ -3148,6 +3350,7 @@ const V3View = (() => {
     if (G.anim) setCam(G.anim);
   }
   function uiPhase(fr) {
+    if (opts.noUi) return;
     const el = document.getElementById("v3-phase"), sl = document.getElementById("v3-scrub");
     if (el && fr && el.dataset.i !== String(fr.i)) { el.dataset.i = String(fr.i); el.textContent = fr.label || ""; }
     if (sl && document.activeElement !== sl) sl.value = String(Math.round(G.t / G.T * 1000));
@@ -3161,7 +3364,7 @@ const V3View = (() => {
   }
   function setAnim(id, idx) {
     G.id = id; G.idx = idx; G.anim = V3A[id][idx]; G.T = G.anim.kf.reduce((a, k) => a + k.d, 0); G.t = 0; G.pal = palette();
-    const el = document.getElementById("v3-phase"); if (el) el.dataset.i = "";
+    if (!opts.noUi) { const el = document.getElementById("v3-phase"); if (el) el.dataset.i = ""; }
     size(); if (G.anim) setCam(G.anim);
   }
   function start() { stop(); G.last = 0; G.raf = requestAnimationFrame(tick); }
@@ -3176,7 +3379,9 @@ const V3View = (() => {
   }
   const view = (name) => { const v = { side: [0, 8], front: [90, 8], angle: [40, 22], top: [0, 84] }[name]; if (v) { G.yaw = v[0] * RAD; G.pitch = v[1] * RAD; if (!G.playing) uiPhase(draw()); } };
   return { G, setAnim, start, stop, bindCanvas, size, view, draw, uiPhase };
-})();
+}
+const V3View = makeView();
+const V3Mini = makeView({ noUi: true, dark: true, transparent: true, zoom: 0.66 });
 
 /* Bedienung der 3D-Ansicht */
 const V3KEY = { "Dead Bug": "deadbug", "Klimmzug-Vorstufen": "pullup", "Handgelenke aufwärmen": "wrist" };
@@ -3218,7 +3423,19 @@ function openV3(id, idx, src) {
   showDialog($("#dlg-3d"), src);
   requestAnimationFrame(() => { V3View.view("side"); v3Select(idx); $("#v3-cv").focus({ preventScroll: true }); });
 }
+let coachKey = "";
+function coachFig() {
+  const box = $("#coachfig"); if (!box || typeof V3Mini === "undefined") return;
+  const p = W.phase, show = ["prep", "work", "hold", "rest"].includes(p);
+  box.hidden = !show;
+  if (!show) { V3Mini.stop(); coachKey = ""; return; }
+  const e = EX[Math.min(p === "rest" ? nextPos().ex : W.ex, EX.length - 1)], idx = lvl(e), key = e.id + ":" + idx;
+  if (key !== coachKey) { coachKey = key; V3Mini.size(); V3Mini.setAnim(e.id, idx); V3Mini.view("side"); }
+  if (reduceMotion()) { V3Mini.G.playing = false; V3Mini.G.t = V3Mini.G.T * 0.4; V3Mini.draw(); V3Mini.stop(); return; }
+  if (!V3Mini.G.raf) V3Mini.start();
+}
 function bindV3() {
+  V3Mini.bindCanvas($("#coach-cv"));
   V3View.bindCanvas($("#v3-cv"));
   $("#x-3d").innerHTML = ic("close");
   $("#dlg-3d").addEventListener("close", () => V3View.stop());
