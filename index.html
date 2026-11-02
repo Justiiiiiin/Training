@@ -597,7 +597,7 @@ body[data-coach="0"] .side { display: none; }
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">Stand 02.11. 13:00</span>
+<span class="ver" id="appver" aria-label="Stand der Version">Stand 02.11. 16:17</span>
 <header class="top">
   <div class="brand"><h1>Fitness Coach</h1><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -3026,7 +3026,63 @@ const CEXTRA = [
   ["knaeckebrot", "Knäckebrot", 340, 10, 10, 20, 0.5], ["brezel|laugenbrezel", "Laugenbrezel", 270, 8, 90, 90, 0.5], ["pfannkuchen|eierkuchen|crepes", "Pfannkuchen", 200, 6, 80, 160, 0.3], ["nuesse|walnuesse|cashew|cashews|haselnuesse|erdnuesse|erdnuss", "Nüsse", 620, 20, 0, 30, 1.2],
   ["sonnenblumenkerne|kuerbiskerne|leinsamen", "Kerne und Samen", 570, 22, 0, 15, 0.7], ["marmelade|konfituere|gelee", "Marmelade", 250, 0.4, 0, 20, 0.3], ["kekse|plaetzchen|keks", "Kekse", 470, 6, 10, 30, 0.6], ["kuchen", "Kuchen", 350, 5, 0, 100, 0.5],
   ["popcorn", "Popcorn", 400, 10, 0, 30, 0.5], ["tomatensuppe|gemuesesuppe|suppe", "Suppe (Dose oder Fertig)", 45, 1.5, 0, 400, 0.15], ["linsensuppe|eintopf", "Eintopf (Dose)", 75, 4, 0, 400, 0.25], ["pesto", "Pesto", 450, 5, 0, 20, 1.3],
-  ["hummus", "Hummus", 230, 7, 0, 40, 0.7], ["currysauce|bratensauce|sosse", "Soße", 80, 1.5, 0, 100, 0.2], ["essig", "Essig", 5, 0, 0, 10, 0.1], ["kaffee", "Kaffee schwarz", 2, 0.2, 0, 250, 0.05], ["tee", "Tee ungesüßt", 1, 0, 0, 250, 0.03]
+  ["hummus", "Hummus", 230, 7, 0, 40, 0.7], ["currysauce|bratensauce|sosse", "Soße", 80, 1.5, 0, 100, 0.2], ["essig", "Essig", 5, 0, 0, 10, 0.1], ["kaffee", "Kaffee schwarz", 2, 0.2, 0, 250, 0.05], ["tee", "Tee ungesüßt", 1, 0, 0, 250, 0.03],
+  ["ingwer", "Ingwer (frisch)", 80, 1.8, 0, 10, 0.8], ["koriander", "Koriander (frisch)", 23, 2.1, 0, 10, 2], ["petersilie", "Petersilie (frisch)", 36, 3, 0, 10, 1.5], ["schnittlauch", "Schnittlauch", 30, 3.3, 0, 10, 2], ["dill", "Dill (frisch)", 43, 3.5, 0, 10, 2],
+  ["minze|pfefferminze", "Minze (frisch)", 44, 3.3, 0, 10, 2], ["basilikum", "Basilikum (frisch)", 23, 3.2, 0, 10, 2], ["chilischote|peperoni|jalapeno|peperoncini", "Chilischote", 40, 1.9, 15, 15, 1.5], ["fruehlingszwiebel|fruehlingszwiebeln|lauchzwiebel|lauchzwiebeln", "Frühlingszwiebel", 30, 1.8, 20, 40, 0.5],
+  ["spargel", "Spargel", 20, 2, 0, 200, 0.9], ["mangold|pak choi|pakchoi|chinakohl", "Blattgemüse", 20, 1.8, 0, 150, 0.4], ["rote bete|rotebete", "Rote Bete", 43, 1.6, 0, 100, 0.3], ["kuerbis|hokkaido", "Kürbis", 26, 1, 0, 200, 0.3],
+  ["suesskartoffel|suesskartoffeln|batate", "Süßkartoffel", 86, 1.6, 200, 200, 0.3], ["gruene bohnen|prinzessbohnen|buschbohnen", "Grüne Bohnen", 31, 1.8, 0, 150, 0.4], ["rosenkohl", "Rosenkohl", 43, 3.4, 0, 150, 0.45], ["fenchel", "Fenchel", 31, 1.2, 0, 150, 0.35],
+  ["maiskolben", "Maiskolben", 90, 3.3, 200, 200, 0.4], ["weisse bohnen|cannellinibohnen|schwarze bohnen", "Weiße oder schwarze Bohnen (Dose)", 100, 7, 0, 120, 0.3], ["edamame", "Edamame", 120, 12, 0, 80, 0.8],
+  ["pflaume|pflaumen|zwetschge|zwetschgen", "Pflaume", 46, 0.7, 60, 60, 0.4], ["kirschen", "Kirschen", 63, 1.1, 0, 100, 0.8], ["aprikose|aprikosen", "Aprikose", 48, 1.4, 45, 90, 0.5], ["grapefruit", "Grapefruit", 42, 0.8, 250, 125, 0.3],
+  ["zitrone|limette|limettensaft", "Zitrone oder Limette", 29, 1.1, 80, 20, 0.3], ["feige|feigen", "Feige", 74, 0.8, 50, 50, 0.9], ["granatapfel", "Granatapfel", 83, 1.7, 0, 100, 0.8], ["trauben", "Weintrauben", 70, 0.7, 0, 100, 0.5],
+  ["haehnchenschenkel|haehnchenunterschenkel", "Hähnchenschenkel (mit Haut, ohne Knochen)", 200, 18, 0, 150, 0.6], ["schweinenacken|nackensteak|kotelett|schweinekotelett", "Schweinenacken oder Kotelett", 220, 19, 0, 150, 0.9], ["schweinebauch", "Schweinebauch", 330, 15, 0, 100, 0.8],
+  ["kassler", "Kassler", 170, 20, 0, 120, 1.0], ["bierschinken|lyoner|mortadella|fleischwurst|jagdwurst", "Aufschnitt (Wurst)", 260, 12, 0, 30, 1.0], ["nuggets|chicken nuggets", "Chicken Nuggets", 250, 14, 20, 120, 0.8],
+  ["kroketten", "Kroketten", 160, 3, 25, 150, 0.35], ["maultaschen", "Maultaschen", 190, 8, 60, 200, 0.5], ["instantnudeln|ramen|nudelsuppe", "Instantnudeln (trocken)", 450, 9, 0, 85, 0.5],
+  ["griechischer joghurt|joghurt griechisch|sahnejoghurt", "Griechischer Joghurt (10 %)", 130, 6, 0, 150, 0.35], ["reibekaese|pizzakaese|streukaese|geriebener kaese", "Reibekäse", 300, 22, 0, 30, 0.9], ["halloumi|grillkaese", "Halloumi", 320, 21, 0, 60, 1.3],
+  ["ricotta", "Ricotta", 170, 9, 0, 50, 0.7], ["mascarpone", "Mascarpone", 400, 4.5, 0, 30, 0.8], ["gorgonzola|blauschimmelkaese", "Gorgonzola", 350, 19, 0, 30, 1.2], ["cheddar", "Cheddar", 400, 25, 0, 30, 1.0], ["schmelzkaese|scheibenkaese|schmelzkaeseecken", "Schmelzkäse", 250, 12, 20, 40, 0.6],
+  ["vollmilch|trinkmilch", "Vollmilch (3,5 %)", 65, 3.4, 0, 200, 0.12], ["kaffeesahne|kondensmilch|kaffeemilch", "Kondensmilch (10 %)", 130, 6, 0, 10, 0.4], ["saure sahne", "Saure Sahne", 170, 3, 0, 30, 0.3], ["paneer", "Paneer", 300, 18, 0, 100, 1.2],
+  ["pita|pitabrot|fladenbrot", "Pita oder Fladenbrot", 275, 9, 60, 60, 0.35], ["naan|naanbrot", "Naan", 290, 9, 90, 90, 0.5], ["bagel", "Bagel", 250, 10, 100, 100, 0.5], ["burgerbroetchen|burger bun", "Burgerbrötchen", 270, 9, 70, 70, 0.3],
+  ["dinkelbrot|roggenbrot|toastbrot vollkorn", "Brot (Dinkel oder Roggen)", 230, 8, 50, 50, 0.25], ["paniermehl|semmelbroesel", "Paniermehl", 350, 11, 0, 20, 0.2], ["gries|griess|maisgries|polenta", "Grieß oder Polenta (Rohgewicht)", 350, 9, 0, 70, 0.2], ["hirse", "Hirse (Rohgewicht)", 360, 11, 0, 70, 0.4],
+  ["speisestaerke|staerke|mondamin", "Speisestärke", 340, 0.3, 0, 10, 0.3], ["basmati|basmatireis|jasminreis|vollkornreis|naturreis|langkornreis|parboiled", "Reis (Rohgewicht)", 350, 7, 0, 80, 0.25], ["bandnudeln|lasagneplatten|spiralnudeln|hoernchen|hornnudeln", "Nudeln (Weizen, Rohgewicht)", 355, 12.5, 0, 100, 0.2],
+  ["worcester|worcestersauce", "Worcestersauce", 78, 0, 0, 10, 0.3], ["sriracha|chilisauce|sambal|sambal oelek", "Chilisauce", 90, 2, 0, 15, 0.5], ["tabasco", "Tabasco", 12, 1, 0, 3, 1], ["harissa", "Harissa", 100, 3, 0, 15, 0.8],
+  ["tahini|sesammus", "Tahini", 595, 17, 0, 15, 1.2], ["bbq|barbecue|bbqsauce|grillsauce", "Barbecuesoße", 150, 1, 0, 20, 0.3], ["balsamico|balsamicoessig", "Balsamico", 88, 0.5, 0, 10, 0.5], ["kokosoel|kokosfett", "Kokosöl", 862, 0, 0, 10, 1.0],
+  ["sesamoel", "Sesamöl", 884, 0, 0, 10, 1.5], ["butterschmalz|ghee|schmalz", "Butterschmalz", 900, 0, 0, 10, 1.5], ["margarine", "Margarine", 720, 0.2, 0, 10, 0.5], ["hefeflocken", "Hefeflocken", 350, 45, 0, 10, 2.5],
+  ["agavendicksaft|agavensirup|ahornsirup|reissirup|sirup", "Sirup", 300, 0, 0, 20, 0.5], ["kokosraspel|kokosflocken", "Kokosraspeln", 650, 6, 0, 15, 1.0], ["sesam", "Sesam", 573, 18, 0, 10, 1.0], ["mohn", "Mohn", 525, 18, 0, 10, 1.0],
+  ["wein|rotwein|weisswein", "Wein", 85, 0.1, 0, 150, 0.4], ["sekt|prosecco", "Sekt", 80, 0.2, 0, 125, 0.5], ["eistee", "Eistee", 20, 0, 0, 330, 0.1], ["cola zero|zero|light getraenk", "Zuckerfreies Getränk", 1, 0, 0, 330, 0.1], ["mineralwasser|wasser", "Wasser", 0, 0, 0, 250, 0.02],
+  ["smoothie", "Smoothie", 55, 0.7, 0, 250, 0.4], ["schokoriegel|snickers|twix|mars|kitkat|bounty", "Schokoriegel", 490, 7, 50, 50, 0.7], ["donut|berliner|krapfen", "Donut oder Berliner", 400, 5, 70, 70, 0.6], ["lebkuchen", "Lebkuchen", 380, 5, 40, 40, 0.8],
+  ["waffel|waffeln", "Waffel", 330, 6, 60, 60, 0.4], ["marshmallows|mashmallows", "Marshmallows", 330, 3, 0, 30, 0.6], ["tzatziki", "Tzatziki", 120, 4, 0, 40, 0.5], ["guacamole", "Guacamole", 150, 2, 0, 40, 0.8], ["falafel", "Falafel", 330, 13, 25, 100, 0.8],
+  ["rosinen", "Rosinen", 300, 3, 0, 30, 0.5], ["pinienkerne", "Pinienkerne", 670, 14, 0, 20, 5.0], ["kuerbiskerne", "Kürbiskerne", 560, 30, 0, 20, 1.2],
+  ["garam masala|garam|masala", "Garam Masala", 325, 11, 2, 2, 6, "TL"],
+  ["paprikapulver|paprika edelsuess|paprika rosenscharf|geraeuchertes paprikapulver|paprika geraeuchert", "Paprikapulver", 282, 14, 2.5, 2.5, 6, "TL"],
+  ["kurkuma|gelbwurz", "Kurkuma", 312, 10, 3, 3, 6, "TL"],
+  ["kreuzkuemmel|cumin|kumin|kreuzkuemmelpulver", "Kreuzkümmel", 375, 18, 2, 2, 6, "TL"],
+  ["zimt|zimtpulver", "Zimt", 247, 4, 2.6, 2.6, 6, "TL"],
+  ["chilipulver|chiliflocken|cayenne|cayennepfeffer|chili", "Chili und Cayenne (Pulver)", 290, 12, 2, 2, 6, "TL"],
+  ["pfeffer|schwarzer pfeffer|weisser pfeffer", "Pfeffer", 251, 10, 2.3, 2.3, 6, "TL"],
+  ["salz|meersalz|jodsalz|kraeutersalz", "Salz", 0, 0, 6, 6, 6, "TL"],
+  ["oregano", "Oregano (getrocknet)", 265, 9, 1, 1, 6, "TL"],
+  ["basilikum getrocknet", "Basilikum (getrocknet)", 233, 23, 0.7, 0.7, 6, "TL"],
+  ["thymian", "Thymian", 276, 9, 1, 1, 6, "TL"],
+  ["rosmarin", "Rosmarin", 331, 5, 1, 1, 6, "TL"],
+  ["majoran", "Majoran", 271, 13, 0.6, 0.6, 6, "TL"],
+  ["salbei", "Salbei", 315, 11, 0.7, 0.7, 6, "TL"],
+  ["petersilie getrocknet", "Petersilie (getrocknet)", 292, 27, 0.5, 0.5, 6, "TL"],
+  ["korianderpulver|koriandersamen|gemahlener koriander", "Koriander (Pulver)", 298, 12, 2, 2, 6, "TL"],
+  ["ingwerpulver", "Ingwerpulver", 335, 9, 2, 2, 6, "TL"],
+  ["knoblauchpulver|knoblauchgranulat", "Knoblauchpulver", 331, 17, 3, 3, 6, "TL"],
+  ["zwiebelpulver|zwiebelgranulat", "Zwiebelpulver", 341, 10, 2.4, 2.4, 6, "TL"],
+  ["muskat|muskatnuss", "Muskat", 525, 6, 2.2, 2.2, 6, "TL"],
+  ["kardamom", "Kardamom", 311, 11, 2, 2, 6, "TL"],
+  ["nelken|gewuerznelken", "Nelken", 274, 6, 2, 2, 6, "TL"],
+  ["bockshornklee|kasuri methi", "Bockshornklee", 323, 23, 3, 3, 6, "TL"],
+  ["senfkoerner|senfsaat|senfpulver", "Senfkörner", 508, 26, 3, 3, 6, "TL"],
+  ["fenchelsamen|anis|sternanis", "Fenchel und Anis", 345, 16, 2, 2, 6, "TL"],
+  ["suessstoff", "Süßstoff", 0, 0, 0.1, 0.1, 6, "TL"],
+  ["bruehpulver|gemuesebruehpulver|bruehwuerfel|huehnerbruehe pulver", "Brühpulver", 180, 6, 4, 4, 6, "TL"],
+  ["backpulver", "Backpulver", 53, 0.1, 4, 4, 6, "TL"],
+  ["natron", "Natron", 0, 0, 4, 4, 6, "TL"],
+  ["trockenhefe|backhefe", "Trockenhefe", 325, 40, 3, 3, 6, "TL"],
+  ["vanille|vanilleextrakt|vanillearoma", "Vanilleextrakt", 288, 0.1, 4, 4, 6, "TL"],
+  ["vanillezucker", "Vanillezucker", 390, 0, 8, 8, 6, "TL"]
 ];
 /* Gerichte außer Haus oder Fertiggerichte, Richtwerte je Portion: [Schlüssel, Name, kcal, Eiweiß] */
 const CDISH = [
@@ -3034,12 +3090,12 @@ const CDISH = [
   ["currywurst", "Currywurst mit Pommes", 850, 26], ["bratwurst broetchen|bratwurst im broetchen", "Bratwurst im Brötchen", 450, 17], ["stueck pizza", "Stück Pizza", 280, 11], ["pizza margherita|pizza", "Pizza (ganz, Restaurant)", 850, 32],
   ["spaghetti bolognese|nudeln bolognese", "Spaghetti Bolognese (Restaurant)", 780, 32], ["lasagne", "Lasagne", 650, 30], ["schnitzel mit pommes|schnitzel pommes", "Schnitzel mit Pommes", 950, 42], ["hirtensalat|salat mit haehnchen", "Salat mit Hähnchen", 450, 32],
   ["leberkaesbroetchen|leberkaes broetchen|leberkaese", "Leberkäsbrötchen", 520, 20], ["kaesebroetchen|broetchen mit kaese|belegtes broetchen", "Brötchen mit Käse", 380, 17], ["schinkenbroetchen|broetchen mit schinken", "Brötchen mit Schinken", 350, 18],
-  ["croissant", "Croissant", 280, 5], ["latte macchiato", "Latte macchiato", 150, 8], ["cappuccino", "Cappuccino", 90, 5], ["kaffee mit milch", "Kaffee mit Milch", 40, 2], ["eis|eiskugel", "Eiskugel", 90, 1.5], ["muesliriegel", "Müsliriegel", 100, 2]
+  ["croissant", "Croissant", 280, 5], ["latte macchiato", "Latte macchiato", 150, 8], ["cappuccino", "Cappuccino", 90, 5], ["kaffee mit milch", "Kaffee mit Milch", 40, 2], ["eis|eiskugel", "Eiskugel", 90, 1.5], ["muesliriegel", "Müsliriegel", 100, 2], ["butter chicken|murgh makhani", "Butter Chicken (ohne Reis)", 520, 36], ["chicken tikka masala|tikka masala", "Chicken Tikka Masala (ohne Reis)", 480, 36], ["chili con carne", "Chili con Carne (Portion)", 450, 30], ["omelett|omelette", "Omelett (3 Eier)", 330, 21], ["samosa|samosas", "Samosa", 250, 5], ["pad thai", "Pad Thai", 700, 25], ["ramen", "Ramen (Restaurant)", 600, 25], ["kaesespaetzle", "Käsespätzle", 700, 28], ["rouladen", "Rouladen mit Beilage", 700, 45], ["gulasch", "Gulasch mit Nudeln", 650, 38]
 ];
 const CFOODS = (() => {
   const L = [], nm = (s) => s.split("|").map((x) => CNORM(x));
   Object.keys(PRICE).forEach((k) => { const p = PRICE[k]; L.push({ id: k, name: p.n.replace(/ \(.*\)/, "").replace(/^Scheibe /, ""), kcal: p.kcal, p: p.p, per: p.u === "g" || p.u === "ml" ? 0 : p.per, pu: p.u, def: CDEF[k] || (p.u === "g" || p.u === "ml" ? 100 : p.per), eur: p.price / p.pack * 100, keys: (CSYN[k] || "").split(" ").flatMap((x) => x.split("|")).filter(Boolean), raw: ["reis", "nudel", "couscous", "linse"].includes(k) }); });
-  CEXTRA.forEach((x, i) => L.push({ id: "x" + i,  name: x[1], kcal: x[2], p: x[3], per: x[4], pu: x[4] ? "Stk" : "g", def: x[5], eur: x[6], keys: nm(x[0]), raw: /Rohgewicht/.test(x[1]) }));
+  CEXTRA.forEach((x, i) => L.push({ id: "x" + i,  name: x[1], kcal: x[2], p: x[3], per: x[4], pu: x[7] || (x[4] ? "Stk" : "g"), def: x[5], eur: x[6], keys: nm(x[0]), raw: /Rohgewicht/.test(x[1]) }));
   return L;
 })();
 const cLev = (a, b) => { const d = Array.from({ length: a.length + 1 }, (_, i) => [i]); for (let j = 1; j <= b.length; j++) d[0][j] = j; for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); return d[a.length][b.length]; };
@@ -3058,24 +3114,25 @@ function cMatch(list, text) {
   return best;
 }
 const CDISHL = CDISH.map((d) => ({ name: d[1], kcal: d[2], p: d[3], keys: d[0].split("|").map(CNORM) }));
-const CUNIT = { g: "g", gr: "g", gramm: "g", kg: "kg", ml: "ml", l: "l", liter: "l", el: "el", essloeffel: "el", tl: "tl", teeloeffel: "tl", stk: "stk", stueck: "stk", x: "stk", scheibe: "scheibe", scheiben: "scheibe", dose: "dose", dosen: "dose", becher: "becher", packung: "packung", portion: "portion", portionen: "portion" };
+const CUNIT = { g: "g", gr: "g", gramm: "g", kg: "kg", ml: "ml", l: "l", liter: "l", el: "el", essloeffel: "el", tl: "tl", teeloeffel: "tl", stk: "stk", stueck: "stk", x: "stk", scheibe: "scheibe", scheiben: "scheibe", dose: "dose", dosen: "dose", becher: "becher", packung: "packung", portion: "portion", portionen: "portion", messerspitzen: "prise", messerspitze: "prise", msp: "prise", prisen: "prise", prise: "prise", zehen: "stk", zehe: "stk", handvoll: "handvoll", tassen: "tasse", tasse: "tasse", glaeser: "glas", glas: "glas", bund: "bund", zweige: "zweig", zweig: "zweig" };
 function cGrams(f, n, unit) {
   const per = f && f.per > 1 ? f.per : 0;
   switch (unit) {
     case "g": case "ml": return n; case "kg": case "l": return n * 1000;
-    case "el": return n * (f && f.pu === "EL" ? f.per : 15); case "tl": return n * (f && f.pu === "TL" ? f.per : 5);
+    case "el": return n * (f && f.pu === "EL" ? f.per : f && f.pu === "TL" ? f.per * 3 : 15); case "tl": return n * (f && f.pu === "TL" ? f.per : 5);
     case "stk": return n * (per || (f && f.def) || 100); case "scheibe": return n * (f && f.pu === "Stk" ? f.per : 30);
     case "dose": return n * (f && ["kiche", "bohne"].includes(f.id) ? 240 : 400); case "becher": return n * 150; case "packung": return n * 250; case "portion": return n * ((f && f.def) || 150);
+    case "prise": return n * 0.5; case "handvoll": return n * 30; case "tasse": return n * 250; case "glas": return n * 200; case "bund": return n * 30; case "zweig": return n * 3;
     default: return per && n < 20 ? n * per : n >= 10 ? n : n * ((f && f.def) || 100);
   }
 }
 function cParse(text) {
   const pre = text.replace(/½/g, " 0.5 ").replace(/¼/g, " 0.25 ").replace(/(\d),(\d)/g, "$1.$2").replace(/(\d)\/(\d)/g, (m, a, b) => " " + (a / b) + " ");
-  const segs = pre.split(/\n|;|\+|,|\s+und\s+|\s+mit\s+|\s+plus\s+/i).map((x) => x.trim()).filter(Boolean).slice(0, 25);
+  const segs = pre.split(/\n|;|\+|,|\s+und\s+|\s+plus\s+/i).map((x) => x.trim()).filter(Boolean).flatMap((x) => (cMatch(CDISHL, CNORM(x)) ? [x] : x.split(/\s+mit\s+/i).map((y) => y.trim()).filter(Boolean))).slice(0, 25);
   return segs.map((raw) => {
     let t = CNORM(raw), cooked = /gekocht/.test(t), fried = /gebraten|gegart|gegrillt|gebacken|angebraten/.test(t); t = t.replace(/gekochte[rnms]?|gekocht|gebratene[rnms]?|gebraten|gegarte[rnms]?|gegart|gegrillte[rnms]?|gegrillt|gebackene[rnms]?|angebratene[rnms]?/g, " ").replace(/\s+/g, " ").trim();
     let n = null, unit = "";
-    const m = t.match(/(\d+(?:\.\d+)?|halbe[rsn]?|halb)\s*(kg|gramm|gr|g|ml|liter|l|el|essloeffel|tl|teeloeffel|stk|stueck|x|scheiben|scheibe|dosen|dose|becher|packung|portionen|portion)?(?![a-z])/);
+    const m = t.match(/(\d+(?:\.\d+)?|halbe[rsn]?|halb)\s*(kg|gramm|gr|g|ml|liter|l|el|essloeffel|tl|teeloeffel|stk|stueck|x|scheiben|scheibe|dosen|dose|becher|packung|portionen|portion|messerspitzen|messerspitze|msp|prisen|prise|zehen|zehe|handvoll|tassen|tasse|glaeser|glas|bund|zweige|zweig)?(?![a-z])/);
     if (m) { n = /^halb/.test(m[1]) ? 0.5 : parseFloat(m[1]); unit = CUNIT[m[2]] || ""; t = (t.slice(0, m.index) + " " + t.slice(m.index + m[0].length)).replace(/\s+/g, " ").trim(); }
     const mult = n != null && !unit ? n : 1, name = t || raw;
     const dish = cMatch(CDISHL, t);
