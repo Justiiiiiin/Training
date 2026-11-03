@@ -277,8 +277,9 @@ th { color: var(--muted); font-weight: 550; }
 .week b { display: block; font-family: var(--display); font-size: 1.125rem; font-weight: 650; }
 .week .on { background: var(--accent-soft); }
 details.src { background: var(--surface); border-radius: var(--r-md); padding: 14px 18px; margin-top: 22px; box-shadow: var(--shadow); }
-details.src summary { cursor: pointer; font-weight: 650; }
+details.src summary { cursor: pointer; font-weight: 650; padding: 10px 0; margin: -10px 0; } /* größere Tippfläche, gleiches Layout */
 details.src ul { margin: 8px 0 0; padding-left: 20px; font-size: 0.9375rem; display: flex; flex-direction: column; gap: 4px; }
+details.src li a { padding: 3px 0; } /* größere Tippfläche (mindestens 24 px), Layout bleibt gleich */
 
 /* Glücksrad: das eine auffällige Element */
 .raddeck { gap: 16px; }
@@ -494,7 +495,7 @@ body[data-coach="0"] .side { display: none; }
 .v3stage canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 .v3stage canvas:active { cursor: grabbing; }
 .v3phase { font-weight: 650; min-height: 1.5em; margin: 0; }
-#v3-scrub { width: 100%; accent-color: var(--accent); }
+#v3-scrub { width: 100%; height: 32px; accent-color: var(--accent); }
 .v3ctl, .v3views { gap: 8px; }
 .v3ctl .btn, .v3views .btn { min-height: 40px; padding: 0 14px; }
 .v3vars { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -536,7 +537,7 @@ body[data-coach="0"] .side { display: none; }
 .pslot.done { opacity: 0.6; }
 .pl-l { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 170px; }
 .pl-when { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent-text); }
-.pl-title { text-align: left; background: none; border: 0; padding: 0; font: inherit; font-weight: 650; color: var(--ink); cursor: pointer; overflow-wrap: anywhere; }
+.pl-title { text-align: left; background: none; border: 0; padding: 6px 0; margin: -6px 0; font: inherit; font-weight: 650; color: var(--ink); cursor: pointer; overflow-wrap: anywhere; }
 .pl-title:hover { text-decoration: underline; }
 .pl-b { display: flex; gap: 6px; align-items: center; flex: none; }
 .pl-ok { color: var(--good); font-weight: 650; font-size: 0.875rem; }
