@@ -6,7 +6,7 @@ fails = []
 def ck(n, c, info=""):
     print(("OK   " if c else "FAIL ") + n, info)
     if not c: fails.append(n)
-html = open(fcenv.APP_FILE, encoding="utf-8").read()
+html = open(fcenv.APP_FILE, encoding="utf-8").read() + open(os.path.join(fcenv.APP_DIR, "styles.css"), encoding="utf-8").read()
 sw = open(os.path.join(fcenv.APP_DIR, "sw.js"), encoding="utf-8").read()
 ck("kein Google Fonts im HTML", "fonts.googleapis" not in html and "fonts.gstatic" not in html)
 files = re.findall(r"url\((fonts/[^)]+\.woff2)\)", html)

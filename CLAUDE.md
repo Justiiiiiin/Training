@@ -1,14 +1,15 @@
 # Fitness Coach: Hinweise für Claude Code
 
-Persönliche Fitness- und Ernährungs-App für Einsteiger, Deutsch (Du-Form, einfache Sprache). Läuft als einzelne Webseite (`index.html`, ca. 740 KB) auf GitHub Pages und wird auf dem iPhone als Home-Bildschirm-App benutzt. Ausprobiert wird auch als Claude-Artifact.
+Persönliche Fitness- und Ernährungs-App für Einsteiger, Deutsch (Du-Form, einfache Sprache). Läuft als Webseite (`index.html` mit `styles.css` und `js/`) auf GitHub Pages und wird auf dem iPhone als Home-Bildschirm-App benutzt. Ausprobiert wird auch als Claude-Artifact.
 Live: https://justiiiiiin.github.io/Training/
 
 ## Aufbau
 
-- `index.html`: CSS inline, HTML, dann der gesamte Code. Der Hauptcode steht in `<script type="text/plain" id="fc-main">` und wird per `textContent` ausgeführt. Ein `<script>`-Tag darin würde die Seite zerstören, schreibe also nie `</script>` in Strings.
-- Davor liegt ein kleiner Sync-Block (`window.FC`): Speicher über localStorage, optional Supabase (Tabelle `kv`) oder die Artifact-Datenbank. Schema und Row-Level-Security der Tabelle stehen in `docs/supabase.sql`.
-- `sw.js`: Service Worker (Netz zuerst, Offline-Rückfall, Cache `fc-offline-v3`). `manifest.webmanifest` und die Icons gehören zur Installation auf dem Home-Bildschirm.
-- Daten im Code: `RECIPES` (300 Rezepte), `DAYS`, `PRICE` (Lidl-Richtwerte) werden aus `tools/recipes/` eingesetzt. Übungen: `EX`, `EXALT`, `EXFUT`, `GEAR`. 3D-Animationen: `V3A`.
+- `index.html`: nur HTML, keine Inline-Skripte. `styles.css`: das gesamte CSS (inkl. `@font-face` für `fonts/`).
+- `js/`: klassische Skripte, die sich den globalen Bereich teilen. `sync.js` und `boot.js` stehen am Ende von `index.html`. `boot.js` lädt nach dem ersten Abgleich der Reihe nach `data.js` (Übungen, Rezepte, Preise, Tipps), `app.js` (Zustand, Oberfläche, Logik), `v3.js` (3D-Ansicht) und `start.js` (Start, setzt `window.__fcReady`), jeweils mit `?v=<Versionslabel>`.
+- Der Sync-Block (`js/sync.js`, `window.FC`): Speicher über localStorage, optional Supabase (Tabelle `kv`) oder die Artifact-Datenbank. Schema und Row-Level-Security der Tabelle stehen in `docs/supabase.sql`.
+- `sw.js`: Service Worker (Netz zuerst, Offline-Rückfall, Cache `fc-offline-v3`). Neue Dateien gehören in seine Liste `FILES`. `manifest.webmanifest` und die Icons gehören zur Installation auf dem Home-Bildschirm.
+- Daten in `js/data.js`: `RECIPES` (300 Rezepte), `DAYS`, `PRICE` (Lidl-Richtwerte) werden aus `tools/recipes/` eingesetzt. Übungen: `EX`, `EXALT`, `EXFUT`, `GEAR`. 3D-Animationen: `V3A`.
 - Wichtige Stellen: `sanitizeState()` (prüft alle gespeicherten Daten), `showTab()`/`GROUPS`/`TABN` (Navigation), `renderEx`, `renderAusblick`, `prepCalc`/`prepGen` (Vorkochen), `shopCalc` (Einkaufsliste), `buyEstimate` (Ausgaben), `cParse` (Kalorien-Rechner mit `CEXTRA`, `CDISH`).
 - Gespeichert wird alles in localStorage-Schlüsseln `fc_*` (zum Beispiel `fc_settings`, `fc_diary`, `fc_goals`). Ändere nie ihre Bedeutung, ohne `sanitizeState` mitzuziehen.
 
@@ -21,18 +22,14 @@ python3 tests/calc_test.py            # ein einzelner Test
 python3 tools/stamp.py                # Versionslabel hochzählen (v3.N · Datum), nur beim Veröffentlichen
 ```
 
-Syntaxcheck des Hauptcodes (der steht ja in einem `text/plain`-Block):
+Syntaxcheck (der zweite Befehl findet doppelte Namen über Dateigrenzen hinweg):
 
 ```bash
-python3 - <<'PY'
-import re
-s = open("index.html", encoding="utf-8").read()
-open("/tmp/main.js", "w", encoding="utf-8").write(re.search(r'<script type="text/plain" id="fc-main">(.*?)</script>', s, re.S).group(1))
-PY
-node --check /tmp/main.js
+for f in js/*.js sw.js; do node --check "$f"; done
+cat js/data.js js/app.js js/v3.js js/start.js > /tmp/all.js && node --check /tmp/all.js
 ```
 
-Rezepte ändern: `tools/recipes/build.py` bearbeiten, dann `python3 tools/recipes/build.py` (prüft Kalorien, Eiweiß, Vielfalt, schreibt die JSON-Dateien) und `python3 tools/recipes/inject.py` (setzt sie in `index.html` ein).
+Rezepte ändern: `tools/recipes/build.py` bearbeiten, dann `python3 tools/recipes/build.py` (prüft Kalorien, Eiweiß, Vielfalt, schreibt die JSON-Dateien) und `python3 tools/recipes/inject.py` (setzt sie in `js/data.js` ein).
 
 ## Tests
 
@@ -42,10 +39,11 @@ Bekannte Eigenheit: `Overnight Oats (dein Rezept)` hat 845 kcal und wird von `bu
 
 ## Fallstricke
 
-- Der Code läuft von oben nach unten. Top-level-`const` und `let` müssen vor ihrer ersten Benutzung stehen, auch indirekt über Funktionen, die beim Start laufen (`sanitizeState` läuft mitten in der Datei). Doppelte Namen fallen mit `node --check` auf.
+- Der Code läuft von oben nach unten, Datei für Datei. Top-level-`const` und `let` müssen vor ihrer ersten Benutzung stehen, auch indirekt über Funktionen, die beim Start laufen (`sanitizeState` läuft mitten in `app.js`). Funktionen aus einer späteren Datei gibt es beim Laden einer früheren noch nicht. Doppelte Namen fallen mit dem zusammengefügten `node --check` auf.
 - Im Rechner (`cParse`) prüft `CDISH` (Gerichte) vor `CFOODS` (Zutaten), und ein einzelnes Wort in `CDISH` trifft auch als Teil eines längeren Wortes. Nimm dort nur eindeutige oder mehrwortige Schlüssel.
 - Beim Hinzufügen von Übungen ohne 3D-Animation (`V3A`) muss die Oberfläche das berücksichtigen (siehe `techBtn`, `coachFig`).
-- `index.html` wird bei Veröffentlichung nur durch `tools/stamp.py` versioniert. Das Label steht in `#appver` und der Update-Check vergleicht es.
+- `index.html` wird bei Veröffentlichung nur durch `tools/stamp.py` versioniert. Das Label steht in `#appver`, der Update-Check vergleicht es, und `boot.js` hängt es an die Skript-Adressen (frischer Cache nach Updates).
+- Als Claude-Artifact braucht die Seite jetzt ihre Dateien mit (`styles.css`, `js/`, `fonts/`), z. B. über `files` beim Veröffentlichen.
 - Texte stehen auf Deutsch mit echten Umlauten. Keine langen Gedankenstriche in Texten.
 
 ## So bitte arbeiten

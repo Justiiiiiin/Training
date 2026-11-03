@@ -1,11 +1,11 @@
-"""Setzt recipes.json, days.json und prices.json in index.html ein (Ersatz fuer RECIPES, DAYS und PRICE).
+"""Setzt recipes.json, days.json und prices.json in js/data.js ein (Ersatz fuer RECIPES, DAYS und PRICE).
 
 Ablauf: python3 tools/recipes/build.py   (erzeugt die JSON-Dateien und prueft die Rezepte)
-        python3 tools/recipes/inject.py  (schreibt sie nach index.html)
+        python3 tools/recipes/inject.py  (schreibt sie nach js/data.js)
 """
 import json, os, re
 HERE = os.path.dirname(os.path.abspath(__file__))
-INDEX = os.path.join(os.path.dirname(os.path.dirname(HERE)), "index.html")
+INDEX = os.path.join(os.path.dirname(os.path.dirname(HERE)), "js", "data.js")
 load = lambda n: json.load(open(os.path.join(HERE, n), encoding="utf-8"))
 R, D, P = load("recipes.json"), load("days.json"), load("prices.json")
 s = open(INDEX, encoding="utf-8").read()
