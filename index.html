@@ -233,6 +233,8 @@ dialog::backdrop { background: rgba(8, 12, 14, 0.56); }
 .shiftrow { align-items: center; gap: 10px; }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 40; max-width: min(92vw, 420px); padding: 12px 16px; border-radius: 16px; background: var(--ink); color: var(--bg); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3); font-weight: 600; text-align: center; }
 .toast[hidden] { display: none; }
+.startfail { position: fixed; left: 12px; right: 12px; top: calc(12px + env(safe-area-inset-top, 0px)); z-index: 60; max-width: 520px; margin: 0 auto; padding: 16px; border-radius: var(--r-md); background: var(--surface); color: var(--ink); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3); }
+.startfail p { margin: 0 0 10px; }
 .updbar { position: fixed; left: 50%; transform: translateX(-50%); top: calc(34px + env(safe-area-inset-top, 0px)); z-index: 40; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3); font-weight: 600; max-width: calc(100vw - 24px); }
 .buylist li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
 .buyform { align-items: flex-end; gap: 10px; }
@@ -5539,13 +5541,38 @@ if (!FC.embedded && "serviceWorker" in navigator && /^https?:$/.test(location.pr
 }
 showTab("heute", true); window.addEventListener("resize", () => { moveBoth(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { moveBoth(); });
+window.__fcReady = true; /* Start komplett durchgelaufen (sonst zeigt der Startblock unten einen Hinweis) */
 </script>
 <script>
+/* Bricht der Hauptcode beim Start ab, bleibt sonst eine halbe App ohne Meldung. Dann Hinweis mit Neu laden und Sicherung. */
+function fcStartFailed(msg) {
+  if (document.getElementById("startfail")) return;
+  var box = document.createElement("div"); box.id = "startfail"; box.className = "startfail"; box.setAttribute("role", "alert");
+  var p = document.createElement("p"); p.textContent = "Beim Start ist ein Fehler aufgetreten. Deine Daten sind noch gespeichert. Lade die App neu. Klappt es dann immer noch nicht, kopiere zur Sicherheit eine Sicherung.";
+  var d = document.createElement("p"); d.className = "small muted"; d.textContent = "Fehler: " + msg;
+  var row = document.createElement("div"); row.className = "row";
+  var b1 = document.createElement("button"); b1.type = "button"; b1.className = "btn primary"; b1.textContent = "Neu laden";
+  b1.addEventListener("click", function () { location.reload(); });
+  var b2 = document.createElement("button"); b2.type = "button"; b2.className = "btn"; b2.textContent = "Sicherung kopieren";
+  var m = document.createElement("p"); m.className = "small"; m.setAttribute("aria-live", "polite");
+  b2.addEventListener("click", function () {
+    var t = FC.exportAll();
+    var manual = function () { var ta = document.createElement("textarea"); ta.rows = 4; ta.readOnly = true; ta.value = t; ta.style.width = "100%"; m.textContent = "Markiere den Text und kopiere ihn von Hand."; m.appendChild(ta); ta.select(); };
+    try { navigator.clipboard.writeText(t).then(function () { m.textContent = "Sicherung kopiert. Füge sie in eine Notiz ein."; }, manual); } catch (e) { manual(); }
+  });
+  row.appendChild(b1); row.appendChild(b2); box.appendChild(p); box.appendChild(d); box.appendChild(row); box.appendChild(m);
+  document.body.appendChild(box);
+}
 FC.boot(function () {
+  var first = "";
+  var onErr = function (e) { if (!first) first = String((e && e.message) || "unbekannt"); };
+  window.addEventListener("error", onErr);
   var el = document.createElement("script");
   el.textContent = document.getElementById("fc-main").textContent;
   document.body.appendChild(el);
+  window.removeEventListener("error", onErr);
   FC.paint();
+  if (!window.__fcReady) fcStartFailed(first || "unbekannt");
 });
 </script>
 </body>

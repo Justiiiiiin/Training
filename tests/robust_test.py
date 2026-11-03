@@ -50,7 +50,7 @@ with sync_playwright() as p:
         r = pg.evaluate(VISIT)
         ck(name + ": kein Absturz", not errs and not r["errs"], str(errs[:2] + r["errs"][:2]))
         ck(name + ": kein HTML ausgeführt", r["xss"] == 0, str(r["xss"]))
-        ck(name + ": App vollständig gestartet", pg.evaluate("!!document.querySelector('#panel-heute .card')"))
+        ck(name + ": App vollständig gestartet", pg.evaluate("!!document.querySelector('#panel-heute .card') && window.__fcReady === true && !document.getElementById('startfail')"))
         c.close()
     # Speicher voll: Hinweis statt stillem Datenverlust, App läuft weiter
     c = b.new_context(viewport={"width": 390, "height": 844}); pg = c.new_page(); errs = []
@@ -63,6 +63,16 @@ with sync_playwright() as p:
     ck("Speicher voll: Hinweis erscheint", "Speicher" in t and "Sicherung" in t, t[:80])
     ck("Speicher voll: Eintrag bleibt in der Sitzung", pg.evaluate("dayGet().items.length") == 1)
     ck("Speicher voll: kein Absturz", not errs, str(errs[:2]))
+    c.close()
+    # Fehler mitten im Start: Hinweis mit Neu laden und Sicherung statt halber App
+    c = b.new_context(viewport={"width": 390, "height": 844}, permissions=["clipboard-read", "clipboard-write"])
+    c.add_init_script("localStorage.setItem('fc_sessions', JSON.stringify(['2026-11-01'])); Intl.NumberFormat = function () { throw new Error('kaputt'); };")
+    pg = c.new_page(); pg.goto(URL); pg.wait_for_timeout(600)
+    ck("Startfehler: Hinweis sichtbar", pg.is_visible("#startfail"), pg.evaluate("(document.getElementById('startfail') || {}).textContent || ''")[:120])
+    ck("Startfehler: Fehlertext genannt", "kaputt" in pg.inner_text("#startfail"))
+    pg.click("#startfail >> text=Sicherung kopieren"); pg.wait_for_timeout(300)
+    clip = pg.evaluate("navigator.clipboard.readText()")
+    ck("Startfehler: Sicherung kopierbar", '"fitness-coach"' in clip and "fc_sessions" in clip, clip[:60])
     c.close()
     b.close()
 print("FAILS", fails)
