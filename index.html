@@ -711,12 +711,65 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 .recent { display: grid; gap: 6px; }
 .recentrow { gap: 6px; flex-wrap: wrap; }
 .recentrow .fchip { max-width: 100%; text-align: left; }
+/* Ausblick und Ausrüstung */
+a.btn { text-decoration: none; }
+.card ol.road { list-style: none; padding-left: 0; display: grid; gap: 10px; }
+.road li { border: 1px solid var(--line); border-radius: 16px; padding: 6px 14px; }
+.road details { display: grid; gap: 4px; padding-bottom: 6px; }
+.road details > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; cursor: pointer; list-style: none; min-height: 40px; }
+.road details > summary::-webkit-details-marker { display: none; }
+.road details > summary::after { content: ""; margin-left: auto; width: 9px; height: 9px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translateY(-2px); transition: transform 0.2s var(--ease); }
+.road details[open] > summary::after { transform: rotate(-135deg); }
+.road details > span { display: block; }
+.road li.cur { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.road li.past { opacity: 0.78; }
+.road li b { font-family: var(--display); font-size: 1.0625rem; }
+.road .swtag { margin-left: 0; }
+.card ul.buyorder { list-style: none; padding-left: 0; gap: 0; }
+.buyorder li { display: grid; gap: 4px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.bo2 { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+.buyorder li:last-child { border-bottom: 0; }
+.gearh { margin: 6px 0 -8px; }
+.gearhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.gchip { flex: none; display: inline-flex; align-items: center; font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); color: var(--ink); white-space: nowrap; }
+.gchip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--muted); }
+.g-now::before, .g-own::before { background: var(--good); }
+.g-soon::before { background: var(--accent); }
+.g-never::before { background: var(--warn); }
+.g-now { background: var(--good-soft); }
+.g-soon { background: var(--accent-soft); }
+.gearcard.st-own { box-shadow: inset 0 0 0 1.5px var(--good); }
+.gearcard.never { border: 1px dashed var(--warn); box-shadow: none; }
+.card ul.gcrit { list-style: none; padding-left: 0; gap: 4px; }
+.gcrit li { position: relative; padding-left: 24px; }
+.gcrit li::before { content: "○"; position: absolute; left: 0; color: var(--muted); }
+.gcrit li.ok::before { content: "✓"; color: var(--good); font-weight: 700; }
+.gearrow { gap: 8px; }
+.gtoggle { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line); }
+.gtoggle:hover { background: var(--surface-2); }
+.gtoggle[aria-pressed="true"] { background: var(--good-soft); box-shadow: inset 0 0 0 1.5px var(--good); }
+.card ul.msl { list-style: none; padding-left: 0; gap: 0; }
+.msl li { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.msl li:last-child { border-bottom: 0; }
+.msl li.ok > span:first-child { color: var(--good); font-weight: 650; }
+.swopt.fut summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 4px; list-style: none; min-height: 44px; }
+.swopt.fut summary::-webkit-details-marker { display: none; }
+.swopt.fut[open] summary { margin-bottom: 8px; }
+.swopt.fut { gap: 8px; }
+.card ul.laterl { list-style: none; padding-left: 0; gap: 16px; }
+.laterl .gearrow { margin-top: 8px; }
+.gearcard .exmore > summary { min-height: 44px; padding: 10px 0; box-sizing: border-box; }
+.swopt.fut .swtag { white-space: normal; margin-left: 0; }
+.swopt.fut summary b { margin-right: 6px; }
+.swopt.fut > p, .swopt.fut > ol, .swopt.fut > .row { margin: 0 0 10px; }
+
+.swopt.locked { opacity: 0.85; border-style: dashed; }
 </style>
 </head>
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.22 · 03.11. 11:22</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.23 · 03.11. 12:53</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -789,6 +842,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 
     <section class="panel" id="panel-ernaehrung" role="tabpanel" hidden></section>
     <section class="panel" id="panel-tipps" role="tabpanel" hidden></section>
+    <section class="panel" id="panel-ausblick" role="tabpanel" hidden></section>
 
     <section class="panel" id="panel-fortschritt" role="tabpanel" hidden>
       <div class="stats" id="stats"></div>
@@ -1278,15 +1332,125 @@ const EXALT = [
     ladder: ["Seitstütz auf den Knien", "Seitstütz auf dem Unterarm", "Seitstütz, oberes Bein angehoben"],
     mx: { core: 1 } }
 ];
+const EXFUT = [
+  { id: "rowband", slot: "row", name: "Rudern mit Band an der Tür", reps: "10 bis 15 Wiederholungen", short: "10–15", def: 0, gear: ["baender"],
+    need: "Ein Widerstandsband mit Türanker und eine Tür, die sich von dir weg öffnet",
+    why: "Der Zug ist gleichmäßig und du steigerst den Widerstand über die Bandstärke und deinen Abstand zur Tür.",
+    cue: "Türanker auf Brusthöhe in die geschlossene Tür einhängen, die Tür muss sich von dir weg öffnen, damit dein Zug sie ins Schloss drückt. Mit je einem Griff in jeder Hand so weit zurückgehen, dass das Band leicht gespannt ist. Füße hüftbreit, Knie leicht gebeugt. Schulterblätter nach hinten unten ziehen, die Ellbogen eng am Körper nach hinten führen, kurz halten und langsam zurücklassen. Teste bei dir zuerst mit leichtem Zug, ob Tür und Zarge nichts bewegen.",
+    mistakes: "Der Oberkörper lehnt sich nach hinten, die Schultern ziehen zu den Ohren, das Band schnellt unkontrolliert zurück.",
+    ladder: ["Rudern mit dünnem Band, nah an der Tür", "Rudern mit mittlerem Band", "Rudern mit starkem Band, oben 2 Sekunden halten"],
+    mx: { back: 1, bi: 0.5, glute: 0.25 } },
+  { id: "rowdb", slot: "row", name: "Einarmiges Rudern mit Kurzhantel", reps: "8 bis 12 pro Arm", short: "8–12", def: 0, gear: ["hanteln"],
+    need: "Eine Kurzhantel (anfangs 5 bis 8 kg) und ein stabiles Sofa oder ein Stuhl zum Abstützen",
+    why: "Du kannst das Gewicht in kleinen Schritten steigern und jede Seite einzeln trainieren.",
+    cue: "Ein Knie und eine Hand auf Sofa oder Stuhl stützen, der Rücken bleibt gerade und etwa waagerecht. Die Hantel mit der freien Hand hängen lassen. Den Ellbogen eng am Körper zur Hüfte ziehen, oben kurz halten, dann langsam absenken. Erst alle Wiederholungen mit einem Arm, dann Seitenwechsel. Trag die Wiederholungen pro Seite ein.",
+    mistakes: "Der Oberkörper dreht auf, du schwingst die Hantel hoch, der Nacken verspannt.",
+    ladder: ["Rudern mit leichter Kurzhantel (etwa 5 kg)", "Rudern mit schwerer Kurzhantel (etwa 8 bis 12 kg)", "Rudern, oben 2 Sekunden halten"],
+    mx: { back: 1, bi: 0.5 } },
+  { id: "rowpull", slot: "row", name: "Klimmzug-Training an der Stange", reps: "3 bis 6 Wiederholungen", short: "3–6", def: 0, gear: ["klimmzugturm", "stangewand"],
+    need: "Ein Klimmzugturm oder eine fest montierte Stange, die dein Gewicht sicher trägt",
+    why: "Der Klimmzug trainiert den Rücken am stärksten. Die Stufen führen dich vom Hängen bis zum ersten Klimmzug.",
+    cue: "Stufe 1: aus dem Hang die Schulterblätter nach unten ziehen, ohne die Arme zu beugen. Stufe 2: hängen, 10 Sekunden zählen als eine Wiederholung. Stufe 3: mit Hilfe nach oben steigen (Stuhl) und 3 bis 5 Sekunden langsam herunterlassen. Stufe 4: der Klimmzug. Prüfe vor jedem Training, dass die Stange fest sitzt und dein Gewicht sicher trägt.",
+    mistakes: "Du schwingst, die Schultern ziehen zu den Ohren, du fällst in den Hang statt zu bremsen.",
+    ladder: ["Schulterblätter aktivieren", "Hängen, 20 bis 30 Sekunden", "Negative Klimmzüge", "Klimmzug"],
+    mx: { back: 1, bi: 1 } },
+  { id: "pushpar", slot: "push", name: "Liegestütze auf Griffen", reps: "6 bis 12 Wiederholungen", short: "6–12", def: 0, gear: ["griffe", "parallettes"],
+    need: "Liegestützgriffe oder Parallettes auf rutschfestem Boden",
+    why: "Die Hände stehen erhöht, du kommst tiefer und die Handgelenke bleiben gerade. Der Weg ist länger, deshalb ist es schwerer als normale Liegestütze.",
+    cue: "Die Griffe etwas mehr als schulterbreit auf den Boden stellen, die Hände fest um die Griffe, der Körper bildet ein Brett. Ellbogen etwa 45 Grad vom Körper. Die Brust sinkt zwischen die Griffe bis knapp zum Boden, dann kraftvoll hochdrücken.",
+    mistakes: "Die Griffe rutschen, die Hüfte hängt durch, du gehst nicht tief genug oder die Schultern ziehen zu den Ohren.",
+    ladder: ["Liegestütz auf Griffen, aus den Knien", "Liegestütz auf Griffen", "Liegestütz auf Griffen, 3 Sekunden langsam runter"],
+    mx: { chest: 1, shoulder: 0.5, tri: 0.5 } },
+  { id: "pushdip", slot: "push", name: "Dips am Turm", reps: "5 bis 8 Wiederholungen", short: "5–8", def: 0, gear: ["klimmzugturm"],
+    need: "Ein Klimmzugturm mit Dip-Griffen",
+    why: "Ein starker Reiz für Brust, Trizeps und Schultern. Starte erst, wenn Liegestütze und der Stütz auf den Griffen sicher sind.",
+    cue: "Auf die Griffe stützen, Arme gestreckt, Schultern weg von den Ohren, der Körper leicht nach vorn geneigt. Langsam beugen, bis die Oberarme fast waagerecht sind, dann kontrolliert hochdrücken. Bei Schmerzen in der Schulter sofort aufhören.",
+    mistakes: "Zu tief absacken, die Schultern wandern nach vorn, du schwingst mit den Beinen.",
+    ladder: ["Dips mit Fußhilfe (ein Fuß bleibt am Boden)", "Dips, nur bis halbe Tiefe", "Dips bis die Oberarme waagerecht sind"],
+    mx: { chest: 1, shoulder: 0.5, tri: 1 } },
+  { id: "pikedb", slot: "pike", name: "Schulterdrücken mit Kurzhanteln", reps: "8 bis 12 Wiederholungen", short: "8–12", def: 0, gear: ["hanteln"],
+    need: "Zwei Kurzhanteln (je 3 bis 8 kg)",
+    why: "Gleichmäßig steigerbar und für die Handgelenke schonender als Pike-Liegestütze.",
+    cue: "Aufrecht stehen, Füße hüftbreit, die Hanteln auf Schulterhöhe halten. Bauch und Po anspannen, die Hanteln gerade über den Kopf drücken, bis die Arme gestreckt sind. Langsam wieder auf Schulterhöhe absenken.",
+    mistakes: "Hohlkreuz, die Hanteln wandern nach vorn, die Rippen öffnen sich.",
+    ladder: ["Schulterdrücken, leichte Kurzhanteln (je 3 bis 4 kg)", "Schulterdrücken, schwerere Kurzhanteln (je 5 bis 8 kg)", "Schulterdrücken, 3 Sekunden langsam runter"],
+    mx: { shoulder: 1, tri: 0.5 } },
+  { id: "squatdb", slot: "squat", name: "Goblet-Kniebeuge mit Kurzhantel", reps: "10 bis 15 Wiederholungen", short: "10–15", def: 0, gear: ["hanteln"],
+    need: "Eine Kurzhantel (anfangs 8 bis 12 kg)",
+    why: "Mehr Gewicht als mit dem Rucksack, in kleinen Schritten steigerbar, und du bleibst aufrecht.",
+    cue: "Die Hantel senkrecht mit beiden Händen vor der Brust halten, Ellbogen nach unten. Füße etwa schulterbreit, Fersen bleiben am Boden. Hinsetzen wie auf einen Stuhl, Brust oben lassen, dann kraftvoll aufstehen.",
+    mistakes: "Die Knie fallen nach innen, die Fersen heben ab, die Hantel zieht den Oberkörper nach vorn.",
+    ladder: ["Goblet-Kniebeuge, Kurzhantel 8 bis 10 kg", "Goblet-Kniebeuge, Kurzhantel 12 bis 16 kg", "Goblet-Kniebeuge, 3 Sekunden langsam runter"],
+    mx: { quad: 1, glute: 0.5 } },
+  { id: "bridgedb", slot: "bridge", name: "Hip Thrust mit Kurzhantel", reps: "10 bis 15 Wiederholungen", short: "10–15", def: 0, gear: ["hanteln"],
+    need: "Eine Kurzhantel (anfangs 10 kg) und ein Sofa, dazu ein gefaltetes Handtuch als Polster",
+    why: "Der Po bekommt zusätzlichen Widerstand, den du in kleinen Schritten steigern kannst.",
+    cue: "Mit dem oberen Rücken an die Sofakante lehnen, Füße hüftbreit. Die Hantel quer auf die Hüfte legen (Handtuch darunter) und mit beiden Händen halten. Die Hüfte hochdrücken, bis Knie, Hüfte und Schultern eine Linie bilden, oben den Po fest anspannen, dann kontrolliert senken.",
+    mistakes: "Hohlkreuz, der Rücken rutscht ab, die Hantel rollt weg.",
+    ladder: ["Hip Thrust, Kurzhantel 10 kg", "Hip Thrust, Kurzhantel 15 bis 20 kg", "Hip Thrust, oben 2 Sekunden halten"],
+    mx: { glute: 1 } },
+  { id: "plankl", slot: "plank", name: "Stütz-Halten auf Parallettes", reps: "halten", short: "halten", type: "hold", def: 0, gear: ["parallettes"],
+    need: "Parallettes und eine Matte",
+    why: "Das ist die Vorstufe zum L-Sit. Rumpf, Schultern und Trizeps arbeiten gemeinsam.",
+    cue: "Auf der Matte sitzen, die Parallettes neben der Hüfte. Hände fest aufsetzen, Arme strecken und den Körper vom Boden wegdrücken, die Schultern aktiv nach unten. Halte die Position und atme normal weiter.",
+    mistakes: "Die Schultern ziehen zu den Ohren, der Rücken wird rund, du hältst die Luft an.",
+    ladder: ["Stütz halten, Füße am Boden", "Stütz halten, Füße schweben, Knie gebeugt", "Stütz halten, ein Bein gestreckt (Seite wechseln)"],
+    mx: { core: 1, shoulder: 0.25, tri: 0.5 } },
+  { id: "plankhang", slot: "plank", name: "Hängendes Knieheben", reps: "6 bis 10 Wiederholungen", short: "6–10", def: 0, gear: ["klimmzugturm", "stangewand"],
+    need: "Ein Klimmzugturm (am besten mit Rückenpolster und Armstützen) oder eine fest montierte Stange",
+    why: "Trainiert den unteren Bauch stärker als der Plank und stärkt nebenbei den Griff.",
+    cue: "Im Stütz auf den Armstützen (Rücken am Polster) oder im Hang an der Stange. Die Knie kontrolliert bis über Hüfthöhe anziehen, oben kurz halten, langsam wieder absenken. Nicht schwingen.",
+    mistakes: "Du schwingst mit dem Körper, die Schultern ziehen zu den Ohren, die Beine fallen unkontrolliert herunter.",
+    ladder: ["Knieheben im Stütz, Rücken am Polster", "Knieheben im Hang an der Stange", "Knieheben im Hang, Beine gestreckt"],
+    mx: { core: 1 } }
+];
+const GEAR = [
+  { id: "matte", name: "Trainingsmatte", prio: 1, p: [15, 30], u: [8, 15], q: "Gymnastikmatte 10 mm rutschfest", qk: "gymnastikmatte",
+    gives: "Ein weicher, rutschfester Boden für Floor Press, Seitstütz, Plank und Hip Thrust. Das schont Ellbogen, Knie und Wirbelsäule.",
+    tips: ["Dicke 8 bis 15 mm, dünne Yogamatten sind für den Plank zu hart.", "Mindestens 180 cm lang und unten rutschfest.", "Neue Matten erst ein paar Tage auslüften."],
+    crit: [] },
+  { id: "baender", name: "Widerstandsbänder mit Türanker", prio: 2, p: [15, 30], u: [5, 12], q: "Widerstandsbänder Set Türanker", qk: "resistance bands",
+    gives: "Rudern mit gleichmäßigem Zug, später auch Hilfe bei Klimmzügen. Klein, leicht und günstig.",
+    tips: ["Ein Set mit mehreren Stärken und Türanker nehmen, so kannst du den Widerstand langsam steigern.", "Röhrenbänder mit Griffen oder flache Loop-Bänder gehen beide.", "Bei dir: Hänge den Anker nur in eine Tür, die sich von dir weg öffnet, und teste zuerst mit leichtem Zug, ob Tür und lockere Zarge nichts bewegen.", "Prüfe Bänder regelmäßig auf feine Risse und tausche sie dann aus."],
+    crit: [["Mindestens 2 Wochen dabei", (c) => c.wk >= 2], ["Mindestens 6 Trainingseinheiten", (c) => c.n >= 6]] },
+  { id: "griffe", name: "Liegestützgriffe", prio: 3, p: [15, 30], u: [8, 15], q: "Liegestützgriffe Push Up Bars", qk: "push up bars",
+    gives: "Gerade Handgelenke und mehr Weg nach unten. Hilft, wenn Liegestütze auf dem Boden an den Handgelenken ziehen.",
+    tips: ["Rutschfeste Unterseite und stabile Verbindung zwischen Griff und Fuß.", "Belastbar bis mindestens 150 kg.", "Griffhöhe 10 bis 15 cm reicht für den Anfang."],
+    crit: [["Mindestens 3 Wochen dabei", (c) => c.wk >= 3], ["Liegestütz mindestens Stufe 3 von 7", (c) => c.push >= 2]] },
+  { id: "hanteln", name: "Verstellbare Kurzhanteln", prio: 4, p: [30, 60], u: [15, 35], q: "Kurzhantel Set verstellbar 20 kg", qk: "kurzhantel set",
+    gives: "Mehr Gewicht als dein Rucksack, in kleinen Schritten steigerbar. Damit geht Kniebeuge, Schulterdrücken, Rudern und Hip Thrust.",
+    tips: ["Zwei Kurzhanteln mit Sternverschluss oder Gewinde, zusammen 20 kg reichen für den Anfang. Wenn du schon stark bist, nimm das 30-kg-Set.", "Rändelung am Griff, damit nichts rutscht.", "Scheiben vor jedem Satz kurz auf festen Sitz prüfen.", "Eine Matte darunter schützt den Boden."],
+    crit: [["Mindestens 4 Wochen dabei", (c) => c.wk >= 4], ["Mindestens eine Übung auf der letzten Stufe", (c) => c.top >= 1]] },
+  { id: "parallettes", name: "Parallettes", prio: 5, p: [30, 80], u: [15, 40], q: "Parallettes Holz", qk: "parallettes",
+    gives: "Tiefe Liegestütze, Stütz-Halten und die Vorstufen zum L-Sit. Erst sinnvoll, wenn der normale Liegestütz sitzt.",
+    tips: ["Höhe 15 bis 30 cm: niedrig für Liegestütze, höher für den L-Sit.", "Rutschfeste Gummifüße und feste Verschraubung, keine wackeligen Billigmodelle.", "Wenn du nur tiefere Liegestütze willst, reichen Liegestützgriffe."],
+    crit: [["Mindestens 8 Wochen dabei", (c) => c.wk >= 8], ["Liegestütz mindestens Stufe 5 von 7", (c) => c.push >= 4], ["Mindestens 16 Trainingseinheiten", (c) => c.n >= 16]] },
+  { id: "klimmzugturm", name: "Klimmzugturm (Power Tower)", prio: 6, p: [100, 170], u: [50, 90], q: "Power Tower Dip Station Klimmzugstange freistehend", qk: "power tower",
+    gives: "Klimmzüge, Dips und Knieheben ohne Bohren und ohne Tür. Für deine Wohnung die sichere Lösung statt eines Türrecks.",
+    tips: ["Traglast mindestens 120 kg, besser 150 kg.", "Freistehend, mit Dip-Griffen, Rückenpolster und Armstützen.", "Platzbedarf etwa 80 × 115 cm Stellfläche und rund 2,40 m Höhe. Miss die Deckenhöhe vorher.", "Gummifüße und ebener Boden. Rüttel vor jedem Training am Rahmen und zieh die Schrauben in den ersten Wochen nach.", "Gebraucht oft ein guter Kauf, prüfe Schrauben und Schweißnähte vor Ort."],
+    crit: [["Mindestens 8 Wochen dabei", (c) => c.wk >= 8], ["Rudern mindestens Stufe 3", (c) => c.row >= 2], ["Liegestütz mindestens Stufe 5 von 7", (c) => c.push >= 4], ["Mindestens 20 Trainingseinheiten", (c) => c.n >= 20]] },
+  { id: "stangewand", name: "Klimmzugstange zur Wandmontage", prio: 7, alt: true, p: [30, 70], u: [15, 40], q: "Klimmzugstange Wandmontage", qk: "klimmzugstange wand",
+    gives: "Die platzsparende Alternative zum Turm, wenn du eine tragende Wand hast und bohren darfst.",
+    tips: ["Nur in Beton oder Vollziegel montieren, nicht in Rigips oder Hohlblock.", "Passende Schwerlastdübel und die Anleitung genau befolgen.", "In der Mietwohnung vorher den Vermieter fragen.", "Traglast mindestens 120 kg."],
+    crit: [["Mindestens 8 Wochen dabei", (c) => c.wk >= 8], ["Rudern mindestens Stufe 3", (c) => c.row >= 2], ["Liegestütz mindestens Stufe 5 von 7", (c) => c.push >= 4], ["Mindestens 20 Trainingseinheiten", (c) => c.n >= 20]] },
+  { id: "tuerreck", name: "Türreck (Stange im Türrahmen)", prio: 99, never: true,
+    why: "Deine Zarge ist an einigen Stellen locker. Ein Türreck belastet genau diesen Rahmen. Hält er nicht, stürzt du beim Klimmzug.",
+    note: "Wenn die Zarge irgendwann fest und sicher ist, schauen wir noch einmal. Bis dahin ist der Turm die bessere Wahl." }
+];
+const gearOwned = (id) => !!(settings.gear && settings.gear[id] === true);
+const gearOk = (e) => !e.gear || e.gear.some(gearOwned);
+const gearName = (id) => { const g = GEAR.find((x) => x.id === id); return g ? g.name : id; };
+const gearNames = (e) => (e.gear || []).map(gearName).join(" oder ");
+const lockedVariants = (slot) => EXALL.filter((x) => x.slot === slot && !gearOk(x));
 const EXBASE = EX.slice();
-const EXALL = EXBASE.concat(EXALT);
+const EXALL = EXBASE.concat(EXALT, EXFUT);
 const exById = (id) => EXALL.find((x) => x.id === id);
-const slotVariants = (slot) => EXALL.filter((x) => x.slot === slot);
+const slotVariants = (slot) => EXALL.filter((x) => x.slot === slot && gearOk(x));
 const SLOTNAME = { squat: "Beine", push: "Brust", row: "Rücken (Rudern)", pike: "Schultern", bridge: "Po und Hüfte", plank: "Rumpf" };
 let SWAPD = { date: "", map: {} };
 function altFor(slot) {
   const t = SWAPD.date === todayISO() ? SWAPD.map[slot] : null, perm = settings.alt && typeof settings.alt === "object" ? settings.alt[slot] : null;
-  const ok = (id) => id && exById(id) && exById(id).slot === slot;
+  const ok = (id) => id && exById(id) && exById(id).slot === slot && gearOk(exById(id));
   return ok(t) ? t : ok(perm) ? perm : slot;
 }
 function applyAlts() { EXBASE.forEach((b, i) => { EX[i] = exById(altFor(b.slot)); }); }
@@ -1987,9 +2151,9 @@ function drawSwap() {
   $("#dlg-swap").innerHTML = '<div class="dlg"><div class="dlg-head"><div><h3>Übung austauschen: ' + SLOTNAME[slot] + '</h3><p class="muted">Wähle, wie du diese Muskelgruppe trainieren willst. „Dauerhaft“ gilt ab jetzt immer, „Nur heute“ nur bis Mitternacht.</p></div><button class="btn icon" data-close aria-label="Schließen">' + ic("close") + "</button></div>" + rowNote +
     '<div class="swlist">' + vars.map((e) => {
       const li = lvl(e), tags = (e.id === cur ? '<span class="swtag">Aktuell</span>' : "") + (e.id === permId && permId !== slot ? '<span class="swtag">Dauerhaft</span>' : "");
-      return '<div class="swopt' + (e.id === cur ? " cur" : "") + '"><h4>' + e.name + tags + '</h4><p class="small muted">Du brauchst: ' + e.need + "</p><p>" + e.why + '</p><p class="small">Deine Stufe: ' + (li + 1) + " von " + e.ladder.length + ", " + e.ladder[li] + '</p><div class="row"><button class="btn" type="button" data-v3="' + e.id + '" data-i="' + li + '">' + ic("info") + "<span>3D ansehen</span></button>" +
+      return '<div class="swopt' + (e.id === cur ? " cur" : "") + '"><h4>' + e.name + tags + '</h4><p class="small muted">Du brauchst: ' + e.need + "</p><p>" + e.why + '</p><p class="small">Deine Stufe: ' + (li + 1) + " von " + e.ladder.length + ", " + e.ladder[li] + '</p><div class="row">' + (V3A[e.id] ? '<button class="btn" type="button" data-v3="' + e.id + '" data-i="' + li + '">' + ic("info") + "<span>3D ansehen</span></button>" : "") +
         (e.id !== permId ? '<button class="btn primary" type="button" data-swap="' + e.id + '" data-mode="perm">Dauerhaft nehmen</button>' : "") + (e.id !== cur ? '<button class="btn" type="button" data-swap="' + e.id + '" data-mode="day">Nur heute</button>' : "") + "</div></div>";
-    }).join("") + "</div></div>";
+    }).join("") + "</div>" + swapLocked(slot) + "</div>";
 }
 function openSwap(slot, src) { if (!SLOTNAME[slot]) return; swapSlot = slot; drawSwap(); showDialog($("#dlg-swap"), src || null); }
 function doSwap(id, mode) {
@@ -2001,6 +2165,7 @@ function doSwap(id, mode) {
 function techBtn() {
   const p = W.phase; if (!["prep", "work", "hold", "rest"].includes(p)) return "";
   const e = EX[Math.min(p === "rest" ? nextPos().ex : W.ex, EX.length - 1)];
+  if (!V3A[e.id]) return "";
   return '<button class="btn" type="button" data-v3="' + e.id + '" data-i="' + lvl(e) + '">' + ic("info") + "<span>Technik</span></button>";
 }
 function swapBtn() {
@@ -2257,13 +2422,14 @@ function renderEx() {
     "<li>Schaffst du bei allen Sätzen die obere Zahl sauber, geh eine Stufe weiter.</li></ul></div>" +
     '<div class="grid2">' + EX.map((e) => {
       const li = lvl(e), nvar = slotVariants(e.slot).length;
-      return '<article class="card excard" data-nofold><div class="exhead"><div><h3>' + e.name + '</h3><p class="kicker">' + e.reps + (e.id !== e.slot ? " · Alternative" : "") + '</p></div><button class="btn icon sm infobtn" type="button" data-v3="' + e.id + '" aria-label="So geht’s: 3D-Ansicht für ' + e.name + '" title="3D-Ansicht">' + ic("info") + "</button></div>" +
+      return '<article class="card excard" data-nofold><div class="exhead"><div><h3>' + e.name + '</h3><p class="kicker">' + e.reps + (e.id !== e.slot ? " · Alternative" : "") + '</p></div>' + (V3A[e.id] ? '<button class="btn icon sm infobtn" type="button" data-v3="' + e.id + '" aria-label="So geht’s: 3D-Ansicht für ' + e.name + '" title="3D-Ansicht">' + ic("info") + "</button>" : "") + "</div>" +
         '<div class="exnow"><b>' + levelName(e) + '</b><div class="meter"><span style="width:' + Math.round((li + 1) / e.ladder.length * 100) + '%"></span></div><span class="small muted">Stufe ' + (li + 1) + " von " + e.ladder.length + "</span></div>" +
         exHintHTML(e) +
         '<div class="row"><button class="btn" data-lvl="' + e.id + '" data-d="-1">Leichter</button><button class="btn" data-lvl="' + e.id + '" data-d="1">Schwerer</button>' + (nvar > 1 ? '<button class="btn" type="button" data-swapopen="' + e.slot + '">' + ic("repeat") + "<span>Tauschen</span></button>" : "") + "</div>" +
-        '<details class="exmore"><summary>Anleitung und alle Stufen</summary><p>' + e.cue + '</p><ol class="ladder">' + e.ladder.map((n, i) => '<li class="' + (i === li ? "cur" : "") + '">' + n + (i === li ? " (deine Stufe)" : "") + '<button class="v3mini" type="button" data-v3="' + e.id + '" data-i="' + i + '" aria-label="3D-Ansicht: ' + n + '">3D</button></li>').join("") + '</ol><p class="mistake"><b>Häufige Fehler:</b> ' + e.mistakes + '</p><p class="small muted">Du brauchst: ' + e.need + "</p></details></article>";
+        '<details class="exmore"><summary>Anleitung und alle Stufen</summary><p>' + e.cue + '</p><ol class="ladder">' + e.ladder.map((n, i) => '<li class="' + (i === li ? "cur" : "") + '">' + n + (i === li ? " (deine Stufe)" : "") + (V3A[e.id] ? '<button class="v3mini" type="button" data-v3="' + e.id + '" data-i="' + i + '" aria-label="3D-Ansicht: ' + n + '">3D</button>' : "") + '</li>').join("") + '</ol><p class="mistake"><b>Häufige Fehler:</b> ' + e.mistakes + '</p><p class="small muted">Du brauchst: ' + e.need + "</p></details></article>";
     }).join("") + "</div>" +
     '<h3 style="margin-top:6px">Zusatz</h3><div class="grid2">' + EXTRAS.map((x) => '<article class="card flat"><h4>' + x.name + '</h4><p class="kicker">' + x.sub + "</p><p>" + x.text + "</p>" + (V3KEY[x.name] ? '<div class="row"><button class="btn" type="button" data-v3="' + V3KEY[x.name] + '">' + ic("info") + "<span>3D-Ansicht</span></button></div>" : "") + "</article>").join("") + "</div>";
+  $("#panel-uebungen").insertAdjacentHTML("beforeend", '<article class="card flat" data-nofold><h4>Wie geht es weiter?</h4><p>Neue Übungen, Zusatz-Ausrüstung mit Kauflinks und deine nächsten Ziele findest du im Tab „Ausblick“.</p><div class="row"><button class="btn" type="button" data-goto="ausblick">Ausblick ansehen</button></div></article>');
   foldCards($("#panel-uebungen"));
 }
 function bodyCalc() {
@@ -2333,6 +2499,112 @@ function renderTips() {
   $("#panel-tipps .card").setAttribute("data-nofold", "");
   foldCards($("#panel-tipps"));
 }
+const ROAD = [
+  { a: 1, b: 2, t: "Technik lernen", sp: "Woche 1 und 2", goal: "Saubere Bewegung vor Schwere. Jede Übung auf der ersten Stufe, ohne Schmerzen und mit Kontrolle.", gear: "Keine Ausrüstung nötig. Eine Matte macht den Boden bequemer." },
+  { a: 3, b: 8, t: "Aufbau", sp: "Woche 3 bis 8", goal: "Wiederholungen steigern, Stufen hochgehen und 2 bis 3 Einheiten pro Woche durchziehen. Der Rucksack ist dein Gewicht.", gear: "Bänder fürs Rudern, Liegestützgriffe falls die Handgelenke stören." },
+  { a: 9, b: 20, t: "Ausbauen", sp: "Woche 9 bis 20", goal: "Die Stufen werden oben eng. Jetzt kommen mehr Gewicht und neue Hebel dazu: Kurzhanteln, ein dritter Satz, Klimmzug-Vorstufen.", gear: "Kurzhanteln, Parallettes und ein Klimmzugturm." },
+  { a: 21, b: 9999, t: "Fortgeschritten", sp: "ab Woche 21", goal: "Erste Klimmzüge, tiefe Liegestütze und Dips, L-Sit-Vorstufen, einbeinige Varianten.", gear: "Alles aus der Phase davor, später optional eine Gewichtsweste." }
+];
+const maxLog = (k) => log.reduce((m, x) => Math.max(m, x && typeof x[k] === "number" ? x[k] : 0), 0);
+const MILES = [
+  { id: "m12w", t: "12 Wochen drangeblieben", auto: () => weekNo() >= 12 },
+  { id: "m30", t: "30 Trainingseinheiten geschafft", auto: () => sessions.length >= 30 },
+  { id: "mpush10", t: "10 Liegestütze am Stück", auto: () => maxLog("pushups") >= 10 },
+  { id: "mpush20", t: "20 Liegestütze am Stück", auto: () => maxLog("pushups") >= 20 },
+  { id: "mplank60", t: "60 Sekunden Plank", auto: () => maxLog("plank") >= 60 },
+  { id: "msquat20", t: "20 saubere Kniebeugen am Stück" },
+  { id: "mhang30", t: "30 Sekunden an der Stange hängen" },
+  { id: "mneg", t: "Ein negativer Klimmzug über 5 Sekunden" },
+  { id: "mpull", t: "Der erste Klimmzug" }
+];
+const LATER = [
+  { name: "Sprungseil", p: [8, 15], note: "Für Ausdauer zwischendurch. Günstig, klein und überall nutzbar.", q: "Springseil Speed Rope", qk: "springseil" },
+  { name: "Gymnastikringe", p: [30, 50], note: "Erst nach sauberen Klimmzügen und Dips. Sie wackeln und sind deutlich schwerer.", q: "Gymnastikringe Holz", qk: "gymnastikringe" },
+  { name: "Gewichtsweste", p: [50, 100], note: "Erst wenn 20 Liegestütze und mehrere Klimmzüge sauber sitzen.", q: "Gewichtsweste verstellbar 10 kg", qk: "gewichtsweste" },
+  { name: "Hantelbank", p: [60, 120], note: "Nur wenn du über 20 kg Kurzhanteln hinausgehst und Platz hast.", q: "Hantelbank verstellbar", qk: "hantelbank" }
+];
+const ST_TXT = { now: "Jetzt sinnvoll", soon: "Bald", later: "Später", own: "Hast du", never: "Nicht bei dir" };
+const buyLinks = (q, qk) => [
+  ["Amazon", "https://www.amazon.de/s?k=" + encodeURIComponent(q)],
+  ["Otto", "https://www.otto.de/suche/" + encodeURIComponent(q) + "/"],
+  ["Kleinanzeigen", "https://www.kleinanzeigen.de/s-" + encodeURIComponent(qk.toLowerCase().replace(/\s+/g, "-")) + "/k0"]
+];
+const linksHTML = (q, qk) => buyLinks(q, qk).map((l) => '<a class="btn" href="' + l[1] + '" target="_blank" rel="noopener noreferrer">' + l[0] + "</a>").join("");
+function gearCtx() {
+  const L = (id) => { const e = exById(id); return e ? lvl(e) : 0; };
+  const rowBest = Math.max.apply(null, EXALL.filter((e) => e.slot === "row" && !e.gear).map(lvl));
+  return { wk: weekNo(), n: sessions.length, push: L("push"), row: rowBest, top: EX.filter((e) => lvl(e) >= e.ladder.length - 1).length };
+}
+function gearState(g) {
+  if (g.never) return { k: "never", t: ST_TXT.never, ok: [], n: 0 };
+  if (gearOwned(g.id)) return { k: "own", t: ST_TXT.own, ok: [], n: 0 };
+  const c = gearCtx(), ok = g.crit.map((x) => !!x[1](c)), n = ok.filter(Boolean).length;
+  const k = !g.crit.length || n === g.crit.length ? "now" : n * 2 >= g.crit.length ? "soon" : "later";
+  return { k, t: ST_TXT[k], ok, n };
+}
+const eurR = (r) => r[0] + " bis " + r[1] + "\u00a0€";
+function gearHTML(g) {
+  const s = gearState(g);
+  if (g.never) return '<article class="card gearcard never" data-nofold><div class="gearhead"><div><h3>' + g.name + '</h3><p class="kicker">Nicht empfohlen</p></div><span class="gchip g-never">' + s.t + "</span></div><p>" + g.why + '</p><p class="note">' + g.note + "</p></article>";
+  const own = s.k === "own", unl = EXFUT.filter((e) => e.gear.includes(g.id)).map((e) => e.name);
+  const crit = !own && g.crit.length ? '<ul class="gcrit">' + g.crit.map((x, i) => '<li class="' + (s.ok[i] ? "ok" : "no") + '">' + x[0] + "</li>").join("") + '</ul><p class="small muted">' + s.n + " von " + g.crit.length + " Punkten erfüllt. Das sind nur Richtwerte aus deinen Daten, kaufen kannst du jederzeit.</p>" : !own ? '<p class="small muted">Kostet wenig und hilft dir ab sofort.</p>' : "";
+  return '<article class="card gearcard st-' + s.k + '" data-nofold data-gearcard="' + g.id + '"><div class="gearhead"><div><h3>' + g.name + '</h3><p class="kicker">' + eurR(g.p) + " neu, gebraucht etwa " + eurR(g.u) + '</p></div><span class="gchip g-' + s.k + '">' + s.t + "</span></div>" +
+    "<p>" + g.gives + "</p>" + (g.alt ? '<p class="small muted">Alternative zum Klimmzugturm, du brauchst nur eins von beidem.</p>' : "") + crit +
+    '<details class="exmore"><summary>Worauf du beim Kauf achten solltest</summary><ul>' + g.tips.map((t) => "<li>" + t + "</li>").join("") + "</ul>" + (unl.length ? '<p class="small muted">Das schaltet frei: ' + unl.join(", ") + ".</p>" : "") + "</details>" +
+    '<div class="row gearrow">' + (own ? "" : linksHTML(g.q, g.qk)) + '<button class="btn gtoggle" type="button" data-gear="' + g.id + '" aria-pressed="' + own + '">' + (own ? "✓ Habe ich" : "Habe ich schon") + "</button></div></article>";
+}
+function futureHTML(e) {
+  const ok = gearOk(e), slotN = SLOTNAME[e.slot];
+  return '<details class="swopt fut"><summary><b>' + e.name + '</b><span class="swtag">' + (ok ? "Freigeschaltet" : "Braucht " + gearNames(e)) + '</span></summary><p class="small muted">Ersetzt: ' + slotN + "</p><p>" + e.why + '</p><p>' + e.cue + '</p><ol class="ladder">' + e.ladder.map((n) => "<li>" + n + "</li>").join("") + '</ol><p class="mistake"><b>Häufige Fehler:</b> ' + e.mistakes + "</p>" +
+    (ok ? '<div class="row"><button class="btn primary" type="button" data-swapopen="' + e.slot + '">Übung tauschen</button></div>' : "") + "</details>";
+}
+function renderAusblick(keep) {
+  const p = $("#panel-ausblick"); if (!p) return;
+  const wasOpen = keep ? $$("#panel-ausblick details").map((d) => d.open) : [], y = window.scrollY;
+  const wk = weekNo(), ph = ROAD.findIndex((r) => wk >= r.a && wk <= r.b);
+  const st = GEAR.filter((g) => !g.never && !g.alt).map((g) => [g, gearState(g)]);
+  const todo = st.filter((x) => x[1].k !== "own").sort((a, b) => a[0].prio - b[0].prio);
+  const nxt = todo.find((x) => x[1].k === "now") || todo.find((x) => x[1].k === "soon");
+  const nxtTxt = nxt ? (nxt[1].k === "now" ? "Als Nächstes sinnvoll: <b>" + nxt[0].name + "</b>." : "Bald sinnvoll: <b>" + nxt[0].name + "</b>.") : "Du bist gerade gut ausgerüstet, es muss nichts Neues sein.";
+  const lo = todo.reduce((a, x) => a + x[0].p[0], 0), hi = todo.reduce((a, x) => a + x[0].p[1], 0), ulo = todo.reduce((a, x) => a + x[0].u[0], 0), uhi = todo.reduce((a, x) => a + x[0].u[1], 0);
+  const start = todo.filter((x) => ["matte", "baender", "hanteln"].includes(x[0].id)), slo = start.reduce((a, x) => a + x[0].p[0], 0), shi = start.reduce((a, x) => a + x[0].p[1], 0);
+  const road = '<div class="card" data-nofold><h3>Dein Weg</h3><p class="kicker">Du bist in Woche ' + wk + '. ' + nxtTxt + '</p><ol class="road">' + ROAD.map((r, i) => '<li class="' + (i === ph ? "cur" : i < ph ? "past" : "") + '"><details' + (i === ph ? " open" : "") + '><summary><b>' + r.t + "</b>" + (i === ph ? '<span class="swtag">Du bist hier</span>' : "") + '<span class="small muted">' + r.sp + "</span></summary><span>" + r.goal + '</span><span class="small muted">Ausrüstung: ' + r.gear + "</span></details></li>").join("") +
+    '</ol><p class="note">Die Wochen sind Richtwerte. Wichtiger als der Kalender ist, ob du die obere Wiederholungszahl in allen Sätzen sauber schaffst. Dann geht es eine Stufe weiter.</p></div>';
+  const buy = '<div class="card" data-nofold><h3>Ausrüstung im Überblick</h3>' + (todo.length ? '<ul class="buyorder">' + todo.map((x, i) => '<li><b>' + (i + 1) + ". " + x[0].name + '</b><span class="bo2"><span class="small muted">' + eurR(x[0].p) + '</span><span class="gchip g-' + x[1].k + '">' + x[1].t + "</span></span></li>").join("") + "</ul>" +
+    '<p>Alles zusammen wären etwa <b>' + eurR([lo, hi]) + "</b> neu, gebraucht etwa " + eurR([ulo, uhi]) + "." + (start.length ? " Du musst nicht alles kaufen: " + start.map((x) => x[0].name).join(", ") + " (zusammen etwa " + eurR([slo, shi]) + ") reichen für viele Monate." : "") + "</p>" : "<p>Du hast alles Wichtige. Super.</p>") +
+    '<p class="note">Die Preise sind grobe Richtwerte (Stand November 2026) und ändern sich. Die Knöpfe unten öffnen eine Suche bei Amazon, Otto und Kleinanzeigen, keine festen Produkte. Vergleiche Bewertungen und die Angaben zur Traglast selbst.</p></div>';
+  const ms = '<div class="card"><h3>Meilensteine</h3><p class="kicker">Ziele, die du abhaken kannst</p><ul class="msl">' + MILES.map((m) => {
+    const done = m.auto ? !!m.auto() : !!(settings.ms && settings.ms[m.id]), d = settings.ms && settings.ms[m.id];
+    return '<li class="' + (done ? "ok" : "") + '"><span>' + (done ? "✓ " : "○ ") + m.t + "</span>" + (m.auto ? '<span class="small muted">' + (done ? "automatisch erkannt" : "wird automatisch erkannt") + "</span>" : '<button class="btn" type="button" data-ms="' + m.id + '" aria-pressed="' + done + '">' + (done ? "Geschafft" + (d ? " am " + d.slice(8, 10) + "." + d.slice(5, 7) + "." : "") : "Abhaken") + "</button>") + "</li>";
+  }).join("") + "</ul></div>";
+  const gear = '<h3 class="gearh">Ausrüstung</h3><div class="grid2">' + GEAR.map(gearHTML).join("") + "</div>";
+  const fut = '<div class="card"><h3>Das kannst du später trainieren</h3><p class="kicker">Neue Übungen mit Ausrüstung</p><p>Sobald du etwas besitzt und oben auf „Habe ich“ tippst, erscheinen die passenden Übungen im Dialog „Tauschen“ in deinem Plan.</p><div class="swlist">' + EXFUT.map(futureHTML).join("") + "</div></div>";
+  const later = '<div class="card"><h3>Noch später</h3><p class="kicker">Nur zum Merken, nichts davon brauchst du jetzt</p><ul class="laterl">' + LATER.map((x) => "<li><b>" + x.name + '</b> <span class="small muted">' + eurR(x.p) + "</span><br>" + x.note + '<div class="row gearrow">' + linksHTML(x.q, x.qk) + "</div></li>").join("") + "</ul></div>";
+  p.innerHTML = road + buy + gear + ms + fut + later;
+  foldCards(p);
+  if (keep) { $$("#panel-ausblick details").forEach((d, i) => { if (wasOpen[i]) d.open = true; }); if (window.scrollY !== y) window.scrollTo(0, y); }
+}
+function toggleGear(id) {
+  if (!GEAR.some((g) => g.id === id && !g.never)) return;
+  settings.gear = settings.gear && typeof settings.gear === "object" ? settings.gear : {};
+  if (settings.gear[id]) {
+    if (isActive() && EX.some((e) => e.gear && e.gear.includes(id))) { toast("Beende zuerst dein Training, du nutzt gerade eine Übung dazu."); return; }
+    delete settings.gear[id];
+  } else settings.gear[id] = true;
+  store.set("fc_settings", settings);
+  applyAlts(); coachKey = ""; renderAusblick(true); renderEx(); render(); renderToday(); if (swapSlot) drawSwap();
+}
+function toggleMs(id) {
+  if (!MILES.some((m) => m.id === id && !m.auto)) return;
+  settings.ms = settings.ms && typeof settings.ms === "object" ? settings.ms : {};
+  if (settings.ms[id]) delete settings.ms[id]; else settings.ms[id] = todayISO();
+  store.set("fc_settings", settings);
+  renderAusblick(true);
+}
+function swapLocked(slot) {
+  const l = lockedVariants(slot); if (!l.length) return "";
+  return '<h4 style="margin-top:16px">Mit Zusatz-Ausrüstung</h4><p class="small muted">Diese Übungen schaltest du frei, wenn du die Ausrüstung hast und im Tab „Ausblick“ auf „Habe ich“ tippst.</p><div class="swlist">' + l.map((e) => '<div class="swopt locked"><h4>' + e.name + '</h4><p class="small muted">Braucht: ' + gearNames(e) + "</p><p>" + e.why + "</p></div>").join("") + '</div><div class="row" style="margin-top:10px"><button class="btn" type="button" data-goto="ausblick">Ausrüstung ansehen</button></div>';
+}
 function renderSources() {
   $("#sources").innerHTML = "<summary>Quellen</summary>" + SOURCES.map((g) => '<h4 style="margin-top:12px">' + g[0] + "</h4><ul>" + g[1].map((s) => "<li>" + (s[1] ? '<a href="' + s[1] + '" target="_blank" rel="noopener">' + s[0] + "</a>" : s[0]) + "</li>").join("") + "</ul>").join("");
 }
@@ -2368,6 +2640,7 @@ function waistNote() {
 const MUSC = [["chest", "Brust"], ["shoulder", "Schultern"], ["tri", "Trizeps"], ["back", "Rücken"], ["bi", "Bizeps"], ["quad", "Oberschenkel"], ["glute", "Po und Beinrückseite"], ["core", "Bauch und Rumpf"]];
 const MAPX = { squat: { quad: 1, glute: 0.5 }, push: { chest: 1, shoulder: 0.5, tri: 0.5 }, row: { back: 1, bi: 0.5 }, pike: { shoulder: 1, tri: 0.5 }, bridge: { glute: 1 }, plank: { core: 1 } };
 EXALT.forEach((a) => { MAPX[a.id] = a.mx; });
+EXFUT.forEach((a) => { MAPX[a.id] = a.mx; });
 function weekSets(startISO) {
   const end = shiftDay(startISO, 7), out = {};
   MUSC.forEach((m) => { out[m[0]] = 0; });
@@ -2455,12 +2728,12 @@ function renderProgress() {
 /* ======================= Tabs ======================= */
 const GROUPS = [
   { id: "heute", title: "Heute", tabs: ["heute"] },
-  { id: "training", title: "Training", tabs: ["uebungen", "tipps"] },
+  { id: "training", title: "Training", tabs: ["uebungen", "tipps", "ausblick"] },
   { id: "essen", title: "Essen", tabs: ["rezepte", "rad", "vorkochen", "einkauf", "ernaehrung"] },
   { id: "fortschritt", title: "Fortschritt", tabs: ["fortschritt"] }
 ];
-const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", rezepte: "Rezepte", rad: "Rad", vorkochen: "Vorkochen", einkauf: "Einkauf", ernaehrung: "Ernährung", fortschritt: "Fortschritt" };
-const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", rezepte: "300 Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", vorkochen: "Sonntag kochen, die Woche essen", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf" };
+const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", ausblick: "Ausblick", rezepte: "Rezepte", rad: "Rad", vorkochen: "Vorkochen", einkauf: "Einkauf", ernaehrung: "Ernährung", fortschritt: "Fortschritt" };
+const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", ausblick: "Pläne, Ausrüstung und Kauflinks", rezepte: "300 Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", vorkochen: "Sonntag kochen, die Woche essen", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf" };
 const LAST = {};
 let CUR = "heute";
 const greeting = () => { const h = new Date().getHours(); return h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend"; };
@@ -2495,6 +2768,7 @@ function showTab(name, quiet) {
   CUR = name; LAST[g.id] = name;
   if (name === "fortschritt" && typeof renderProgress === "function" && !quiet) renderProgress();
   if (name === "uebungen" && typeof renderEx === "function" && !quiet) renderEx();
+  if (name === "ausblick" && !quiet) renderAusblick();
   if (name === "vorkochen" && typeof renderPrep === "function" && !quiet) renderPrep();
   $$(".gbtn").forEach((b) => b.setAttribute("aria-selected", b.dataset.group === g.id ? "true" : "false"));
   $$(".panel").forEach((p) => { p.hidden = p.id !== "panel-" + name; });
@@ -2897,6 +3171,8 @@ let WK = store.get("fc_wk", []);
   });
   Object.keys(levels).forEach((k) => { if (typeof levels[k] !== "number" || !isFinite(levels[k]) || levels[k] < 0) delete levels[k]; });
   if (!Array.isArray(settings.tdays) || settings.tdays.length !== 7) settings.tdays = [1, 0, 1, 0, 1, 0, 0]; settings.tdays = settings.tdays.map((v) => (v ? 1 : 0));
+  if (!isObj(settings.gear)) settings.gear = {}; Object.keys(settings.gear).forEach((k) => { if (settings.gear[k] !== true || !GEAR.some((g) => g.id === k && !g.never)) delete settings.gear[k]; });
+  if (!isObj(settings.ms)) settings.ms = {}; Object.keys(settings.ms).forEach((k) => { if (!MILES.some((m) => m.id === k && !m.auto) || !/^\d{4}-\d{2}-\d{2}$/.test(String(settings.ms[k]))) delete settings.ms[k]; });
   if (!isObj(settings.alt)) settings.alt = {}; Object.keys(settings.alt).forEach((k) => { const v = settings.alt[k], e = typeof v === "string" ? exById(v) : null; if (!e || e.slot !== k) delete settings.alt[k]; }); applyAlts();
   MYD = (Array.isArray(MYD) ? MYD : []).filter((d) => isObj(d) && typeof d.name === "string" && [d.k, d.p, d.w].every((x) => typeof x === "number" && isFinite(x)) && d.w > 0 && d.k >= 0 && d.p >= 0).slice(0, 60).map((d) => ({ id: String(d.id || d.name), name: d.name.slice(0, 60), k: d.k, p: d.p, c: typeof d.c === "number" && isFinite(d.c) ? d.c : 0, w: d.w, est: !!d.est, lg: typeof d.lg === "number" && d.lg > 0 ? d.lg : 250, text: typeof d.text === "string" ? d.text.slice(0, 400) : "" }));
   if (!isObj(PREP)) PREP = Object.assign({}, PREPDEF);
@@ -3794,6 +4070,9 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.calccat) { const c = CCATS.find((x) => x[0] === t.dataset.c); calcRead(); CALC.man[t.dataset.calccat] = { k: c[1], p: c[2], cat: c[0] }; return drawEat(); }
   if (t.dataset.calcadd) { calcRead(); return calcAdd(); }
   if (t.dataset.swapopen) return openSwap(t.dataset.swapopen, t);
+  if (t.dataset.gear) return toggleGear(t.dataset.gear);
+  if (t.dataset.ms) return toggleMs(t.dataset.ms);
+  if (t.dataset.goto) { const gd = t.closest("dialog"); if (gd && gd.open) gd.close(); return showTab(t.dataset.goto); }
   if (t.dataset.swap) return doSwap(t.dataset.swap, t.dataset.mode);
   if (t.dataset.reps) { if (W.phase === "work") setDone(parseInt(t.dataset.reps, 10)); return; }
   if (t.dataset.water != null && t.dataset.water !== "") { const i = parseInt(t.dataset.water, 10), day = dayEns(); day.water = day.water === i + 1 ? i : i + 1; saveToday(); return renderToday(); }
@@ -4422,6 +4701,7 @@ const V3A = (() => {
   out.pushfp.forEach((a) => (a.face = 1)); out.bridgehip.forEach((a) => (a.face = 1));
   return out;
 })();
+V3A.rowband = V3A.rowtowel; V3A.rowpull = V3A.pullup;
 
 function makeView(opts) {
   opts = opts || {};
@@ -4633,7 +4913,7 @@ function v3Select(i) {
   V3View.start();
 }
 function v3Alts(id) {
-  const box = $("#v3-alts"), e = exById(id), list = e ? slotVariants(e.slot) : [];
+  const box = $("#v3-alts"), e = exById(id), list = e ? slotVariants(e.slot).filter((x) => V3A[x.id]) : [];
   box.hidden = list.length < 2;
   box.innerHTML = list.length < 2 ? "" : '<span class="small muted">Andere Variante dieser Übung:</span>' + list.map((x) => '<button class="btn" type="button" data-v3alt="' + x.id + '" aria-pressed="' + (x.id === id) + '">' + x.name + "</button>").join("");
 }
@@ -4659,6 +4939,7 @@ function coachFig() {
   box.hidden = !show;
   if (!show) { V3Mini.stop(); coachKey = ""; return; }
   const e = EX[Math.min(p === "rest" ? nextPos().ex : W.ex, EX.length - 1)], idx = lvl(e), key = e.id + ":" + idx;
+  if (!V3A[e.id]) { box.hidden = true; V3Mini.stop(); coachKey = key; return; }
   if (key !== coachKey) { coachKey = key; V3Mini.size(); V3Mini.setAnim(e.id, idx); V3Mini.view("mini"); }
   if (reduceMotion()) { V3Mini.G.playing = false; V3Mini.G.t = V3Mini.G.T * 0.4; V3Mini.draw(); V3Mini.stop(); return; }
   if (!V3Mini.G.raf) V3Mini.start();
@@ -4681,7 +4962,7 @@ function bindV3() {
 /* ======================= Start ======================= */
 $("#b-settings").innerHTML = ic("gear"); $("#b-settings2").innerHTML = ic("gear") + "<span>Einstellungen</span>";
 $("#x-settings").innerHTML = ic("close");
-applyPrices(); bindV3(); renderEx(); renderRecipes(); renderNutrition(); renderTips(); renderSources(); renderProgress(); bindSettings(); render(); bindGoals(); renderToday();
+applyPrices(); bindV3(); renderEx(); renderRecipes(); renderNutrition(); renderTips(); renderAusblick(); renderSources(); renderProgress(); bindSettings(); render(); bindGoals(); renderToday();
 function radShowAll() { rad.shown = new Set(); const P = RPL[RAD.mode]; if (P) P.days.forEach((d, di) => d.slots.forEach((x, si) => rad.shown.add(di + ":" + si))); }
 Object.keys(RPL).forEach((k) => { if (!RPL[k] || !RPL[k].days || RPL[k].days.some((d) => d.slots.some((x) => !byId(x.id)))) delete RPL[k]; });
 radShowAll(); renderRadOpts(); radIdle(); radRender(); renderShop();
