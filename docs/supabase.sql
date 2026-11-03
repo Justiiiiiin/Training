@@ -13,6 +13,8 @@ create table if not exists public.kv (
 
 alter table public.kv enable row level security;
 
+-- ältere Regel aus der ersten Einrichtung (doppelt zu den vier Regeln unten)
+drop policy if exists "eigene Zeilen" on public.kv;
 drop policy if exists kv_select_own on public.kv;
 drop policy if exists kv_insert_own on public.kv;
 drop policy if exists kv_update_own on public.kv;
@@ -24,10 +26,14 @@ create policy kv_delete_own on public.kv for delete to authenticated using ((sel
 
 -- Nicht angemeldete Aufrufe (nur Anon-Key) dürfen nichts.
 revoke all on public.kv from anon;
+-- Angemeldete Nutzer brauchen nur Lesen, Anlegen, Ändern, Löschen. TRUNCATE würde RLS umgehen.
+revoke truncate, trigger, references on public.kv from authenticated;
 
 -- Prüfen: rls muss true sein, und es müssen die vier Regeln oben erscheinen.
 -- select relrowsecurity as rls from pg_class where oid = 'public.kv'::regclass;
 -- select policyname, cmd, roles from pg_policies where tablename = 'kv';
+-- select grantee, string_agg(privilege_type, ',') from information_schema.role_table_grants where table_name = 'kv' and grantee in ('anon', 'authenticated') group by grantee;
+--   erwartet: nur authenticated mit DELETE,INSERT,SELECT,UPDATE
 
 -- Empfehlung: Wenn nur du die App nutzt, unter Authentication > Sign In / Providers
 -- "Allow new users to sign up" ausschalten, sobald dein Konto angelegt ist.
