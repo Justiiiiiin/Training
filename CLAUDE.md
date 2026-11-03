@@ -7,7 +7,7 @@ Live: https://justiiiiiin.github.io/Training/
 
 - `index.html`: CSS inline, HTML, dann der gesamte Code. Der Hauptcode steht in `<script type="text/plain" id="fc-main">` und wird per `textContent` ausgeführt. Ein `<script>`-Tag darin würde die Seite zerstören, schreibe also nie `</script>` in Strings.
 - Davor liegt ein kleiner Sync-Block (`window.FC`): Speicher über localStorage, optional Supabase (Tabelle `kv`) oder die Artifact-Datenbank. Schema und Row-Level-Security der Tabelle stehen in `docs/supabase.sql`.
-- `sw.js`: Service Worker (Netz zuerst, Offline-Rückfall, Cache `fc-offline-v2`). `manifest.webmanifest` und die Icons gehören zur Installation auf dem Home-Bildschirm.
+- `sw.js`: Service Worker (Netz zuerst, Offline-Rückfall, Cache `fc-offline-v3`). `manifest.webmanifest` und die Icons gehören zur Installation auf dem Home-Bildschirm.
 - Daten im Code: `RECIPES` (300 Rezepte), `DAYS`, `PRICE` (Lidl-Richtwerte) werden aus `tools/recipes/` eingesetzt. Übungen: `EX`, `EXALT`, `EXFUT`, `GEAR`. 3D-Animationen: `V3A`.
 - Wichtige Stellen: `sanitizeState()` (prüft alle gespeicherten Daten), `showTab()`/`GROUPS`/`TABN` (Navigation), `renderEx`, `renderAusblick`, `prepCalc`/`prepGen` (Vorkochen), `shopCalc` (Einkaufsliste), `buyEstimate` (Ausgaben), `cParse` (Kalorien-Rechner mit `CEXTRA`, `CDISH`).
 - Gespeichert wird alles in localStorage-Schlüsseln `fc_*` (zum Beispiel `fc_settings`, `fc_diary`, `fc_goals`). Ändere nie ihre Bedeutung, ohne `sanitizeState` mitzuziehen.

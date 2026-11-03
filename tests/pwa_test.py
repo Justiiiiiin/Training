@@ -15,8 +15,8 @@ try:
         ck("Manifest laedt", pg.evaluate("fetch('manifest.webmanifest').then(r=>r.json()).then(j=>j.display)")=="standalone")
         st=pg.evaluate("navigator.serviceWorker.ready.then(r=>!!r.active)"); ck("Service Worker aktiv", st)
         pg.wait_for_timeout(800)
-        keys=pg.evaluate("caches.keys()"); ck("Cache angelegt", keys==["fc-offline-v2"], keys)
-        files=pg.evaluate("caches.open('fc-offline-v2').then(c=>c.keys()).then(k=>k.map(r=>new URL(r.url).pathname))"); print("  im Cache:",files)
+        keys=pg.evaluate("caches.keys()"); ck("Cache angelegt", keys==["fc-offline-v3"], keys)
+        files=pg.evaluate("caches.open('fc-offline-v3').then(c=>c.keys()).then(k=>k.map(r=>new URL(r.url).pathname))"); print("  im Cache:",files)
         ck("index.html im Cache", "/index.html" in files)
         ver=pg.evaluate("document.getElementById('appver').textContent")
         # Offline neu laden

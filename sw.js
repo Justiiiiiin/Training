@@ -1,6 +1,7 @@
 /* Fitness Coach: Offline-Betrieb. Mit Netz kommt immer die neueste Version, ohne Netz die zuletzt geladene. */
-const CACHE = "fc-offline-v2";
-const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "icon.svg"];
+const CACHE = "fc-offline-v3";
+const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "icon.svg",
+  "fonts/hanken-grotesk-latin.woff2", "fonts/hanken-grotesk-latin-ext.woff2", "fonts/bricolage-grotesque-latin.woff2", "fonts/bricolage-grotesque-latin-ext.woff2"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES.map((f) => new Request(f, { cache: "reload" })))).then(() => self.skipWaiting()));
@@ -19,8 +20,6 @@ self.addEventListener("activate", (e) => {
   })());
 });
 
-const FONTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
-
 async function netFirst(req) {
   const c = await caches.open(CACHE);
   try {
@@ -37,21 +36,10 @@ async function netFirst(req) {
   }
 }
 
-async function cacheFirst(req) {
-  const c = await caches.open(CACHE), hit = await c.match(req);
-  if (hit) return hit;
-  try {
-    const r = await fetch(req);
-    if (r && (r.ok || r.type === "opaque")) c.put(req, r.clone());
-    return r;
-  } catch (err) { return Response.error(); }
-}
-
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
   const u = new URL(req.url);
   if (u.searchParams.has("fcv")) return;   /* Versionsabfrage der Seite: direkt zum Netz */
   if (u.origin === location.origin) e.respondWith(netFirst(req));
-  else if (FONTS.includes(u.hostname)) e.respondWith(cacheFirst(req));
 });

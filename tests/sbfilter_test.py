@@ -33,7 +33,10 @@ def run(token_status=200, logout=False):
         if logout:
             pg.click("#b-settings") if pg.is_visible("#b-settings") else pg.evaluate("openSettings()")
             pg.evaluate("document.getElementById('sbbox').open = true"); pg.wait_for_timeout(200)
-            pg.click("#sb-logout"); pg.wait_for_timeout(1200)
+            pg.click("#sb-logout")
+            try: pg.wait_for_function("localStorage.getItem('fc__sb') === null", timeout=8000)
+            except Exception: pass
+            pg.wait_for_timeout(300)
             st = pg.evaluate("localStorage.getItem('fc__sb')")
         b.close()
     return seen, st, errs

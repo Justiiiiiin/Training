@@ -13,10 +13,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#f6f0e6" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#221f1b" media="(prefers-color-scheme: dark)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
 <style>
+/* Schriften liegen im Repo (fonts/, SIL Open Font License), damit keine Anfrage an Google geht */
+@font-face { font-family: "Bricolage Grotesque"; font-style: normal; font-weight: 500 800; font-display: swap; src: url(fonts/bricolage-grotesque-latin-ext.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Bricolage Grotesque"; font-style: normal; font-weight: 500 800; font-display: swap; src: url(fonts/bricolage-grotesque-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Hanken Grotesk"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(fonts/hanken-grotesk-latin-ext.woff2) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Hanken Grotesk"; font-style: normal; font-weight: 400 700; font-display: swap; src: url(fonts/hanken-grotesk-latin.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 /* Layout: links eine dunkle „Stoppuhr“ mit Timer-Ring und Übungsliste, rechts ein Segment-Menü für Übungen, Rezepte, Glücksrad, Ernährung, Tipps, Fortschritt. Unter 980 px eine Spalte. */
 /* Farben: warmes Creme, gedämpftes Terrakotta und Salbei, weiche braune Schrift. Kein reines Weiß, kein reines Schwarz. */
 :root {
@@ -1077,7 +1079,8 @@ window.FC = (function () {
     if (!r.ok) { var m = j.error_description || j.msg || j.message || ("Fehler " + r.status); var er = new Error(m); er.status = r.status; throw er; }
     return j;
   }
-  function sbStore(c, j) { c.at = j.access_token; c.rt = j.refresh_token || c.rt; c.exp = Date.now() + (j.expires_in || 3600) * 1000; lsSet("fc__sb", JSON.stringify(c)); }
+  var loggedOut = false;
+  function sbStore(c, j) { if (loggedOut) return; c.at = j.access_token; c.rt = j.refresh_token || c.rt; c.exp = Date.now() + (j.expires_in || 3600) * 1000; lsSet("fc__sb", JSON.stringify(c)); }
   async function sbRefresh() {
     var c = sbCfg(); if (!c) throw new Error("login");
     try { var j = await sbAuth(c.url, c.key, "token?grant_type=refresh_token", { refresh_token: c.rt }); sbStore(c, j); }
@@ -1248,6 +1251,7 @@ window.FC = (function () {
   }
   /* Anmeldung bei der eigenen Datenbank (Supabase) */
   async function sbLogin(url, key, email, pw, signup) {
+    loggedOut = false;
     url = String(url || "").trim().replace(/\/+$/, ""); key = String(key || "").trim(); email = String(email || "").trim();
     if (!/^(https:\/\/[^\s/]+|http:\/\/(127\.0\.0\.1|localhost)(:\d+)?)$/.test(url)) throw new Error("Die Projekt-URL sieht nicht richtig aus. Sie beginnt mit https:// und endet auf .supabase.co.");
     if (!key || !email || !pw) throw new Error("Bitte alle Felder ausfüllen.");
@@ -1269,7 +1273,7 @@ window.FC = (function () {
         await withTimeout(fetch(c.url + "/auth/v1/logout?scope=local", { method: "POST", headers: { apikey: c.key, Authorization: "Bearer " + c.at } }), 5000);
       } catch (e) {}
     }
-    lsDel("fc__sb"); lsDel("fc__ts"); lsDel("fc__synced");
+    loggedOut = true; lsDel("fc__sb"); lsDel("fc__ts"); lsDel("fc__synced");
   }
   function sbInfo() { var c = sbCfg(); return c ? { url: c.url, email: c.email, key: c.key } : null; }
   function exportAll() {
