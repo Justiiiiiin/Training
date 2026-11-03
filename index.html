@@ -238,6 +238,7 @@ dialog::backdrop { background: rgba(8, 12, 14, 0.56); }
 .dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: sticky; top: 0; z-index: 4; background: var(--surface); margin: -26px -26px 0; padding: 22px 26px 12px; box-shadow: 0 1px 0 var(--line); }
 .dlg-head .btn.icon { width: 48px; min-height: 48px; flex: none; }
 .shiftrow { align-items: center; gap: 10px; }
+.updbar { position: fixed; left: 50%; transform: translateX(-50%); top: calc(34px + env(safe-area-inset-top, 0px)); z-index: 40; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3); font-weight: 600; max-width: calc(100vw - 24px); }
 .buylist li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
 .buyform { align-items: flex-end; gap: 10px; }
 .buyform .field { flex: 1 1 120px; }
@@ -732,7 +733,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.17 · 03.11. 09:34</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.18 · 03.11. 10:07</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -896,6 +897,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
     <p class="note">Firefox und Zen: oben auf „Diktat starten“ tippen, dann Windows + H drücken und sprechen. Im Claude-Fenster gibt es kein Mikrofon: „Diktat starten“ tippen und das Mikrofon der Tastatur benutzen. iPhone in Safari: Siri muss an sein, dann den runden Knopf antippen und einen Befehl sagen. Das Befehlsfeld führt den Befehl nach einer kurzen Pause aus.</p>
     <div id="instbox"><h3>App auf den Home-Bildschirm</h3>
     <p class="note" id="instinfo"></p>
+    <div class="row syncrow"><button class="btn" id="b-upd" type="button">Auf Update prüfen</button></div><p class="muted small" id="updmsg" role="status" aria-live="polite"></p>
     <ol class="small instsl">
       <li>Öffne die Seite in Safari.</li>
       <li>Tippe unten auf <b>Teilen</b> und dann auf <b>Zum Home-Bildschirm</b>.</li>
@@ -4019,6 +4021,7 @@ document.addEventListener("click", (ev) => {
     GOALS.buys.push({ d: d, a: Math.round(a * 100) / 100 }); GOALS.buys.sort((x, y) => (x.d < y.d ? -1 : x.d > y.d ? 1 : 0)); GOALS.buys = GOALS.buys.slice(-400); SPM = d.slice(0, 7); saveToday(); return renderShop();
   }
   if (t.dataset.pricereset) { settings.prices = {}; store.set("fc_settings", settings); applyPrices(); renderRecipes(); renderShop(); renderToday(); return; }
+  if (t.dataset.upd) { reloadFresh(); return; }
   if (t.dataset.setkcal) { const k = parseInt(t.dataset.setkcal, 10); if (k >= 1000 && k <= 6000) { GOALS.kcal = k; saveToday(); renderProgress(); renderToday(); } return; }
   if (t.dataset.perf) { PERF = t.dataset.perf; renderCharts(); return; }
   if (t.dataset.bkdo) { return doBackup().then((r) => { const m = $("#bkmsg"); if (r.ok) { renderToday(); } else if (m) { m.innerHTML = ""; const ta = document.createElement("textarea"); ta.rows = 3; ta.value = r.txt; ta.readOnly = true; m.appendChild(ta); ta.focus(); ta.select(); } }); }
@@ -4210,11 +4213,49 @@ async function shareICS() {
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "fitness-coach.ics"; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   msg.textContent = r.count + " Termine als Datei geladen. Öffne sie, dann fragt der Kalender nach dem Hinzufügen.";
 }
+/* Update-Prüfung: fragt den Server nach der aktuellen Versionsnummer */
+const verNum = (v) => { const m = /v(\d+)\.(\d+)/.exec(v || ""); return m ? [parseInt(m[1], 10), parseInt(m[2], 10)] : null; };
+const verNewer = (a, b) => { const x = verNum(a), y = verNum(b); return !!(x && y && (x[0] > y[0] || (x[0] === y[0] && x[1] > y[1]))); };
+const canCheckUpdate = () => !FC.embedded && /^https?:$/.test(location.protocol);
+async function remoteVersion() {
+  const r = await fetch(location.pathname + "?fcv=" + Date.now(), { cache: "no-store" });
+  if (!r.ok) throw new Error("http " + r.status);
+  const m = /id="appver"[^>]*>([^<]*)</.exec(await r.text());
+  return m ? m[1].trim() : null;
+}
+async function reloadFresh() {
+  try { const rg = navigator.serviceWorker && (await navigator.serviceWorker.getRegistration()); if (rg) await rg.update(); } catch (e) {}
+  try { const ks = await caches.keys(); await Promise.all(ks.map((k) => caches.delete(k))); } catch (e) {}
+  location.reload();
+}
+function showUpdateBar(v) {
+  let el = document.getElementById("updbar");
+  if (!el) { el = document.createElement("div"); el.id = "updbar"; el.className = "updbar"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+  el.innerHTML = "<span>Neue Version " + esc(v) + '</span><button class="btn sm primary" type="button" data-upd="1">Jetzt laden</button>';
+}
+let UPDLAST = 0;
+async function checkUpdate(force) {
+  if (!canCheckUpdate() || (!force && Date.now() - UPDLAST < 45000)) return null;
+  UPDLAST = Date.now();
+  const cur = $("#appver").textContent.trim(), rv = await remoteVersion();
+  if (rv && verNewer(rv, cur)) showUpdateBar(rv);
+  return { cur, rv };
+}
 function bindSync() {
   const msg = (t) => { $("#restoremsg").textContent = t; };
   $("#instinfo").textContent = standalone() ? "Du nutzt gerade die installierte App." : "Noch nicht installiert. Mit diesen Schritten bekommst du ein Symbol auf dem Home-Bildschirm, Vollbild und Betrieb ohne Netz.";
   $("#instbox").hidden = FC.embedded;
-  $("#b-ics").addEventListener("click", shareICS); $("#icsbox").hidden = FC.embedded;
+  $("#b-ics").addEventListener("click", shareICS);
+  $("#b-upd").addEventListener("click", async () => {
+    const m = $("#updmsg"); m.textContent = "Prüfe …";
+    try {
+      const r = await checkUpdate(true);
+      if (!r || !r.rv) m.textContent = "Die Version auf dem Server konnte nicht gelesen werden.";
+      else if (verNewer(r.rv, r.cur)) m.textContent = "Neu: " + r.rv + ". Du hast " + r.cur + ". Tippe oben auf „Jetzt laden“.";
+      else if (verNewer(r.cur, r.rv)) m.textContent = "Du hast " + r.cur + ", auf dem Server liegt noch " + r.rv + ". GitHub braucht manchmal ein paar Minuten.";
+      else m.textContent = "Du hast die neueste Version: " + r.cur + ".";
+    } catch (e) { m.textContent = "Keine Verbindung zum Server."; }
+  }); $("#icsbox").hidden = FC.embedded;
   $("#sb-copy").addEventListener("click", async () => { const i = FC.sbInfo(); if (!i) return; const t = "FCSB:" + JSON.stringify({ url: i.url, key: i.key, mail: i.email }); try { await navigator.clipboard.writeText(t); $("#sbmsg").textContent = "Verbindung kopiert. Füge sie in der App unter „Eigene Datenbank verbinden“ ein."; } catch (e) { $("#sbmsg").textContent = "Kopieren hat nicht geklappt."; } });
   $("#sb-paste").addEventListener("input", (ev) => {
     const v = ev.target.value.trim(); if (v.indexOf("FCSB:") !== 0) return;
@@ -4889,6 +4930,11 @@ window.addEventListener("resize", drawWheel);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWheel);
 window.matchMedia && matchMedia("(prefers-color-scheme: dark)").addEventListener && matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawWheel);
 $$("[data-ic]").forEach((el) => { el.innerHTML = ic(el.dataset.ic); });
+if (canCheckUpdate()) {
+  setTimeout(() => { checkUpdate(true).catch(() => {}); }, 3000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkUpdate(false).catch(() => {}); });
+  setInterval(() => { if (document.visibilityState === "visible") checkUpdate(false).catch(() => {}); }, 15 * 60 * 1000);
+}
 if (!FC.embedded && "serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
   const mf = document.createElement("link"); mf.rel = "manifest"; mf.href = "manifest.webmanifest"; document.head.appendChild(mf);
   window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
