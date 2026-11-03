@@ -6,6 +6,7 @@ Live: https://justiiiiiin.github.io/Training/
 ## Aufbau
 
 - `js/csp.js` (erstes Skript im Kopf) setzt eine Content-Security-Policy (nur Skripte von hier, Verbindungen nur hierher und zu `*.supabase.co`), nicht im Claude-Artifact. Deshalb keine Inline-Skripte und keine `on…`-Attribute verwenden, Ereignisse per `addEventListener`.
+- `js/zoom.js` (zweites Skript im Kopf) sperrt Pinch- und Doppeltipp-Zoom sofort beim Laden, auch auf iOS und als Home-Bildschirm-App (Gesten- und Touch-Ereignisse; Android über `touch-action` in `styles.css`). Eingabefelder brauchen mindestens 16 px, sonst zoomt iOS beim Antippen. Größere Schrift gibt es über Einstellungen > Textgröße.
 - `index.html`: nur HTML, keine Inline-Skripte. `styles.css`: das gesamte CSS (inkl. `@font-face` für `fonts/`).
 - `js/`: klassische Skripte, die sich den globalen Bereich teilen. `sync.js` und `boot.js` stehen am Ende von `index.html`. `boot.js` lädt nach dem ersten Abgleich der Reihe nach `data.js` (Übungen, Rezepte, Preise, Tipps), `app.js` (Zustand, Oberfläche, Logik), `v3.js` (3D-Ansicht) und `start.js` (Start, setzt `window.__fcReady`), jeweils mit `?v=<Versionslabel>`.
 - Der Sync-Block (`js/sync.js`, `window.FC`): Speicher über localStorage, optional Supabase (Tabelle `kv`) oder die Artifact-Datenbank. Schema und Row-Level-Security der Tabelle stehen in `docs/supabase.sql`.

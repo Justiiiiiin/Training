@@ -147,6 +147,8 @@ a { color: var(--accent); }
 
 /* Rückmeldung: reagiert beim Drücken, nicht erst beim Loslassen */
 * { touch-action: pan-x pan-y; }
+/* Eingaben nie unter 16 px: sonst zoomt iOS beim Antippen hinein (es gibt bewusst kein maximum-scale mehr) */
+input, select, textarea { font-size: max(16px, 1em); }
 button, input, select { -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y; }
 .btn, .fchip, .rcard, .tab, .segb { transition: transform 0.24s var(--ease), background-color 0.15s, color 0.15s, box-shadow 0.2s; }
 .btn:active, .fchip:active, .rcard:active, .tab:active, .segb:active { transform: scale(0.97); transition-duration: 0.07s; }

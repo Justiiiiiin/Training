@@ -428,14 +428,12 @@ function ingText(i, spoken) {
   return n + unit + " " + name;
 }
 const reduceMotion = () => !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-/* Pinch-Zoom sperren wie in einer App: Android über touch-action im CSS, iOS Safari über die eigenen Gesten-Ereignisse.
-   Größere Schrift gibt es stattdessen unter Einstellungen > Textgröße (bis 200 %), die Zoom-Funktionen des Systems bleiben nutzbar. */
+/* Textgröße (Einstellungen, bis 200 %) als Ersatz für Zoom. Die Zoom-Sperre selbst steht in js/zoom.js. */
 function applyTextSize() {
   document.documentElement.style.fontSize = settings.text && settings.text !== 100 ? settings.text + "%" : "";
   document.documentElement.toggleAttribute("data-big", settings.text >= 130);
   if (typeof moveBoth === "function") try { moveBoth(); drawWheel(); } catch (e) {}
 }
-["gesturestart", "gesturechange", "gestureend"].forEach((n) => document.addEventListener(n, (e) => e.preventDefault(), { passive: false }));
 const isSheet = () => !!(window.matchMedia && matchMedia("(max-width: 640px)").matches);
 function showDialog(d, src) {
   const was = d.open;
