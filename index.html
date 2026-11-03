@@ -3204,13 +3204,34 @@ let WK = store.get("fc_wk", []);
   log = log.filter((x) => isObj(x) && typeof x.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x.date)).map((x) => { const o = Object.assign({}, x); ["weight", "waist", "pushups", "plank"].forEach((k) => { if (o[k] != null && !(typeof o[k] === "number" && isFinite(o[k]))) o[k] = null; }); return o; });
   sessions = sessions.filter((x) => typeof x === "string");
   EXC = EXC.filter((x) => typeof x === "string"); FAV = FAV.filter((x) => typeof x === "string");
-  CART = CART.filter((x) => isObj(x) && typeof x.id !== "undefined" && typeof x.n === "number" && isFinite(x.n) && x.n > 0);
-  WK = WK.filter((x) => isObj(x) && typeof x.date === "string" && Array.isArray(x.sets));
+  /* Rezepte, die es nach einem Update nicht mehr gibt, fliegen aus dem Warenkorb (sonst stürzt die Einkaufsliste ab) */
+  CART = CART.filter((x) => isObj(x) && typeof x.id === "string" && byId(x.id) && typeof x.n === "number" && isFinite(x.n) && x.n > 0);
+  const numOrNull = (x) => (typeof x === "number" && isFinite(x) ? x : null);
+  WK = WK.filter((x) => isObj(x) && typeof x.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x.date) && Array.isArray(x.sets)).map((x) => ({
+    date: x.date, min: num(x.min, 1, 600, 1), q: x.q ? 1 : 0, effort: ["leicht", "genau", "schwer"].includes(x.effort) ? x.effort : "",
+    sets: x.sets.filter((s) => isObj(s) && typeof s.ex === "string").map((s) => ({ ex: s.ex, lvl: num(s.lvl, 0, 50, 0), set: num(s.set, 1, 20, 1), reps: numOrNull(s.reps), secs: numOrNull(s.secs) }))
+  }));
   Object.keys(DIARY).forEach((k) => {
     const d = DIARY[k];
     if (!isObj(d) || !Array.isArray(d.items)) { delete DIARY[k]; return; }
     d.items = d.items.filter(isObj).map((x) => { const o = Object.assign({}, x, { t: String(x.t == null ? "Eintrag" : x.t).slice(0, 80), k: num(x.k, 0, 20000, 0), p: num(x.p, 0, 2000, 0), c: typeof x.c === "number" && isFinite(x.c) ? x.c : 0 }); if (Array.isArray(x.det)) o.det = x.det.map(String).slice(0, 30); else delete o.det; return o; });
     if (typeof d.water !== "number" || !isFinite(d.water)) d.water = 0;
+    if (d.plan !== undefined) {
+      const pl = d.plan;
+      if (!isObj(pl) || !Array.isArray(pl.ids) || !pl.ids.every((id) => typeof id === "string")) delete d.plan;
+      else d.plan = { ids: pl.ids.slice(0, 10), done: pl.ids.slice(0, 10).map((_, i) => !!(Array.isArray(pl.done) && pl.done[i])), free: !!pl.free, late: !!pl.late };
+    }
+  });
+  /* Rad: Einstellungen und gespeicherte Pläne prüfen */
+  if (!["day", "week", "meal"].includes(RAD.mode)) RAD.mode = "day";
+  if (typeof RAD.meal !== "string" || !["Frühstück", "Mittag/Abend", "Snack", "Egal"].includes(RAD.meal)) RAD.meal = "Mittag/Abend";
+  RAD.people = num(RAD.people, 1, 8, 2); RAD.maxDay = num(RAD.maxDay, 0, 100, 0);
+  if (!isObj(RPL)) RPL = {};
+  Object.keys(RPL).forEach((k) => {
+    const pl = RPL[k];
+    const ok = ["day", "week", "meal"].includes(k) && isObj(pl) && Array.isArray(pl.days) && pl.days.length <= 7 && pl.days.every((d) => isObj(d) && typeof d.name === "string" && Array.isArray(d.slots) && d.slots.every((s) => isObj(s) && typeof s.id === "string" && byId(s.id) && typeof s.label === "string"));
+    if (!ok) { delete RPL[k]; return; }
+    pl.days = pl.days.map((d) => ({ name: d.name.slice(0, 40), slots: d.slots.slice(0, 8).map((s) => ({ label: s.label.slice(0, 40), k: typeof s.k === "string" ? s.k : "", work: !!s.work, id: s.id, locked: !!s.locked })) }));
   });
   Object.keys(levels).forEach((k) => { if (typeof levels[k] !== "number" || !isFinite(levels[k]) || levels[k] < 0) delete levels[k]; });
   if (!Array.isArray(settings.tdays) || settings.tdays.length !== 7) settings.tdays = [1, 0, 1, 0, 1, 0, 0]; settings.tdays = settings.tdays.map((v) => (v ? 1 : 0));
