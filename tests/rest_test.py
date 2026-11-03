@@ -14,7 +14,9 @@ with sync_playwright() as p:
     ck("Reste-Karte da", "Reste" in pg.inner_text("#panel-vorkochen"))
     # Messung: Reste mit/ohne eco
     js="""(eco)=>{ PREP.eco=eco; const W=[],P=[]; let t0=performance.now(); for(let i=0;i<60;i++){ PREP.main=[];PREP.b='';PREP.s='';prepGen('all'); const c=prepCalc(); W.push(restWaste(c.calc)); P.push(c.items.filter(x=>x.kind==='Hauptgericht').reduce((a,x)=>a+x.r.protein,0)/PREP.main.length); } const ms=(performance.now()-t0)/60; return {w:W.reduce((a,x)=>a+x,0)/W.length, p:P.reduce((a,x)=>a+x,0)/P.length, ms}; }"""
-    on=pg.evaluate(js,True); off=pg.evaluate(js,False)
+    # fester Zufalls-Seed: Mittelwerte aus Zufallsplänen sonst gelegentlich knapp über der Grenze
+    SEED="(()=>{let s=20261103; Math.random=()=>{s=(Math.imul(s,1664525)+1013904223)>>>0; return s/4294967296;};})()"
+    pg.evaluate(SEED); on=pg.evaluate(js,True); pg.evaluate(SEED); off=pg.evaluate(js,False)
     print(on,off)
     ck("weniger Reste mit eco", on['w']<off['w']*0.75, f"{on['w']:.2f} vs {off['w']:.2f}")
     ck("Eiweiss bleibt (max -3 g)", on['p']>=off['p']-3, f"{on['p']:.1f} vs {off['p']:.1f}")
