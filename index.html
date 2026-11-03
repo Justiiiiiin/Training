@@ -772,12 +772,17 @@ a.btn { text-decoration: none; }
 .restideas { margin-top: 6px; }
 .restlist .btn { white-space: normal; text-align: left; height: auto; min-height: 36px; padding: 6px 14px; line-height: 1.3; max-width: 100%; }
 .restlist ~ .row .btn { white-space: normal; text-align: left; height: auto; padding: 8px 18px; max-width: 100%; }
+
+/* Einkaufsliste: Abgehaktes eingeklappt */
+.shoplist { display: flex; flex-direction: column; gap: 18px; }
+.doneshop { border-top: 1px solid var(--line); padding-top: 4px; }
+.doneshop[open] > summary { margin-bottom: 4px; }
 </style>
 </head>
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.25 · 03.11. 15:55</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.26 · 03.11. 16:12</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -3089,12 +3094,32 @@ function restHTML(l, used) {
   const ideas = restIdeas(l.k, l.left, used);
   return '<span class="srest">Rest' + amt + ": " + st.short + (ideas.length ? " Dazu passt: " + ideas.map((r) => r.title).join(" oder ") + "." : "") + "</span>";
 }
-function shopListHTML(calc) {
-  const by = {}; calc.lines.forEach((l) => (by[l.sec] = by[l.sec] || []).push(l));
-  return SECS.filter((s) => by[s]).map((s) => '<div class="sgroup"><h4>' + s + (s === "Vorrat" ? ' <span class="muted small">nur kaufen, wenn leer</span>' : "") + "</h4>" +
-    by[s].sort((a, b) => a.name.localeCompare(b.name, "de")).map((l) =>
-      '<label class="sline' + (CHK[l.k] ? " done" : "") + '"><input type="checkbox" data-chk="' + l.k + '"' + (CHK[l.k] ? " checked" : "") + '><span class="sname">' + l.name + '</span><span class="sbuy">' + l.buy + (l.need ? ' <span class="muted">(' + l.need + ")</span>" : "") + '</span><span class="sprice">' + (l.staple ? "" : eur(l.cost)) + "</span>" + restHTML(l, calc.used) + "</label>").join("") + "</div>").join("");
+let SHOPDONEOPEN = false, SHOPN = 0; const SHOPCALCS = {};
+function shopRow(l, calc) {
+  return '<label class="sline' + (CHK[l.k] ? " done" : "") + '"><input type="checkbox" data-chk="' + l.k + '"' + (CHK[l.k] ? " checked" : "") + '><span class="sname">' + l.name + '</span><span class="sbuy">' + l.buy + (l.need ? ' <span class="muted">(' + l.need + ")</span>" : "") + '</span><span class="sprice">' + (l.staple ? "" : eur(l.cost)) + "</span>" + restHTML(l, calc.used) + "</label>";
 }
+function shopListInner(calc) {
+  const by = {}, done = [];
+  calc.lines.forEach((l) => { if (CHK[l.k]) done.push(l); else (by[l.sec] = by[l.sec] || []).push(l); });
+  const byName = (a, b) => a.name.localeCompare(b.name, "de");
+  const open = SECS.filter((s) => by[s]).map((s) => '<div class="sgroup"><h4>' + s + (s === "Vorrat" ? ' <span class="muted small">nur kaufen, wenn leer</span>' : "") + "</h4>" + by[s].sort(byName).map((l) => shopRow(l, calc)).join("") + "</div>").join("");
+  done.sort((a, b) => SECS.indexOf(a.sec) - SECS.indexOf(b.sec) || byName(a, b));
+  const dn = done.length ? '<details class="exmore doneshop"' + (SHOPDONEOPEN ? " open" : "") + "><summary>Bereits abgehakt (" + done.length + ")</summary>" + done.map((l) => shopRow(l, calc)).join("") + "</details>" : "";
+  return (open || (done.length ? '<p class="muted small shopall">Alles abgehakt. Gut gemacht.</p>' : "")) + dn;
+}
+function shopListHTML(calc) {
+  const id = ++SHOPN; SHOPCALCS[id] = calc;
+  Object.keys(SHOPCALCS).slice(0, -40).forEach((k) => { SHOPCALCS[k] = undefined; });
+  return '<div class="shoplist" data-sl="' + id + '">' + shopListInner(calc) + "</div>";
+}
+function shopRefresh(key) {
+  $$("[data-sl]").forEach((b) => { const c = SHOPCALCS[b.dataset.sl]; if (c) b.innerHTML = shopListInner(c); });
+  const vis = (sel) => [...document.querySelectorAll(sel)].find((x) => x.offsetParent);
+  const nb = key ? vis('[data-chk="' + key + '"]') : null;
+  if (nb && !nb.closest("details:not([open])")) nb.focus({ preventScroll: true });
+  else { const s = vis(".doneshop > summary"); if (s) s.focus({ preventScroll: true }); }
+}
+document.addEventListener("toggle", (ev) => { const d = ev.target; if (d && d.classList && d.classList.contains("doneshop")) SHOPDONEOPEN = d.open; }, true);
 function cartAdd(id, n) {
   const c = CART.find((x) => x.id === id);
   if (c) c.n = Math.min(24, c.n + n); else CART.push({ id, n });
@@ -4579,7 +4604,7 @@ document.addEventListener("input", (ev) => {
     saveToday(); return renderToday();
   }
   if (t.dataset && t.dataset.shop) { shop[t.dataset.shop] = t.checked; store.set("fc_shop", shop); }
-  if (t.dataset && t.dataset.chk) { CHK[t.dataset.chk] = t.checked; saveCart(); const ln = t.closest(".sline"); if (ln) ln.classList.toggle("done", t.checked); }
+  if (t.dataset && t.dataset.chk) { CHK[t.dataset.chk] = t.checked; saveCart(); shopRefresh(t.dataset.chk); }
   if (t.dataset && t.dataset.prepchk) { PREP.done[t.dataset.prepchk] = t.checked; prepSave(); const li = t.closest("li"); if (li) li.classList.toggle("done", t.checked); }
 });
 $("#rsort").addEventListener("change", (ev) => { F.sort = ev.target.value; renderRecipes(); });
