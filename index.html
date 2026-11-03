@@ -777,12 +777,22 @@ a.btn { text-decoration: none; }
 .shoplist { display: flex; flex-direction: column; gap: 18px; }
 .doneshop { border-top: 1px solid var(--line); padding-top: 4px; }
 .doneshop[open] > summary { margin-bottom: 4px; }
+
+/* Ausgaben-Schaetzung */
+.card ul.estlist { list-style: none; padding-left: 0; gap: 0; }
+.estlist li { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); }
+.estlist li:first-child { border-top: 0; }
+.stat.inl { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 10px 16px; }
+#estbox .row { margin: 6px 0; }
+#spendcard .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.hhseg { display: grid; gap: 4px; margin: 6px 0; }
+.hhseg .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 </style>
 </head>
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.26 · 03.11. 16:12</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.27 · 03.11. 16:26</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -3239,6 +3249,7 @@ Object.keys(GOALS.sched).forEach((k) => { if (!/^\d{4}-\d{2}-\d{2}$/.test(k) || 
 if (GOALS.shift === "late") { const w0 = weekStartISO(todayISO()); if (!GOALS.sched[w0]) GOALS.sched[w0] = "llllllf"; }
 delete GOALS.shift;
 GOALS.buys = (Array.isArray(GOALS.buys) ? GOALS.buys : []).filter((x) => x && typeof x === "object" && /^\d{4}-\d{2}-\d{2}$/.test(x.d) && typeof x.a === "number" && isFinite(x.a) && x.a > 0 && x.a <= 2000).map((x) => ({ d: x.d, a: Math.round(x.a * 100) / 100 })).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0)).slice(-400);
+GOALS.hh = Number.isInteger(GOALS.hh) && GOALS.hh >= 1 && GOALS.hh <= 4 ? GOALS.hh : 2;
 ["lastBackup", "bkSnooze"].forEach((k) => { if (typeof GOALS[k] !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(GOALS[k])) delete GOALS[k]; });
 function shGet(ws) {
   const S = GOALS.sched;
@@ -3399,7 +3410,7 @@ function planHTML(rest, day) {
 }
 function logEat(r, portions) {
   const n = portions || 1;
-  dayEns().items.push({ id: r.id, t: r.title + (n > 1 ? " ×" + n : ""), k: Math.round(r.kcal * n), p: Math.round(r.protein * n), c: Math.round(r.cost * n * 100) / 100 });
+  dayEns().items.push({ id: r.id, n: n, t: r.title + (n > 1 ? " ×" + n : ""), k: Math.round(r.kcal * n), p: Math.round(r.protein * n), c: Math.round(r.cost * n * 100) / 100 });
   saveToday(); renderToday();
 }
 function addWater(d) { const day = dayEns(); day.water = Math.max(0, Math.min(20, day.water + d)); saveToday(); renderToday(); }
@@ -4390,13 +4401,74 @@ function spendMonth(ym) {
   Object.keys(DIARY).forEach((d) => { if (d.slice(0, 7) !== ym) return; const e = dsum(d); if (DIARY[d].items.length) { eaten += e.c; days++; } });
   return { buys, bought: buys.reduce((a, b) => a + b.a, 0), eaten, days };
 }
+let ESTOPEN = false;
+document.addEventListener("toggle", (ev) => { if (ev.target && ev.target.id === "estbox") ESTOPEN = ev.target.open; }, true);
+/* Ausgaben schätzen: Packungen statt Gramm. Offene Packungen werden erst aufgebraucht, solange sie haltbar sind. */
+const BUYWIN = { quark: 4, skyr: 4, speisequark: 4, jog35: 4, jogGr: 5, moz: 4, schink: 3, paufs: 3, lyoner: 4, ruc: 3, eisb: 5, milch: 6, haehn: 14, pute: 14, schnitzel: 14, ghack: 14, rhack: 14, phack: 14, haehnst: 14, stueck: 4, kiche: 4, bohne: 4, kokos: 4, ei: 21, gouda: 21, parm: 60, butter: 30, tom: 7, gurke: 7, pap: 8, zwie: 14, karo: 14, banane: 5, brot: 14, wrap: 10, broetchen: 2, sgurke: 30, knob: 14, spin: 60, erdb: 60 };
+const buyWin = (k) => (BUYWIN[k] != null ? BUYWIN[k] : PRICE[k].sec === "Nudeln, Reis & Trockenes" ? 120 : 14);
+const hhOf = (r) => (r.meal === "Mittag/Abend" ? GOALS.hh : 1);
+function buyEstimate() {
+  const days = Object.keys(DIARY).filter((d) => DIARY[d] && Array.isArray(DIARY[d].items) && DIARY[d].items.length).sort();
+  const open = {}, packs = [], other = [];
+  days.forEach((d) => {
+    const need = {};
+    DIARY[d].items.forEach((it) => {
+      const r = it.id ? byId(it.id) : null;
+      if (!r) { if (it.c > 0) other.push({ d, c: it.c, t: it.t }); return; }
+      const m = /×(\d+)$/.exec(it.t || ""), n = typeof it.n === "number" && it.n > 0 ? it.n : m ? parseInt(m[1], 10) : 1;
+      r.ing.forEach((i) => { const k = i[4]; if (!k || !PRICE[k] || i[0] == null || PRICE[k].staple) return; need[k] = (need[k] || 0) + i[0] * PRICE[k].per * n * hhOf(r); });
+    });
+    Object.keys(need).forEach((k) => {
+      const p = PRICE[k]; let g = need[k];
+      if (p.loose) { packs.push({ d, k, loose: true, n: 0, cost: g / 1000 * p.price, uses: [{ d, g }], left: 0 }); return; }
+      const o = open[k];
+      if (o && o.left > 1e-6 && d <= shiftDay(o.d, buyWin(k))) { const t = Math.min(o.left, g); o.left -= t; g -= t; o.uses.push({ d, g: t }); }
+      if (g > 1e-6) { const n = Math.ceil(g / p.pack - 1e-9), pk = { d, k, n, cost: n * p.price, uses: [{ d, g }], left: n * p.pack - g }; packs.push(pk); open[k] = pk; }
+    });
+  });
+  return { packs, other };
+}
+function estRange(a, b) {
+  const E = buyEstimate();
+  return E.packs.filter((x) => x.d >= a && x.d <= b).reduce((s, x) => s + x.cost, 0) + E.other.filter((x) => x.d >= a && x.d <= b).reduce((s, x) => s + x.c, 0);
+}
+function fmtAmt(k, g) {
+  const p = PRICE[k];
+  if (p.u === "g" || p.u === "ml") return g >= 1000 ? nf(Math.round(g / 100) / 10) + (p.u === "g" ? " kg" : " l") : Math.max(5, Math.round(g / 5) * 5) + " " + p.u;
+  const q = Math.round(g / p.per * 10) / 10;
+  return nf(q) + " " + (q > 1 && p.pl ? p.pl : p.n);
+}
+function spendEstHTML(ym) {
+  const E = buyEstimate(), t = todayISO(), mp = E.packs.filter((x) => x.d.slice(0, 7) === ym), mo = E.other.filter((x) => x.d.slice(0, 7) === ym);
+  const real = mp.filter((x) => !x.loose), loose = mp.filter((x) => x.loose);
+  const total = mp.reduce((s, x) => s + x.cost, 0) + mo.reduce((s, x) => s + x.c, 0), nPacks = real.reduce((s, x) => s + x.n, 0);
+  const waste = real.filter((x) => x.left > 0.2 * PRICE[x.k].pack && shiftDay(x.d, buyWin(x.k)) < t).map((x) => ({ k: x.k, left: x.left, val: x.left / PRICE[x.k].pack * PRICE[x.k].price }));
+  const wasteSum = waste.reduce((s, x) => s + x.val, 0);
+  const row = (x) => {
+    const p = PRICE[x.k], multi = x.uses.length > 1;
+    return "<li><span><b>" + esc(p.n) + "</b> · " + (x.n > 1 ? x.n + " × " : "1 × ") + esc(p.label) + '<br><span class="small muted">' + x.uses.map((u) => wdShort(u.d) + " " + dateDE(u.d) + " " + fmtAmt(x.k, u.g)).join(" + ") + (multi ? ", zusammen " + (x.n > 1 ? x.n + " Packungen" : "1 Packung") : "") + "</span></span><b>" + eur(x.cost) + "</b></li>";
+  };
+  const list = real.slice().reverse().slice(0, 40).map(row).join("");
+  const looseSum = loose.reduce((s, x) => s + x.cost, 0), looseNames = [...new Set(loose.map((x) => PRICE[x.k].n))].join(", ");
+  const otherSum = mo.reduce((s, x) => s + x.c, 0);
+  const hh = GOALS.hh;
+  const seg = '<div class="hhseg"><span class="small muted">Hauptgerichte koche ich für</span><div class="row">' + [1, 2, 3, 4].map((n) => '<button class="btn sm" type="button" data-hh="' + n + '" aria-pressed="' + (hh === n) + '">' + n + "</button>").join("") + '<span class="small muted">' + (hh === 1 ? "Person" : "Personen") + "</span></div></div>";
+  const body = mp.length || mo.length
+    ? '<ul class="estlist">' + list + (looseSum ? "<li><span><b>Lose Ware</b><br><span class=\"small muted\">" + esc(looseNames) + "</span></span><b>" + eur(looseSum) + "</b></li>" : "") + (otherSum ? "<li><span><b>Weitere Einträge</b><br><span class=\"small muted\">Rechner und eigene Gerichte, nach Preisliste</span></span><b>" + eur(otherSum) + "</b></li>" : "") + "</ul>" +
+      (waste.length ? '<p class="small"><b>Nicht mehr haltbar übrig geblieben:</b> ' + waste.slice(0, 6).map((x) => esc(PRICE[x.k].n) + " ca. " + fmtAmt(x.k, x.left)).join(", ") + " (zusammen ca. " + eur(wasteSum) + ").</p>" : '<p class="small muted">Es ist nichts Haltbares verfallen.</p>')
+    : '<p class="small muted">Für diesen Monat sind noch keine Rezepte im Tagebuch.</p>';
+  return { total, nPacks, wasteSum, has: mp.length + mo.length > 0, html:
+    '<details class="exmore" id="estbox"' + (ESTOPEN ? " open" : "") + '><summary>So kommt die Schätzung zustande</summary><p class="small muted">Ich gehe dein Essens-Tagebuch durch und kaufe in Gedanken ganze Packungen. Was in einer geöffneten Packung noch haltbar ist, wird zuerst verbraucht. Ist es abgelaufen, zählt eine neue Packung. Bei Fleisch rechne ich mit Einfrieren (14 Tage). Öl, Gewürze und Co. sind nicht dabei. Es zählt nur, was du als Rezept eingetragen hast.</p>' + seg + body + "</details>" };
+}
 function spendHTML() {
   if (!/^\d{4}-\d{2}$/.test(SPM)) SPM = todayISO().slice(0, 7);
-  const sp = spendMonth(SPM), cur = SPM === todayISO().slice(0, 7);
+  const sp = spendMonth(SPM), cur = SPM === todayISO().slice(0, 7), es = spendEstHTML(SPM);
   const list = sp.buys.slice().reverse().map((b) => { const i = GOALS.buys.indexOf(b); return "<li><span>" + dateDE(b.d) + '</span><b>' + eur(b.a) + '</b><button class="btn icon sm" type="button" data-buydel="' + i + '" aria-label="Einkauf löschen">' + ic("close") + "</button></li>"; }).join("");
+  const big = (v) => eur(v).replace(" €", "").replace(" €", "") + "<small>€</small>";
   return '<div class="card" data-nofold id="spendcard"><div class="rday-h"><h3>Ausgaben fürs Essen</h3><span class="row" style="gap:4px"><button class="btn icon sm" type="button" data-spm="-1" aria-label="Voriger Monat">‹</button><b>' + MONN[parseInt(SPM.slice(5, 7), 10) - 1] + " " + SPM.slice(0, 4) + '</b><button class="btn icon sm" type="button" data-spm="1" aria-label="Nächster Monat"' + (cur ? " disabled" : "") + ">›</button></span></div>" +
-    '<div class="stats"><div class="stat"><span class="big">' + eur(sp.bought).replace(" €", "") + '<small>€</small></span><span>eingekauft (' + sp.buys.length + (sp.buys.length === 1 ? " Einkauf" : " Einkäufe") + ')</span></div><div class="stat"><span class="big">' + eur(sp.eaten).replace(" €", "") + '<small>€</small></span><span>gegessen nach Preisliste' + (sp.days ? ", Ø " + eur(sp.eaten / sp.days) + " pro Tag" : "") + "</span></div></div>" +
-    (list ? '<ul class="eatlist buylist">' + list + "</ul>" : '<p class="muted small">Noch kein Einkauf eingetragen.</p>') +
+    '<div class="stats"><div class="stat"><span class="big">' + (es.has ? big(es.total) : "–") + "</span><span>" + (es.has ? "Einkauf geschätzt, " + es.nPacks + (es.nPacks === 1 ? " Packung" : " Packungen") : "Einkauf geschätzt, sobald Rezepte im Tagebuch stehen") + '</span></div><div class="stat"><span class="big">' + big(sp.eaten) + "</span><span>gegessen nach Preisliste" + (sp.days ? ", Ø " + eur(sp.eaten / sp.days) + " pro Tag" : "") + "</span></div></div>" +
+    es.html +
+    (list ? '<h4>Tatsächliche Einkäufe</h4><div class="stat inl"><span class="big">' + big(sp.bought) + "</span><span>eingetragen (" + sp.buys.length + (sp.buys.length === 1 ? " Einkauf" : " Einkäufe") + ')</span></div><ul class="eatlist buylist">' + list + "</ul>" : '<p class="muted small">Du kannst zusätzlich echte Einkäufe eintragen, zum Beispiel den Kassenbon. Nötig ist das nicht.</p>') +
     '<div class="row buyform"><label class="field">Betrag in €<input type="text" inputmode="decimal" id="buy-a" autocomplete="off" placeholder="z. B. 38,40"></label><label class="field">Datum<input type="date" id="buy-d" value="' + todayISO() + '" max="' + todayISO() + '"></label><button class="btn primary" type="button" data-buyadd="1">Eintragen</button></div><p class="small muted" id="buymsg" role="status" aria-live="polite"></p></div>';
 }
 /* Wochenrückblick: Montag bis Sonntag */
@@ -4410,7 +4482,7 @@ function weekReview(ws) {
   const wl = log.filter((x) => typeof x.weight === "number").sort((a, b) => (a.date < b.date ? -1 : 1));
   const last = wl.filter((x) => x.date <= we).pop(), prev = wl.filter((x) => x.date < ws).pop();
   const inWeek = last && last.date >= ws;
-  const sp = { bought: GOALS.buys.filter((b) => b.d >= ws && b.d <= we).reduce((a, b) => a + b.a, 0), eaten: past.reduce((a, d) => a + dsum(d).c, 0) };
+  const sp = { bought: GOALS.buys.filter((b) => b.d >= ws && b.d <= we).reduce((a, b) => a + b.a, 0), eaten: past.reduce((a, d) => a + dsum(d).c, 0), est: estRange(ws, we) };
   return { ws, we, trained, goal: trainDays(), nEaten: eaten.length, nPast: past.length, kcal: eaten.length ? eaten.reduce((a, x) => a + x.e.k, 0) / eaten.length : null, prot: eaten.length ? eaten.reduce((a, x) => a + x.e.p, 0) / eaten.length : null, water, dWeight: inWeek && prev ? last.weight - prev.weight : null, weight: inWeek ? last.weight : null, sp };
 }
 function reviewHTML(ws, nav) {
@@ -4423,7 +4495,7 @@ function reviewHTML(ws, nav) {
     ["Essen eingetragen", r.nEaten + " von " + r.nPast + " Tagen"],
     ["Wasser", r.water + " von " + r.nPast + " Tagen im Ziel"],
     ["Gewicht", r.weight == null ? "kein Wert in dieser Woche" : nf(r.weight) + " kg" + (r.dWeight != null ? " (" + sg(r.dWeight) + " kg zur Vorwoche)" : "")],
-    ["Ausgaben", (r.sp.bought > 0 ? eur(r.sp.bought) + " eingekauft, " : "") + eur(r.sp.eaten) + " gegessen (Preisliste)"]
+    ["Ausgaben", (r.sp.bought > 0 ? eur(r.sp.bought) + " eingekauft, " : r.sp.est > 0 ? "ca. " + eur(r.sp.est) + " Einkauf geschätzt, " : "") + eur(r.sp.eaten) + " gegessen (Preisliste)"]
   ];
   const range = dateDE(r.ws) + " bis " + dateDE(r.we);
   return '<div class="card review" data-nofold><div class="rday-h"><div><h3>Wochenrückblick</h3><p class="muted small">' + range + "</p></div>" + (nav ? '<span class="row" style="gap:4px"><button class="btn icon sm" type="button" data-rvw="-1" aria-label="Vorige Woche">‹</button><button class="btn icon sm" type="button" data-rvw="1" aria-label="Nächste Woche"' + (r.we >= todayISO() && r.ws >= weekStartISO(todayISO()) ? " disabled" : "") + ">›</button></span>" : "") + '</div><ul class="ptable rvl">' +
@@ -4490,6 +4562,7 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.eatagain != null) { const x = RECENT[parseInt(t.dataset.eatagain, 10)]; if (x) { const o = Object.assign({}, x, { again: true }); dayEns().items.push(o); saveToday(); renderToday(); drawEat("Nochmal eingetragen: " + x.t); } return; }
   if (t.dataset.calcgo) return calcGo();
   if (t.dataset.rvw) { const nx = shiftDay(/^\d{4}-\d{2}-\d{2}$/.test(REVW) ? REVW : weekStartISO(todayISO()), 7 * parseInt(t.dataset.rvw, 10)); if (nx <= weekStartISO(todayISO())) REVW = nx; return renderCharts(); }
+  if (t.dataset.hh) { GOALS.hh = Math.max(1, Math.min(4, parseInt(t.dataset.hh, 10) || 2)); saveToday(); return renderShop(); }
   if (t.dataset.spm) { SPM = monthShift(/^\d{4}-\d{2}$/.test(SPM) ? SPM : todayISO().slice(0, 7), parseInt(t.dataset.spm, 10)); if (SPM > todayISO().slice(0, 7)) SPM = todayISO().slice(0, 7); return renderShop(); }
   if (t.dataset.buydel != null && t.dataset.buydel !== "") { GOALS.buys.splice(parseInt(t.dataset.buydel, 10), 1); saveToday(); return renderShop(); }
   if (t.dataset.buyadd) {
