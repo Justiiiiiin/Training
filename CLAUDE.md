@@ -35,7 +35,7 @@ Rezepte ändern: `tools/recipes/build.py` bearbeiten, dann `python3 tools/recipe
 
 ## Tests
 
-Alle Tests laufen mit Playwright (Chromium) gegen `index.html`, ohne Server, außer `pwa_test.py` (lokaler Server). Pfade kommen aus `tests/fcenv.py`. Mit `FC_URL` oder `FC_APP_DIR` lässt sich eine andere Version prüfen. Der Audit `audit2.py` geht alle Tabs durch (Überlauf, Kontrast, Tap-Ziele) und dauert länger.
+Alle Tests laufen mit Playwright (Chromium) gegen `index.html`, ohne Server, außer `pwa_test.py` (lokaler Server). Pfade kommen aus `tests/fcenv.py`. Mit `FC_URL` oder `FC_APP_DIR` lässt sich eine andere Version prüfen. `audit2.py` füttert alle Speicherschlüssel mit kaputten Werten und geht die Tabs durch (dauert länger). `ui_test.py` prüft die Oberfläche: Kontrast nach WCAG AA, Tap-Ziele ab 24 px und seitlichen Überlauf, hell und dunkel. `robust_test.py`, `merge_test.py` und `swcache_test.py` decken kaputte Daten, Sync-Konflikte und den Offline-Speicher ab.
 `update_test.py` und `swupdate_test.py` (Update-Banner und Service Worker) fehlen hier, weil sie handgebaute Fixtures brauchen.
 Bekannte Eigenheit: `Overnight Oats (dein Rezept)` hat 845 kcal und wird von `build.py` absichtlich als Ausnahme gemeldet.
 
