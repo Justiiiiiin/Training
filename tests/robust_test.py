@@ -52,5 +52,17 @@ with sync_playwright() as p:
         ck(name + ": kein HTML ausgeführt", r["xss"] == 0, str(r["xss"]))
         ck(name + ": App vollständig gestartet", pg.evaluate("!!document.querySelector('#panel-heute .card')"))
         c.close()
+    # Speicher voll: Hinweis statt stillem Datenverlust, App läuft weiter
+    c = b.new_context(viewport={"width": 390, "height": 844}); pg = c.new_page(); errs = []
+    pg.on("pageerror", lambda e: errs.append(str(e)))
+    pg.goto(URL); pg.wait_for_timeout(500)
+    ck("Vorher kein Hinweis", not pg.evaluate("!!(document.getElementById('toast') && !document.getElementById('toast').hidden)"))
+    pg.evaluate("() => { Storage.prototype.setItem = function () { throw new DOMException('voll', 'QuotaExceededError'); }; return 1; }")
+    pg.evaluate("logEat(RECIPES[0], 1)"); pg.wait_for_timeout(200)
+    t = pg.evaluate("(document.getElementById('toast') || {}).textContent || ''")
+    ck("Speicher voll: Hinweis erscheint", "Speicher" in t and "Sicherung" in t, t[:80])
+    ck("Speicher voll: Eintrag bleibt in der Sitzung", pg.evaluate("dayGet().items.length") == 1)
+    ck("Speicher voll: kein Absturz", not errs, str(errs[:2]))
+    c.close()
     b.close()
 print("FAILS", fails)

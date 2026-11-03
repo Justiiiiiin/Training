@@ -969,7 +969,12 @@ window.FC = (function () {
   var CH = 90000;
   var embedded = !!(window.claude && typeof window.claude.use === "function");
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  /* Schreibfehler (Speicher voll oder gesperrt) werden gezählt und der App gemeldet, statt still zu verschwinden */
+  var saveFails = 0, onSaveFail = null;
+  function lsSet(k, v) {
+    try { localStorage.setItem(k, v); return true; }
+    catch (e) { saveFails++; if (onSaveFail) { try { onSaveFail(); } catch (e2) {} } return false; }
+  }
   function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
   function sbCfg() { try { var c = JSON.parse(lsGet("fc__sb") || "null"); return c && c.url && c.key && c.rt ? c : null; } catch (e) { return null; } }
   var mode = embedded ? "claude" : (sbCfg() ? "sb" : "local");
@@ -1249,7 +1254,8 @@ window.FC = (function () {
     return n;
   }
   return { KEYS: KEYS, embedded: embedded, mode: mode, raw: raw, save: save, boot: boot, paint: paint, syncNow: syncNow, exportAll: exportAll, importAll: importAll,
-    sbLogin: sbLogin, sbLogout: sbLogout, sbInfo: sbInfo, state: function () { return state; }, dirtyCount: function () { return dirty.size; } };
+    sbLogin: sbLogin, sbLogout: sbLogout, sbInfo: sbInfo, state: function () { return state; }, dirtyCount: function () { return dirty.size; },
+    onSaveFail: function (fn) { onSaveFail = fn; if (saveFails && fn) { try { fn(); } catch (e) {} } } };
 })();
 </script>
 <script type="text/plain" id="fc-main">
@@ -4793,6 +4799,15 @@ function toast(t) {
   if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
   el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 5000);
 }
+/* Speicher voll oder gesperrt: Bescheid geben statt still Daten zu verlieren (lokal alle 5 Minuten, mit Datenbank einmal) */
+let SAVEWARN = 0;
+FC.onSaveFail(() => {
+  const local = FC.mode === "local";
+  if (FC.embedded) return; /* im Claude-Artifact liegen die Daten in dessen Datenbank */
+  if (SAVEWARN && (!local || Date.now() - SAVEWARN < 300000)) return;
+  SAVEWARN = Date.now();
+  toast(local ? "Speichern klappt gerade nicht, der Speicher im Browser ist voll oder gesperrt. Kopiere unter Einstellungen eine Sicherung, sonst gehen Änderungen beim Schließen verloren." : "Der Speicher im Browser ist voll oder gesperrt. Deine Änderungen liegen gerade nur in der Datenbank.");
+});
 /* Update-Prüfung: fragt den Server nach der aktuellen Versionsnummer */
 const verNum = (v) => { const m = /v(\d+)\.(\d+)/.exec(v || ""); return m ? [parseInt(m[1], 10), parseInt(m[2], 10)] : null; };
 const verNewer = (a, b) => { const x = verNum(a), y = verNum(b); return !!(x && y && (x[0] > y[0] || (x[0] === y[0] && x[1] > y[1]))); };
