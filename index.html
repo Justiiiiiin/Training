@@ -732,7 +732,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.16 · 03.11. 09:32</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.17 · 03.11. 09:34</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -902,10 +902,10 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
       <li>Öffne die App vom Home-Bildschirm. Sie startet leer, weil das iPhone den Speicher trennt.</li>
       <li>Hole deine Daten zurück: Tippe hier in Safari unter „Eigene Datenbank verbinden“ auf <b>Verbindung kopieren</b>. In der App fügst du sie ein und gibst dein Passwort ein.</li>
     </ol></div>
-    <h3>Kalender</h3>
+    <div id="icsbox"><h3>Kalender</h3>
     <p class="note">Trainingstage und Vorkochen der nächsten 8 Wochen als Kalender-Termine mit Erinnerung. Die Uhrzeit richtet sich nach deiner Schicht (Früh: 18:00, Spät oder frei: 10:00). Ändern kannst du sie später im Kalender.</p>
     <div class="row syncrow"><button class="btn" id="b-ics" type="button">Termine in den Kalender</button></div>
-    <p class="muted small" id="icsmsg" role="status" aria-live="polite"></p>
+    <p class="muted small" id="icsmsg" role="status" aria-live="polite"></p></div>
     <h3>Daten und Sync</h3>
     <p class="note" id="syncinfo"></p>
     <div class="row syncrow"><button class="btn" id="b-syncnow" type="button">Jetzt abgleichen</button><button class="btn" id="b-backup" type="button">Sicherung kopieren</button></div>
@@ -4214,7 +4214,7 @@ function bindSync() {
   const msg = (t) => { $("#restoremsg").textContent = t; };
   $("#instinfo").textContent = standalone() ? "Du nutzt gerade die installierte App." : "Noch nicht installiert. Mit diesen Schritten bekommst du ein Symbol auf dem Home-Bildschirm, Vollbild und Betrieb ohne Netz.";
   $("#instbox").hidden = FC.embedded;
-  $("#b-ics").addEventListener("click", shareICS);
+  $("#b-ics").addEventListener("click", shareICS); $("#icsbox").hidden = FC.embedded;
   $("#sb-copy").addEventListener("click", async () => { const i = FC.sbInfo(); if (!i) return; const t = "FCSB:" + JSON.stringify({ url: i.url, key: i.key, mail: i.email }); try { await navigator.clipboard.writeText(t); $("#sbmsg").textContent = "Verbindung kopiert. Füge sie in der App unter „Eigene Datenbank verbinden“ ein."; } catch (e) { $("#sbmsg").textContent = "Kopieren hat nicht geklappt."; } });
   $("#sb-paste").addEventListener("input", (ev) => {
     const v = ev.target.value.trim(); if (v.indexOf("FCSB:") !== 0) return;
