@@ -89,7 +89,6 @@ a { color: var(--accent); }
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .brand h1 { white-space: nowrap; }
 .top-actions { display: flex; gap: 8px; align-items: center; }
-.heard { color: var(--muted); font-size: 0.875rem; min-height: 1.4em; margin-top: -12px; }
 .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-items: start; }
 .layout > * { min-width: 0; }
 @media (min-width: 980px) {
@@ -106,11 +105,7 @@ a { color: var(--accent); }
 .btn.icon { width: 44px; padding: 0; }
 .btn.sm { min-height: 36px; padding: 0 14px; font-size: 0.875rem; }
 .top .btn { background: var(--surface); box-shadow: var(--shadow); }
-.mic[aria-pressed="true"], .top .mic[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.mic .dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; opacity: 0.55; }
-.mic[aria-pressed="true"] .dot { opacity: 1; animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 50% { transform: scale(0.55); opacity: 0.55; } }
-@media (prefers-reduced-motion: reduce) { .mic .dot { animation: none !important; } }
 
 /* Flächen: nur wo etwas zusammengehört. Keine Rahmen, ein ruhiger Schatten. */
 .card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 24px; display: flex; flex-direction: column; gap: 14px; }
@@ -158,13 +153,11 @@ a { color: var(--accent); }
 .mini .btn { min-height: 40px; padding: 0 10px; font-size: 0.875rem; }
 .caption:empty { display: none; }
 .caption { color: var(--muted); font-size: 0.875rem; min-height: 1.5em; }
-.cmd { display: flex; flex-direction: column; gap: 6px; font-size: 0.8125rem; color: var(--muted); }
-.cmd input, .field input, .field select, .search input, select {
+.field input, .field select, .search input, select {
   font: inherit; color: var(--ink); background: var(--surface-2); border: 0; border-radius: var(--r-sm); padding: 0 14px; min-height: 44px; width: 100%;
 }
-.coach .cmd input { background: var(--surface-2); }
-.cmd input, .field input, .field select, .field textarea, .search input, select, textarea { font-size: 16px; }
-.cmd input::placeholder, .search input::placeholder { color: var(--muted); }
+.field input, .field select, .field textarea, .search input, select, textarea { font-size: 16px; }
+.search input::placeholder { color: var(--muted); }
 
 /* Rückmeldung: reagiert beim Drücken, nicht erst beim Loslassen */
 * { touch-action: pan-x pan-y; }
@@ -238,6 +231,8 @@ dialog::backdrop { background: rgba(8, 12, 14, 0.56); }
 .dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: sticky; top: 0; z-index: 4; background: var(--surface); margin: -26px -26px 0; padding: 22px 26px 12px; box-shadow: 0 1px 0 var(--line); }
 .dlg-head .btn.icon { width: 48px; min-height: 48px; flex: none; }
 .shiftrow { align-items: center; gap: 10px; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(92px + env(safe-area-inset-bottom, 0px)); z-index: 40; max-width: min(92vw, 420px); padding: 12px 16px; border-radius: 16px; background: var(--ink); color: var(--bg); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3); font-weight: 600; text-align: center; }
+.toast[hidden] { display: none; }
 .updbar { position: fixed; left: 50%; transform: translateX(-50%); top: calc(34px + env(safe-area-inset-top, 0px)); z-index: 40; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; border-radius: 999px; background: var(--ink); color: var(--bg); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3); font-weight: 600; max-width: calc(100vw - 24px); }
 .buylist li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
 .buyform { align-items: flex-end; gap: 10px; }
@@ -264,8 +259,6 @@ dialog::backdrop { background: rgba(8, 12, 14, 0.56); }
 .shrow .segb { padding: 0 12px; min-height: 40px; }
 .stepper { display: inline-flex; align-items: center; gap: 10px; }
 .stepper b { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; }
-.cmds { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 22px; list-style: none; padding: 0 !important; margin: 0; font-size: 0.9375rem; }
-.cmds b { color: var(--accent); font-weight: 650; }
 .settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
 .field { display: flex; flex-direction: column; gap: 6px; font-size: 0.875rem; color: var(--muted); font-weight: 550; }
 .check { display: flex; align-items: center; gap: 10px; font-size: 0.9375rem; }
@@ -443,8 +436,6 @@ details.src ul { margin: 8px 0 0; padding-left: 20px; font-size: 0.9375rem; disp
 .top { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; padding: 2px 0 6px; }
 .top-actions { justify-self: end; }
 .brand h1 { font-size: 1.125rem; }
-.heard { margin-top: 0; }
-.heard:empty { display: none; }
 .gnav { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: var(--surface); box-shadow: var(--shadow); }
 .gind { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: var(--ink); transition: transform 0.34s var(--ease), width 0.34s var(--ease); pointer-events: none; }
 .gbtn { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 18px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: inherit; font-weight: 650; cursor: pointer; white-space: nowrap; transition: color 0.15s, transform 0.24s var(--ease); }
@@ -483,7 +474,6 @@ body[data-coach="0"] .side { display: none; }
 }
 @media (max-width: 640px) { .hero { padding: 22px; } .hero .rings { gap: 6px; } .pagetitle { font-size: 2.5rem; } }
 .brand { display: flex; flex-direction: column; gap: 2px; }
-.micfab { display: none; position: fixed; right: 14px; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 25; width: 54px; height: 54px; border-radius: 50%; border: 0; background: var(--ink); color: var(--bg); box-shadow: 0 6px 20px rgba(0,0,0,.28); cursor: pointer; align-items: center; justify-content: center; }
 
 .sbbox { margin: 12px 0; } .sbbox summary { cursor: pointer; font-weight: 650; padding: 6px 0; }
 .syncchip { font-size: 0.75rem; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
@@ -492,7 +482,7 @@ body[data-coach="0"] .side { display: none; }
 .syncchip[data-state="offline"]::before { background: var(--accent); opacity: 1; }
 .field textarea { font: inherit; font-size: 16px; color: var(--ink); background: var(--surface-2); border: 1px solid transparent; border-radius: var(--r-sm); padding: 10px 14px; width: 100%; resize: vertical; }
 .syncrow { margin: 10px 0; }
-@media (max-width: 420px) { .top { gap: 8px; } .top .mic #miclabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } .top .mic { padding: 0 14px; } .brand h1 { font-size: 1rem; } }
+@media (max-width: 420px) { .top { gap: 8px; } .brand h1 { font-size: 1rem; } }
 @media (prefers-reduced-transparency: reduce) { .gnav { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; } }
 @media (prefers-reduced-motion: reduce) { .gind, .gbtn { transition: none; } }
 .tdhead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px 24px; }
@@ -518,23 +508,16 @@ body[data-coach="0"] .side { display: none; }
 .v3vars { display: flex; flex-wrap: wrap; gap: 6px; }
 .v3vars .btn { white-space: normal; text-align: left; justify-content: flex-start; border-radius: 14px; min-height: 44px; padding: 8px 14px; font-weight: 500; }
 .v3vars .btn b { font-weight: 700; margin-right: 2px; }
-.v3 [aria-pressed="true"]:not(.mic) { background: var(--ink); color: var(--bg); }
+.v3 [aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 .v3txt p { margin: 0 0 8px; }
 @media (prefers-reduced-motion: reduce) { .v3stage canvas { cursor: default; } }
 .setfab { display: none; }
-.micfab .ic { width: 26px; height: 26px; }
-.micfab[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.micfab[aria-pressed="true"] .ic { animation: pulse 1.4s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { .micfab .ic { animation: none !important; } }
 @media (max-width: 979px) {
-  .micfab:not([hidden]) { display: inline-flex; }
-  body[data-group="essen"] .micfab, body[data-group="fortschritt"] .micfab { display: none; }
   .setfab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; position: fixed; z-index: 21; left: 8px; bottom: 0; width: calc((100vw - 16px) / 5); min-height: 52px; margin-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); padding: 6px 0; border: 0; border-radius: 12px; background: none; color: var(--muted); font: inherit; font-size: 0.625rem; font-weight: 650; cursor: pointer; white-space: nowrap; overflow: hidden; }
   .setfab .ic { width: 25px; height: 25px; }
   .setfab:active { color: var(--accent); }
   .gnav { padding-left: calc(8px + (100vw - 16px) / 5); }
   .top-actions #b-settings { display: none; }
-  body.has-sr .top .mic { display: none; }
   body:not([data-group="heute"]) .pagesub { display: none; }
   .pagetitle { font-size: 2rem; }
   .pagehead { padding-top: 6px; }
@@ -553,7 +536,6 @@ body[data-coach="0"] .side { display: none; }
   .ladder li .v3mini { margin-left: auto; flex: none; }
   .app { gap: 4px; }
 }
-@media (max-width: 420px) { .top .mic #miclabel { position: static; width: auto; height: auto; overflow: visible; clip: auto; } }
 .plan { display: flex; flex-direction: column; gap: 12px; }
 .plan-h { display: flex; flex-direction: column; gap: 2px; }
 .planlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -661,7 +643,6 @@ body[data-coach="0"] .side { display: none; }
 @media (max-width: 360px) { body[data-group="essen"] .tab { font-size: 0.75rem; } }
 @media (max-width: 979px) {
   .gnav { background: var(--surface) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 -1px 0 var(--line), 0 -8px 24px rgba(0, 0, 0, 0.05) !important; }
-  .coach[data-idle="1"] .cmd { display: none; }
   .coach[data-idle="1"] .caption:empty { display: none; }
 }
 .weekpick { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px; border-radius: 16px; background: var(--surface-2); }
@@ -735,7 +716,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.19 · 03.11. 10:14</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.20 · 03.11. 10:26</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -746,13 +727,10 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
     <button class="gbtn" data-group="fortschritt" aria-selected="false"><span class="gic" data-ic="chart"></span><span>Fortschritt</span></button>
   </nav>
   <div class="top-actions">
-    <button class="btn mic" id="mic" aria-pressed="false"><span class="dot"></span><span id="miclabel">Mikrofon an</span></button>
-    <button class="btn icon" id="b-settings" aria-label="Einstellungen und Sprachbefehle" title="Einstellungen und Sprachbefehle"></button>
+    <button class="btn icon" id="b-settings" aria-label="Einstellungen" title="Einstellungen"></button>
   </div>
 </header>
 <button class="setfab" id="b-settings2" type="button" aria-label="Einstellungen" title="Einstellungen"></button>
-<button class="micfab" id="micfab" type="button" aria-label="Sprachbefehl: antippen und sprechen" aria-pressed="false" hidden></button>
-<p class="heard" id="heard" role="status" aria-live="polite"></p>
 
 <div class="layout">
   <aside class="side">
@@ -773,10 +751,6 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
       <ol class="steps" id="steps"></ol>
       <div class="actions" id="actions"></div>
       <p class="caption" id="caption" aria-live="polite"></p>
-      <div class="cmd">
-        <label for="cmd">Befehl tippen oder diktieren</label>
-        <input type="text" id="cmd" autocomplete="off" placeholder="z. B. Start, Fertig, Rezepte vegetarisch">
-      </div>
     </section>
   </aside>
 
@@ -863,7 +837,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
   </div>
 </dialog>
 
-<dialog id="dlg-settings" aria-label="Einstellungen und Sprachbefehle">
+<dialog id="dlg-settings" aria-label="Einstellungen">
   <div class="dlg">
     <div class="dlg-head"><h3>Einstellungen</h3><button class="btn icon" data-close aria-label="Schließen" id="x-settings"></button></div>
     <div class="settings">
@@ -876,27 +850,6 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
       <label class="field">Wasser, Gläser (250 ml)<select id="s-water"><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>10</option></select></label>
     </div>
     <label class="check"><input type="checkbox" id="s-speak"> Ansagen im Training sprechen</label>
-    <label class="check" id="l-hands" hidden><input type="checkbox" id="s-hands"> Dauerhaft zuhören (iPhone, ausprobieren)</label>
-    <h3>Sprachbefehle</h3>
-    <ul class="cmds">
-      <li><b>„Start“</b> Training beginnen</li>
-      <li><b>„Fertig“</b> Satz geschafft</li>
-      <li><b>„Weiter“</b> Pause oder Aufwärmen überspringen</li>
-      <li><b>„Zurück“</b> vorigen Satz noch mal</li>
-      <li><b>„Pause“</b> / <b>„Fortsetzen“</b></li>
-      <li><b>„Wiederholen“</b> Ansage noch mal</li>
-      <li><b>„Stopp“</b> Training beenden</li>
-      <li><b>„Timer 60 Sekunden“</b> freier Timer</li>
-      <li><b>„Heute“</b> öffnet die Übersicht, <b>„Wasser“</b> trägt ein Glas ein</li>
-      <li><b>„Zwölf“</b> trägt im Satz die Wiederholungen ein und beendet ihn</li>
-      <li><b>„Übungen“</b>, <b>„Rezepte“</b>, <b>„Glücksrad“</b>, <b>„Einkauf“</b>, <b>„Ernährung“</b>, <b>„Tipps“</b>, <b>„Fortschritt“</b></li>
-      <li><b>„Dreh die Woche“</b>, <b>„Dreh den Tag“</b>, <b>„Dreh das Abendessen“</b> lässt das Glücksrad entscheiden</li>
-      <li><b>„Hähnchen-Wrap“</b>, <b>„Linsen-Curry“</b> … öffnet das Rezept. Sagst du nur „Spinat“, suche ich danach.</li>
-      <li><b>„Rezepte vegetarisch“</b>, <b>„Frühstück“</b>, <b>„Snack“</b>, <b>„schnell“</b>, <b>„Meal-Prep“</b>, <b>„viel Eiweiß“</b> filtern die Rezepte</li>
-      <li><b>„Portionen 2“</b> im geöffneten Rezept, <b>„Schließen“</b></li>
-      <li><b>„Gewicht 79,5“</b> / <b>„Taille 92“</b> trägt heute ein</li>
-    </ul>
-    <p class="note">Firefox und Zen: oben auf „Diktat starten“ tippen, dann Windows + H drücken und sprechen. Im Claude-Fenster gibt es kein Mikrofon: „Diktat starten“ tippen und das Mikrofon der Tastatur benutzen. iPhone in Safari: Siri muss an sein, dann den runden Knopf antippen und einen Befehl sagen. Das Befehlsfeld führt den Befehl nach einer kurzen Pause aus.</p>
     <div id="instbox"><h3>App auf den Home-Bildschirm</h3>
     <p class="note" id="instinfo"></p>
     <div class="row syncrow"><button class="btn" id="b-upd" type="button">Auf Update prüfen</button></div><p class="muted small" id="updmsg" role="status" aria-live="polite"></p>
@@ -915,7 +868,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
     <div class="row syncrow"><button class="btn" id="b-syncnow" type="button">Jetzt abgleichen</button><button class="btn" id="b-backup" type="button">Sicherung kopieren</button></div>
     <details class="sbbox" id="sbbox"><summary>Eigene Datenbank verbinden (für Safari am iPhone und für den PC)</summary>
       <div id="sbform">
-        <p class="muted small">Einmal einrichten, dann gilt dieselbe Anmeldung auf allen Geräten. Die Schritte stehen in der Notiz „Online und Mikrofon einrichten“.</p>
+        <p class="muted small">Einmal einrichten, dann gilt dieselbe Anmeldung auf allen Geräten.</p>
         <label class="field">Verbindung einfügen (spart das Abtippen)<input id="sb-paste" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Hier die kopierte Verbindung einfügen"></label>
         <label class="field">Projekt-URL<input id="sb-url" type="url" placeholder="https://abcdxyz.supabase.co" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
         <label class="field">Anon-Key (öffentlicher Schlüssel)<input id="sb-key" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
@@ -1766,7 +1719,7 @@ const store = {
 };
 const $ = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
-let settings = Object.assign({ sets: 2, rest: 90, hold: 30, speak: true, handsfree: false, tdays: [1, 0, 1, 0, 1, 0, 0], alt: { row: "rowbp" } }, store.get("fc_settings", {}));
+let settings = Object.assign({ sets: 2, rest: 90, hold: 30, speak: true, tdays: [1, 0, 1, 0, 1, 0, 0], alt: { row: "rowbp" } }, store.get("fc_settings", {}));
 let levels = store.get("fc_levels", {});
 let log = store.get("fc_log", []);
 let sessions = store.get("fc_sessions", []);
@@ -1888,7 +1841,7 @@ function instructionLong() {
   const head = "Übung " + (W.ex + 1) + " von " + EX.length + ": " + e.name + ". Satz " + W.set + " von " + setsN() + ". " + levelName(e) + ".";
   if (e.type === "hold") return head + " Halte " + settings.hold + " Sekunden." + (lastTxt(e) ? " Letztes Mal: " + lastTxt(e) + "." : "");
   const lt = lastTxt(e);
-  return head + " " + e.reps + ". " + (lt ? "Letztes Mal: " + lt + ". Versuch eine Wiederholung mehr. " : "") + "Lass 1 bis 3 Wiederholungen übrig. Sag fertig, wenn du den Satz geschafft hast.";
+  return head + " " + e.reps + ". " + (lt ? "Letztes Mal: " + lt + ". Versuch eine Wiederholung mehr. " : "") + "Lass 1 bis 3 Wiederholungen übrig. Tippe auf Fertig, wenn du den Satz geschafft hast.";
 }
 function startWorkout(quick) {
   W.quick = !!quick; W.ex = 0; W.set = 1; W.phase = "warmup";
@@ -1957,7 +1910,7 @@ function act(name) {
       if (p === "warmup") return beginWork();
       if (p === "rest" || p === "prep") return skipTimer();
       if (p === "work" || p === "hold") return setDone();
-      return say("Sag Start, um das Training zu beginnen.");
+      return say("Tippe auf Training starten, um zu beginnen.");
     case "back":
       if (!active) return say("Es läuft gerade kein Training.");
       if (p === "warmup") return say("Du bist noch beim Aufwärmen.");
@@ -1968,18 +1921,18 @@ function act(name) {
       return beginWork();
     case "pause":
       if (tm.id) {
-        if (tm.running) { pauseTimer(); say("Pausiert.", "Pausiert. Sag fortsetzen, wenn es weitergeht."); }
+        if (tm.running) { pauseTimer(); say("Pausiert.", "Pausiert. Tippe auf Fortsetzen, wenn es weitergeht."); }
         else { resumeTimer(); say("Weiter geht’s."); }
         return render();
       }
-      return say(active ? "Okay." : "Es läuft gerade kein Training.", active ? "Kein Problem, ich warte. Sag fertig, wenn du den Satz geschafft hast." : "");
+      return say(active ? "Okay." : "Es läuft gerade kein Training.", active ? "Kein Problem, ich warte. Tippe auf Fertig, wenn du den Satz geschafft hast." : "");
     case "resume":
       if (tm.id && !tm.running) { resumeTimer(); say("Weiter geht’s."); return render(); }
       return say("Es ist nichts pausiert.");
     case "repeat":
       if (p === "work" || p === "prep" || p === "hold") return say(instruction(), instructionLong());
       if (p === "rest") { const nx = nextPos(); return say("Als Nächstes: " + EX[nx.ex].name + ", Satz " + nx.set + ".", "Als Nächstes: " + EX[nx.ex].name + ", Satz " + nx.set + ". " + levelName(EX[nx.ex]) + "."); }
-      return say("Sag Start, um das Training zu beginnen.");
+      return say("Tippe auf Training starten, um zu beginnen.");
     case "stop":
       return stopWorkout();
   }
@@ -2412,13 +2365,6 @@ function waistNote() {
   const who = w < 94 ? "unter 94 cm (niedrigeres Risiko)" : w <= 102 ? "zwischen 94 und 102 cm (erhöhtes Risiko)" : "über 102 cm (deutlich erhöhtes Risiko)";
   return "Letzte Taille " + nf(w) + " cm: Verhältnis zur Größe " + nf(Math.round(r * 100) / 100) + ", also " + t + ". Nach den WHO-Grenzen für Männer " + who + ". Orientierungswerte, keine Diagnose.";
 }
-function progressSummary() {
-  const bits = ["Du hast bisher " + sessions.length + " Trainings gemacht, " + weekCount() + " davon in den letzten 7 Tagen."];
-  const w = change("weight"), c = change("waist");
-  if (w != null) bits.push("Gewicht seit dem Start: " + (w > 0 ? "plus " : "minus ") + nf(Math.abs(w)) + " Kilo.");
-  if (c != null) bits.push("Taille seit dem Start: " + (c > 0 ? "plus " : "minus ") + nf(Math.abs(c)) + " Zentimeter.");
-  return bits.join(" ");
-}
 const MUSC = [["chest", "Brust"], ["shoulder", "Schultern"], ["tri", "Trizeps"], ["back", "Rücken"], ["bi", "Bizeps"], ["quad", "Oberschenkel"], ["glute", "Po und Beinrückseite"], ["core", "Bauch und Rumpf"]];
 const MAPX = { squat: { quad: 1, glute: 0.5 }, push: { chest: 1, shoulder: 0.5, tri: 0.5 }, row: { back: 1, bi: 0.5 }, pike: { shoulder: 1, tri: 0.5 }, bridge: { glute: 1 }, plank: { core: 1 } };
 EXALT.forEach((a) => { MAPX[a.id] = a.mx; });
@@ -2541,7 +2487,7 @@ function syncCoach() {
   const g = GROUPS.find((x) => x.tabs.includes(CUR)), run = isActive() || !!tm.id;
   document.body.dataset.group = g.id;
   document.body.dataset.run = run ? "1" : "0";
-  document.body.dataset.coach = (g.id === "heute" || g.id === "training" || run || dictation) ? "1" : "0";
+  document.body.dataset.coach = (g.id === "heute" || g.id === "training" || run) ? "1" : "0";
 }
 function showTab(name, quiet) {
   const g = GROUPS.find((x) => x.tabs.includes(name)); if (!g) return;
@@ -2573,123 +2519,6 @@ function showTab(name, quiet) {
   }
 }
 const activeTab = () => CUR;
-
-/* ======================= Sprachbefehle ======================= */
-function voiceFilters(t) {
-  let hit = false;
-  const set = (k, v) => { F[k] = v; hit = true; };
-  if (/(alle rezepte|filter zurücksetzen|filter löschen)/.test(t)) { const s = F.sort; Object.assign(F, JSON.parse(FDEF)); F.sort = s; hit = true; }
-  else {
-    if (/\bvegan/.test(t)) set("diet", "vegan"); else if (/vegetarisch/.test(t)) set("diet", "vegetarisch");
-    if (/fr[üu]hst[üu]ck/.test(t)) set("meal", "Frühstück");
-    if (/(snack|zwischenmahlzeit)/.test(t)) set("meal", "Snack");
-    if (/(mittag|abendessen|hauptgericht)/.test(t)) set("meal", "Mittag/Abend");
-    if (/(schnell|kurz)/.test(t)) set("time", 10);
-    if (/(meal.?prep|vorkoch)/.test(t)) set("prep", true);
-    if (/(ohne kochen|kalt)/.test(t)) set("nocook", true);
-    if (/(viel eiweiß|eiweißreich|high protein|proteinreich)/.test(t)) set("minProt", true);
-    if (/(günstig|billig|preiswert)/.test(t)) set("cheap", true);
-  }
-  if (!hit) return false;
-  showTab("rezepte"); renderRecipes();
-  const l = filtered();
-  say(l.length ? l.length + (l.length === 1 ? " Rezept gefunden: " : " Rezepte gefunden: ") + l.slice(0, 5).map((r) => r.title).join(", ") + "." : "Dazu habe ich kein Rezept. Lockere die Filter.");
-  return true;
-}
-const norm = (x) => x.toLowerCase().replace(/[.,!?()]/g, " ").replace(/-/g, " ").replace(/\s+/g, " ").trim();
-const STOP = new Set(["rezept", "rezepte", "zeige", "zeig", "bitte", "suche", "suchen", "essen", "kochen", "heute", "noch", "auch", "etwas", "ohne", "viel", "gibt", "habe", "haben", "möchte", "will", "kannst", "lies"]);
-function voiceTitle(t) {
-  const tn = norm(t);
-  let best = null, bl = 0;
-  RECIPES.forEach((r) => { const rt = norm(r.title); if (tn.includes(rt) && rt.length > bl) { best = r; bl = rt.length; } });
-  if (!best) {
-    const toks = tn.split(" ").filter((w) => w.length >= 4 && !STOP.has(w));
-    if (toks.length >= 2) {
-      const c = RECIPES.filter((r) => { const rt = norm(r.title); return toks.every((w) => rt.includes(w)); });
-      if (c.length === 1) best = c[0];
-    }
-  }
-  if (!best) return false;
-  showTab("rezepte"); openRecipe(best.id, true); return true;
-}
-function voiceSearch(t) {
-  const toks = norm(t).split(" ").filter((w) => w.length >= 4 && !STOP.has(w));
-  for (const w of toks) {
-    const m = RECIPES.filter((r) => norm(r.title + " " + r.ing.map((i) => i[2]).join(" ")).includes(w));
-    if (m.length === 1) { showTab("rezepte"); openRecipe(m[0].id, true); return true; }
-    if (m.length > 1 && m.length <= 45) {
-      F.q = w; showTab("rezepte"); renderRecipes();
-      const l = filtered();
-      say(l.length + (l.length === 1 ? " Rezept" : " Rezepte") + " mit " + w + ": " + l.slice(0, 5).map((r) => r.title).join(", ") + (l.length > 5 ? " und weitere." : "."));
-      return true;
-    }
-  }
-  return false;
-}
-function handle(raw) {
-  const lower = raw.toLowerCase();
-  const t = lower.replace(/[.,!?]/g, " ").replace(/\s+/g, " ").trim();
-  $("#heard").textContent = "Gehört: „" + raw.trim() + "“";
-  const idle = W.phase === "idle" || W.phase === "done";
-  let m;
-  if ($("#dlg-cook").open && CK.r) { if (/\b(weiter|nächster|nächste|los)\b/.test(t)) return ckGo(1); if (/\b(zurück|vorheriger|vorherige)\b/.test(t)) return ckGo(-1); if (/(schließen|fertig|ende)/.test(t)) { ckStop(); unwake(); return closeDialog($("#dlg-cook")); } }
-  if (W.phase === "work" && EX[W.ex].type !== "hold") { const cnt = parseCount(t); if (cnt != null) return setDone(cnt); }
-
-  if ((m = lower.match(/gewicht\D{0,12}(\d{2,3})(?:\s*(?:,|\.|komma)\s*(\d))?/))) {
-    const v = parseFloat(m[1] + (m[2] ? "." + m[2] : ""));
-    saveEntry({ weight: v }); return say("Gewicht " + nf(v) + " Kilo für heute eingetragen.");
-  }
-  if ((m = lower.match(/taille\D{0,12}(\d{2,3})(?:\s*(?:,|\.|komma)\s*(\d))?/))) {
-    const v = parseFloat(m[1] + (m[2] ? "." + m[2] : ""));
-    saveEntry({ waist: v }); return say("Taille " + nf(v) + " Zentimeter für heute eingetragen.");
-  }
-  if ($("#dlg-recipe").open && (m = t.match(/portion(?:en)?\s*(\d)/))) {
-    portions = Math.max(1, Math.min(4, parseInt(m[1], 10))); drawRecipe(); return readRecipe(RECIPES.find((x) => x.id === openId));
-  }
-  if (/(schließen|schliessen|zumachen|fenster zu)/.test(t)) {
-    const d = $("#dlg-recipe"), s = $("#dlg-settings"), v = $("#dlg-3d");
-    if (v.open) closeDialog(v); else if (d.open) closeDialog(d); else if (s.open) closeDialog(s);
-    return say("Okay.");
-  }
-  if (/\b(austauschen|tauschen|alternative|ersetzen)\b/.test(t)) { if (isActive() && ["work", "hold"].includes(W.phase)) return say("Tauschen geht in der Pause oder vor dem Satz."); const se = EX[Math.min(isActive() ? (W.phase === "rest" ? nextPos().ex : W.ex) : 0, EX.length - 1)]; openSwap(se.slot); return say("Hier kannst du " + se.name + " austauschen."); }
-  if (/\b(technik|3d|dreidee|übung zeigen|zeig mir die übung|wie geht das)\b/.test(t)) { const e = isActive() ? EX[Math.min(W.ex, EX.length - 1)] : EX[0]; openV3(e.id, lvl(e)); return say("Hier siehst du die Technik: " + e.name + "."); }
-  if (/\b(auslassen|übung überspringen|nächste übung)\b/.test(t)) return act("skipex");
-  if (/(kurz[ -]?training|kurze einheit|kurz starten|kurzes training)/.test(t)) return act("startquick");
-  if (/\b(stopp|stop|beenden|abbrechen|aufhören)\b/.test(t)) return act("stop");
-  if (/(fortsetzen|weitermachen|weiter machen)/.test(t)) return act("resume");
-  if (/\b(pause|pausieren|warte|moment)\b/.test(t)) return act("pause");
-  if (/\b(fertig|geschafft|erledigt|done)\b/.test(t)) return act("done");
-  if (/\b(weiter|nächste|nächster|überspringen|skip)\b/.test(t)) return act("next");
-  if (/\b(zurück|vorherige|vorheriger)\b/.test(t)) return act("back");
-  if (/(wiederhol|nochmal|noch mal|nochmals)/.test(t)) return act("repeat");
-
-  if (/\btimer\b/.test(t) && (m = t.match(/(\d+)\s*(sekunden|sek|minuten|minute|min)?/))) {
-    let sec = parseInt(m[1], 10);
-    if (m[2] && /^min/.test(m[2])) sec *= 60;
-    if (sec > 0 && sec <= 3600) {
-      if (!idle) return say("Der Timer geht nur, solange kein Training läuft.");
-      startTimer(sec, () => { say("Timer abgelaufen."); render(); });
-      return say("Timer läuft: " + sec + " Sekunden.");
-    }
-  }
-
-  if (/^(heute|übersicht|uebersicht|startseite|tagesübersicht)$/.test(t)) { showTab("heute"); return say("Hier ist deine Übersicht für heute."); }
-  if (/\bwasser\b/.test(t)) { addWater(1); return say("Ein Glas Wasser eingetragen."); }
-  if (/(vorkoch|meal ?prep|vorkochen)/.test(t)) { showTab("vorkochen"); return say("Hier ist dein Vorkochplan für die Woche."); }
-  if (/(einkauf|einkaufsliste|einkaufszettel)/.test(t)) { showTab("einkauf"); return say("Hier ist deine Einkaufsliste."); }
-  if (radVoice(t)) return;
-  if (voiceTitle(t)) return;
-  if (voiceFilters(t)) return;
-  if (/rezept/.test(t)) { showTab("rezepte"); return say("Hier sind die Rezepte. Sag zum Beispiel Linsen oder Rührei, dann öffne ich das Rezept."); }
-  if (/(ernährung|ernaehrung|eiweiß)/.test(t)) { showTab("ernaehrung"); return readCurrent(); }
-  if (/(tipp|tips)/.test(t)) { showTab("tipps"); return say("Hier sind die Tipps. Du kannst sie hier lesen."); }
-  if (/(übung|uebung)/.test(t)) { showTab("uebungen"); return say("Hier sind die Übungen mit ihren Stufen."); }
-  if (/(fortschritt|verlauf|werte)/.test(t)) { showTab("fortschritt"); return say(progressSummary()); }
-  if (/(hilfe|befehle|was kann|einstellungen)/.test(t)) { openSettings(); return say("Hier sind die Einstellungen und alle Sprachbefehle."); }
-  if (voiceSearch(t)) return;
-  if (idle && /(start|beginn|anfang|loslegen|\blos\b|training)/.test(t)) return act("start");
-  say("Das habe ich nicht verstanden. Sag Hilfe für die Befehle.", "Nicht verstanden: „" + raw.trim() + "“");
-}
 
 /* ======================= Glücksrad ======================= */
 const RAD = Object.assign({ mode: "day", meal: "Mittag/Abend", bfDay: true, bfWeek: false, noSpinat: true, cheap: true, work: false, maxDay: 0, people: 2 }, store.get("fc_rad", {}));
@@ -2930,19 +2759,6 @@ function renderRadOpts() {
   $("#radopts").innerHTML = h;
   $("#spin").textContent = "Drehen";
   $("#spin").setAttribute("aria-label", { meal: "Mahlzeit drehen", day: "Tag drehen", week: "Woche drehen" }[RAD.mode]);
-}
-function radVoice(t) {
-  if (!/(glücksrad|gluecksrad|\bdreh|drehe|zufall|was soll ich essen|was essen wir|was gibt es)/.test(t)) return false;
-  showTab("rad");
-  if (/woche/.test(t)) RAD.mode = "week";
-  else if (/\b(tag|heute)\b/.test(t)) RAD.mode = "day";
-  else if (/(frühstück|fruehstueck)/.test(t)) { RAD.mode = "meal"; RAD.meal = "Frühstück"; }
-  else if (/snack/.test(t)) { RAD.mode = "meal"; RAD.meal = "Snack"; }
-  else if (/(mittag|abend)/.test(t)) { RAD.mode = "meal"; RAD.meal = "Mittag/Abend"; }
-  else if (/(mahlzeit|essen)/.test(t)) RAD.mode = "meal";
-  saveRad(); renderRadOpts(); radIdle(); radRender(); drawWheel();
-  if (/(dreh|zufall|was soll ich essen|was essen wir|was gibt es)/.test(t)) radRoll(); else say("Das Glücksrad. Sag zum Beispiel: Dreh die Woche, Dreh den Tag oder Dreh das Abendessen.");
-  return true;
 }
 
 /* ======================= Einkauf (Lidl-Richtwerte) ======================= */
@@ -3687,12 +3503,6 @@ function repChips(e) {
   for (let n = Math.max(1, r[0] - 3); n <= r[1] + 2; n++) h += '<button class="fchip" data-reps="' + n + '">' + n + "</button>";
   return '<div class="repchips" role="group" aria-label="Wiederholungen eintragen"><span class="small muted">Wie viele hast du geschafft?</span><div class="row">' + h + "</div></div>";
 }
-const NUMW = { ein: 1, eins: 1, eine: 1, zwei: 2, drei: 3, vier: 4, fünf: 5, fuenf: 5, sechs: 6, sieben: 7, acht: 8, neun: 9, zehn: 10, elf: 11, zwölf: 12, zwoelf: 12, dreizehn: 13, vierzehn: 14, fünfzehn: 15, fuenfzehn: 15, sechzehn: 16, siebzehn: 17, achtzehn: 18, neunzehn: 19, zwanzig: 20 };
-function parseCount(t) {
-  const m = t.replace(/\b(mal|wiederholungen|stück|reps)\b/g, "").replace(/\s+/g, " ").trim();
-  if (/^\d{1,2}$/.test(m)) return parseInt(m, 10);
-  return NUMW[m] != null ? NUMW[m] : null;
-}
 const exOf = (w) => EXALL.filter((e) => w.sets.some((x) => x.ex === e.id));
 function evalEx(e, sets) {
   const mine = sets.filter((s) => s.ex === e.id);
@@ -3922,77 +3732,6 @@ function bindGoals() {
   ["#s-kcal", "#s-protein", "#s-water"].forEach((x) => $(x).addEventListener("change", save));
 }
 
-let SR = FC.embedded ? null : (window.SpeechRecognition || window.webkitSpeechRecognition);
-const IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-const PTT = IOS; /* iPhone: Apple erlaubt kein zuverlässiges Dauer-Zuhören, daher einmal pro Tippen sprechen */
-let rec = null, listening = false, dictation = false;
-function setMic(on) {
-  $("#mic").setAttribute("aria-pressed", on ? "true" : "false");
-  $("#miclabel").textContent = SR ? (on ? "Ich höre zu" : (PTT ? "Tippen & sprechen" : "Mikrofon an")) : (on ? "Diktat bereit" : "Diktat starten");
-  const fab = $("#micfab"); if (fab) { fab.setAttribute("aria-pressed", on ? "true" : "false"); fab.hidden = !SR; }
-}
-function setupRec() {
-  rec = new SR();
-  rec.lang = "de-DE"; rec.continuous = !PTT; rec.interimResults = false; rec.maxAlternatives = 1;
-  rec.onresult = (ev) => {
-    for (let i = ev.resultIndex; i < ev.results.length; i++) {
-      if (!ev.results[i].isFinal) continue;
-      if (!PTT && (speaking || Date.now() - lastSpoke < 700)) continue;
-      handle(ev.results[i][0].transcript);
-    }
-  };
-  rec.onerror = (ev) => {
-    if (ev.error === "service-not-allowed" && IOS) {
-      listening = false; setMic(false);
-      $("#heard").textContent = "Die Spracherkennung ist aus. Schalte Siri ein (Einstellungen, Siri) und erlaube Safari das Mikrofon. Öffne die Seite in Safari, nicht als Home-Bildschirm-App.";
-    } else if (ev.error === "not-allowed" || ev.error === "service-not-allowed") {
-      listening = false; setMic(false);
-      $("#heard").textContent = IOS ? "Das Mikrofon ist blockiert. Tippe in Safari auf „aA“, dann Webseiten-Einstellungen, und erlaube das Mikrofon." : "Das Mikrofon ist blockiert. Erlaube den Zugriff in der Adressleiste und klick dann noch mal auf Mikrofon an.";
-    } else if (ev.error === "no-speech" && PTT) {
-      $("#heard").textContent = "Ich habe nichts gehört. Tippe noch mal und sprich dann.";
-    } else if (ev.error === "network") {
-      listening = false; setMic(false);
-      $("#heard").textContent = "Die Spracherkennung braucht eine Internetverbindung.";
-    }
-  };
-  rec.onend = () => {
-    if (PTT) {
-      if (listening && settings.handsfree) setTimeout(() => { if (!listening) return; rec = null; setupRec(); try { rec.start(); } catch (e) { listening = false; setMic(false); } }, speaking ? 900 : 400);
-      else { listening = false; setMic(false); }
-      return;
-    }
-    if (listening) setTimeout(() => { try { rec.start(); } catch (e) {} }, 300);
-  };
-}
-function toggleMic() {
-  if (!SR) {
-    dictation = !dictation; setMic(dictation); syncCoach();
-    if (dictation) { $("#cmd").focus(); $("#heard").textContent = FC.embedded ? "Tippe ins Befehlsfeld und nutze das Mikrofon deiner Tastatur. Nach einer kurzen Pause führe ich den Befehl aus." : "Drücke jetzt Windows + H und sprich. Nach einer kurzen Pause führe ich den Befehl aus."; }
-    else $("#heard").textContent = "Diktat aus.";
-    return;
-  }
-  if (listening) { listening = false; try { rec.stop(); } catch (e) {} setMic(false); $("#heard").textContent = "Mikrofon aus."; return; }
-  if (PTT) { try { speechSynthesis.cancel(); } catch (e) {} speaking = false; rec = null; }
-  if (!rec) setupRec();
-  listening = true;
-  try { rec.start(); setMic(true); $("#heard").textContent = "Ich höre zu. Sag zum Beispiel „Start“."; }
-  catch (e) { listening = false; setMic(false); }
-}
-
-/* Befehlsfeld: tippen oder per Windows-Diktat (Windows-Taste + H) sprechen. Funktioniert in jedem Browser. */
-let cmdTimer = null;
-function runCmd() {
-  clearTimeout(cmdTimer);
-  const f = $("#cmd"), v = f.value.trim();
-  f.value = "";
-  if (v) handle(v);
-}
-$("#cmd").addEventListener("input", () => {
-  clearTimeout(cmdTimer);
-  if (dictation && (speaking || Date.now() - lastSpoke < 1500)) { $("#cmd").value = ""; return; }
-  cmdTimer = setTimeout(runCmd, 1300);
-});
-$("#cmd").addEventListener("keydown", (ev) => { if (ev.key === "Enter") { ev.preventDefault(); runCmd(); } });
 
 /* ======================= Ereignisse ======================= */
 function openSettings() { showDialog($("#dlg-settings"), $("#b-settings")); }
@@ -4052,7 +3791,7 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.excz) { toggleExc("z:" + t.dataset.excz); return renderRecipes(); }
   if (t.dataset.excr) { toggleExc("r:" + t.dataset.excr); return renderRecipes(); }
   if (t.dataset.fav) { const id = t.dataset.fav; FAV = FAV.includes(id) ? FAV.filter((x) => x !== id) : FAV.concat(id); store.set("fc_fav", FAV); drawRecipe(); return renderRecipes(); }
-  if (t.dataset.hide) { toggleExc("r:" + t.dataset.hide); closeDialog($("#dlg-recipe")); $("#heard").textContent = "Das Rezept ist ausgeblendet. Unter „Weitere Filter“ holst du es zurück."; return renderRecipes(); }
+  if (t.dataset.hide) { toggleExc("r:" + t.dataset.hide); closeDialog($("#dlg-recipe")); toast("Das Rezept ist ausgeblendet. Unter „Weitere Filter“ holst du es zurück."); return renderRecipes(); }
   if (t.dataset.cook) return openCook(t.dataset.cook, t);
   if (t.dataset.ckgo) return ckGo(parseInt(t.dataset.ckgo, 10));
   if (t.dataset.cktimer) return ckTimer(parseInt(t.dataset.cktimer, 10));
@@ -4063,8 +3802,6 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.eatdel != null && t.dataset.eatdel !== "") { const dd = dayEns(), gone = dd.items.splice(parseInt(t.dataset.eatdel, 10), 1)[0]; if (gone && dd.plan && !gone.again) { const ix = dd.plan.ids.indexOf(gone.id); if (ix >= 0) dd.plan.done[ix] = false; } saveToday(); return renderToday(); }
   if (t.dataset.effort) { if (WK[SUMIDX]) { WK[SUMIDX].effort = t.dataset.effort; saveToday(); drawSummary(SUMIDX); } return; }
   if (t.dataset.lvlup || t.dataset.lvldown) { const id = t.dataset.lvlup || t.dataset.lvldown, e = EX.find((x) => x.id === id); levels[id] = Math.max(0, Math.min(e.ladder.length - 1, lvl(e) + (t.dataset.lvlup ? 1 : -1))); store.set("fc_levels", levels); renderEx(); render(); drawSummary(SUMIDX); return; }
-  if (dictation && t.id !== "mic") setTimeout(() => { if (!document.querySelector("dialog[open]")) $("#cmd").focus(); }, 0);
-  if (t.id === "mic" || t.id === "micfab") return toggleMic();
   if (t.id === "b-settings" || t.id === "b-settings2") return openSettings();
   if (t.hasAttribute("data-close")) { closeDialog(t.closest("dialog")); return; }
   if (t.dataset.act) {
@@ -4154,13 +3891,13 @@ document.addEventListener("submit", (ev) => {
 });
 function bindSettings() {
   $("#s-sets").value = String(settings.sets); $("#s-rest").value = String(settings.rest);
-  $("#s-hold").value = String(settings.hold); $("#s-speak").checked = settings.speak; $("#s-hands").checked = !!settings.handsfree; $("#l-hands").hidden = !(PTT && SR);
+  $("#s-hold").value = String(settings.hold); $("#s-speak").checked = settings.speak;
   const save = () => {
     settings.sets = parseInt($("#s-sets").value, 10); settings.rest = parseInt($("#s-rest").value, 10);
-    settings.hold = parseInt($("#s-hold").value, 10); settings.speak = $("#s-speak").checked; settings.handsfree = $("#s-hands").checked;
+    settings.hold = parseInt($("#s-hold").value, 10); settings.speak = $("#s-speak").checked;
     store.set("fc_settings", settings); render();
   };
-  ["#s-sets", "#s-rest", "#s-hold", "#s-speak", "#s-hands"].forEach((s) => $(s).addEventListener("change", save));
+  ["#s-sets", "#s-rest", "#s-hold", "#s-speak"].forEach((s) => $(s).addEventListener("change", save));
   bindSync(); bindDays();
 }
 function bindDays() {
@@ -4214,6 +3951,13 @@ async function shareICS() {
   } catch (e) { if (e && e.name === "AbortError") { msg.textContent = "Abgebrochen."; return; } }
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "fitness-coach.ics"; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   msg.textContent = r.count + " Termine als Datei geladen. Öffne sie, dann fragt der Kalender nach dem Hinzufügen.";
+}
+/* Kurze Hinweiszeile unten */
+let toastT = 0;
+function toast(t) {
+  let el = document.getElementById("toast");
+  if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+  el.textContent = t; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 5000);
 }
 /* Update-Prüfung: fragt den Server nach der aktuellen Versionsnummer */
 const verNum = (v) => { const m = /v(\d+)\.(\d+)/.exec(v || ""); return m ? [parseInt(m[1], 10), parseInt(m[2], 10)] : null; };
@@ -4922,7 +4666,7 @@ function bindV3() {
 }
 
 /* ======================= Start ======================= */
-$("#b-settings").innerHTML = ic("gear"); $("#b-settings2").innerHTML = ic("gear") + "<span>Einstellungen</span>"; $("#micfab").innerHTML = ic("mic"); document.body.classList.toggle("has-sr", !!SR);
+$("#b-settings").innerHTML = ic("gear"); $("#b-settings2").innerHTML = ic("gear") + "<span>Einstellungen</span>";
 $("#x-settings").innerHTML = ic("close");
 applyPrices(); bindV3(); renderEx(); renderRecipes(); renderNutrition(); renderTips(); renderSources(); renderProgress(); bindSettings(); render(); bindGoals(); renderToday();
 function radShowAll() { rad.shown = new Set(); const P = RPL[RAD.mode]; if (P) P.days.forEach((d, di) => d.slots.forEach((x, si) => rad.shown.add(di + ":" + si))); }
@@ -4944,13 +4688,6 @@ if (!FC.embedded && "serviceWorker" in navigator && /^https?:$/.test(location.pr
 }
 showTab("heute", true); window.addEventListener("resize", () => { moveBoth(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { moveBoth(); });
-if (!SR) {
-  setMic(false);
-  $("#heard").textContent = FC.embedded ? "Online gibt es keine eingebaute Spracherkennung. Tippe auf „Diktat starten“ und nutze das Mikrofon deiner Tastatur." : "Dieser Browser hat keine eingebaute Spracherkennung. Klick auf „Diktat starten“ und nutze dann Windows + H.";
-} else {
-  setMic(false);
-  $("#heard").textContent = "";
-}
 </script>
 <script>
 FC.boot(function () {
