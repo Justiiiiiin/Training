@@ -33,7 +33,7 @@
   --wheel-b: #eadfcc;
   --display: "Bricolage Grotesque", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
   --body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --material: rgba(246, 240, 230, 0.86);
+  --material: rgb(246, 240, 230);
   --material-line: rgba(90, 70, 40, 0.09);
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --r-lg: 26px;
@@ -59,7 +59,7 @@
     --warn: #e6b866;
     --wheel-a: #332e28;
     --wheel-b: #28241f;
-    --material: rgba(34, 31, 27, 0.86);
+    --material: rgb(34, 31, 27);
     --material-line: rgba(255, 255, 255, 0.07);
     --shadow: 0 1px 0 rgba(0, 0, 0, 0.25), 0 8px 22px -12px rgba(0, 0, 0, 0.5);
     color-scheme: dark;
@@ -167,7 +167,7 @@ button, input, select { -webkit-tap-highlight-color: transparent; touch-action: 
 .btn:active, .fchip:active, .rcard:active, .tab:active, .segb:active { transform: scale(0.97); transition-duration: 0.07s; }
 
 /* Segment-Menü */
-.tabs { position: sticky; top: 12px; z-index: 6; display: flex; gap: 2px; overflow-x: auto; padding: 4px; background: var(--material); -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%); border-radius: 999px; box-shadow: var(--shadow), inset 0 0 0 1px var(--material-line); scrollbar-width: none; }
+.tabs { position: sticky; top: 12px; z-index: 6; display: flex; gap: 2px; overflow-x: auto; padding: 4px; background: var(--material); border-radius: 999px; box-shadow: var(--shadow), inset 0 0 0 1px var(--material-line); scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
 .tab-ind { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: var(--ink); transition: transform 0.34s var(--ease), width 0.34s var(--ease); pointer-events: none; }
 .tab { position: relative; z-index: 1; flex: 1 0 auto; min-height: 40px; padding: 0 15px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: inherit; font-weight: 650; cursor: pointer; white-space: nowrap; }
@@ -211,6 +211,7 @@ button, input, select { -webkit-tap-highlight-color: transparent; touch-action: 
 .rgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(236px, 1fr)); gap: 16px; }
 .rcard { text-align: left; background: var(--surface); border: 0; border-radius: var(--r-md); padding: 18px; display: flex; flex-direction: column; gap: 14px; cursor: pointer; font: inherit; color: inherit; box-shadow: var(--shadow); }
 .rcard:hover { box-shadow: var(--shadow), 0 0 0 2px var(--accent); }
+.rcard { content-visibility: auto; contain-intrinsic-size: auto 150px; }
 .rcard h4 { font-size: 1.125rem; line-height: 1.25; overflow-wrap: anywhere; hyphens: auto; }
 .rnum { display: flex; flex-direction: column; gap: 2px; margin-top: auto; }
 .pro { font-family: var(--display); font-size: 2.5rem; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: var(--good); font-variant-numeric: tabular-nums; }
@@ -225,7 +226,7 @@ button, input, select { -webkit-tap-highlight-color: transparent; touch-action: 
 .empty { text-align: center; align-items: center; padding: 36px 16px; grid-column: 1 / -1; }
 
 dialog { border: 0; border-radius: var(--r-lg); background: var(--surface); color: var(--ink); padding: 0; width: min(660px, calc(100vw - 24px)); max-height: calc(100vh - 32px); box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42); }
-dialog::backdrop { background: rgba(8, 12, 14, 0.46); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+dialog::backdrop { background: rgba(8, 12, 14, 0.56); }
 .dlg { padding: 26px; display: flex; flex-direction: column; gap: 16px; }
 .dlg ul, .dlg ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
 .dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
@@ -437,7 +438,7 @@ body[data-coach="0"] .side { display: none; }
 @media (max-width: 979px) {
   .app { padding: 14px 16px calc(100px + env(safe-area-inset-bottom, 0px)); }
   .top { grid-template-columns: 1fr auto; }
-  .gnav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-radius: 0; padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); background: var(--material); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); box-shadow: 0 -1px 0 var(--material-line); }
+  .gnav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-radius: 0; padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); background: var(--material); box-shadow: 0 -1px 0 var(--material-line); }
   .gind { display: none; }
   .gbtn { flex-direction: column; justify-content: center; gap: 3px; min-height: 52px; padding: 6px 2px; font-size: 0.6875rem; border-radius: 12px; }
   .gbtn .ic { width: 25px; height: 25px; }
@@ -604,6 +605,7 @@ body[data-coach="0"] .side { display: none; }
 .ver { position: fixed; top: 3px; right: 10px; z-index: 5; font-size: 0.6875rem; line-height: 1; color: var(--muted); pointer-events: none; font-variant-numeric: tabular-nums; }
 
 .hday { border-top: 1px solid var(--line); padding: 4px 0; }
+.hday { content-visibility: auto; contain-intrinsic-size: auto 48px; }
 .hday summary { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; cursor: pointer; padding: 8px 0; flex-wrap: wrap; list-style: none; }
 .hday summary::-webkit-details-marker { display: none; }
 .hitems { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
@@ -699,7 +701,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.10 · 02.11. 23:33</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.11 · 03.11. 08:02</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -1721,7 +1723,10 @@ let log = store.get("fc_log", []);
 let sessions = store.get("fc_sessions", []);
 let prof = Object.assign({ weight: 80, height: 175 }, store.get("fc_body", {}));
 let shop = store.get("fc_shop", {});
-const todayISO = () => new Date().toLocaleDateString("sv-SE");
+const _p2 = (n) => (n < 10 ? "0" : "") + n;
+const isoOf = (d) => isNaN(d) ? "Invalid Date" : d.getFullYear() + "-" + _p2(d.getMonth() + 1) + "-" + _p2(d.getDate());
+const todayISO = () => isoOf(new Date());
+const NDEF = new Intl.NumberFormat("de-DE");
 applyAlts();
 const lvl = (e) => Math.min(levels[e.id] != null ? levels[e.id] : e.def, e.ladder.length - 1);
 const levelName = (e) => e.ladder[lvl(e)];
@@ -2328,7 +2333,7 @@ function saveEntry(part) {
 }
 function weekCount() {
   const lim = new Date(); lim.setDate(lim.getDate() - 6);
-  const iso = lim.toLocaleDateString("sv-SE");
+  const iso = isoOf(lim);
   return sessions.filter((s) => s >= iso).length;
 }
 function change(key) {
@@ -2452,9 +2457,20 @@ let CUR = "heute";
 const greeting = () => { const h = new Date().getHours(); return h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend"; };
 function placeInd(i, b) {
   if (!b || !i) return;
-  if (i.dataset.init !== "1") { i.style.transition = "none"; i.dataset.init = "1"; i.style.width = b.offsetWidth + "px"; i.style.transform = "translateX(" + b.offsetLeft + "px)"; void i.offsetWidth; i.style.transition = ""; return; }
-  i.style.width = b.offsetWidth + "px";
-  i.style.transform = "translateX(" + b.offsetLeft + "px)";
+  const w = b.offsetWidth, l = b.offsetLeft;
+  if (i.dataset.init !== "1") { i.style.transition = "none"; i.dataset.init = "1"; i.style.width = w + "px"; i.style.transform = "translateX(" + l + "px)"; void i.offsetWidth; i.style.transition = ""; return; }
+  i.style.width = w + "px";
+  i.style.transform = "translateX(" + l + "px)";
+}
+function moveBoth() {
+  const a = $("#tabind"), ab = $('#subnav .tab[aria-selected="true"]'), g = $("#gind"), gb = $('.gbtn[aria-selected="true"]');
+  const ra = a && ab ? [ab.offsetWidth, ab.offsetLeft] : null, rg = g && gb ? [gb.offsetWidth, gb.offsetLeft] : null;
+  const put = (i, r) => {
+    if (i.dataset.init !== "1") { i.style.transition = "none"; i.dataset.init = "1"; i.style.width = r[0] + "px"; i.style.transform = "translateX(" + r[1] + "px)"; void i.offsetWidth; i.style.transition = ""; return; }
+    i.style.width = r[0] + "px"; i.style.transform = "translateX(" + r[1] + "px)";
+  };
+  if (ra) put(a, ra);
+  if (rg) put(g, rg);
 }
 function moveInd() { placeInd($("#tabind"), $('#subnav .tab[aria-selected="true"]')); }
 function moveG() { placeInd($("#gind"), $('.gbtn[aria-selected="true"]')); }
@@ -2482,7 +2498,7 @@ function showTab(name, quiet) {
   const now = new Date();
   $("#pagetitle").textContent = name === "heute" ? greeting() : g.title;
   $("#pagesub").textContent = name === "heute" ? WD[now.getDay()] + ", " + now.getDate() + ". " + MON[now.getMonth()] : TABSUB[name];
-  syncCoach(); moveInd(); moveG();
+  syncCoach(); moveBoth();
   if (name === "rad") requestAnimationFrame(drawWheel);
   if (name === "heute") renderToday();
   if (!quiet) {
@@ -2872,7 +2888,8 @@ let BUDGET = store.get("fc_budget", 0);
 let CHK = store.get("fc_chk", {});
 const SECS = ["Obst & Gemüse", "Kühlregal", "Fleisch & Wurst", "Brot & Backwaren", "Nudeln, Reis & Trockenes", "Tiefkühl", "Vorrat"];
 const esc = (x) => String(x == null ? "" : x).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const eur = (n) => n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "\u00a0€";
+const EURF = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const eur = (n) => EURF.format(n) + "\u00a0€";
 const saveCart = () => { store.set("fc_cart", CART); store.set("fc_budget", BUDGET); store.set("fc_chk", CHK); };
 function needTxt(k, g) {
   const p = PRICE[k], q = g / p.per;
@@ -3023,7 +3040,7 @@ const dayEns = (d) => { const k = d || todayISO(); return DIARY[k] || (DIARY[k] 
 const dsum = (d) => dayGet(d).items.reduce((a, x) => ({ k: a.k + x.k, p: a.p + x.p, c: a.c + (x.c || 0) }), { k: 0, p: 0, c: 0 });
 const WD = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 const MON = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
-const shiftDay = (iso, k) => { const x = new Date(iso + "T12:00:00"); x.setDate(x.getDate() + k); return x.toLocaleDateString("sv-SE"); };
+const shiftDay = (iso, k) => { const x = new Date(iso + "T12:00:00"); x.setDate(x.getDate() + k); return isoOf(x); };
 const weekStartISO = (iso) => { const x = new Date(iso + "T12:00:00"); return shiftDay(iso, -((x.getDay() + 6) % 7)); };
 const weekCountISO = (ws) => sessions.filter((s) => weekStartISO(s) === ws).length;
 function weekStreak() {
@@ -3608,7 +3625,7 @@ function chartSVG(pts, label, trend) {
   const X = (ms) => L + (x1 === x0 ? 0.5 : (ms - x0) / (x1 - x0)) * (W2 - L - R), Y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H2 - T - B);
   let g = "";
   for (let i = 0; i <= 3; i++) { const v = lo + (hi - lo) * i / 3, y = Y(v); g += '<line class="gl2" x1="' + L + '" x2="' + (W2 - R) + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '"/><text x="' + (L - 8) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end">' + nf(Math.round(v * 10) / 10) + "</text>"; }
-  const d1 = new Date(x0).toLocaleDateString("sv-SE"), d2 = new Date(x1).toLocaleDateString("sv-SE");
+  const d1 = isoOf(new Date(x0)), d2 = isoOf(new Date(x1));
   g += '<text x="' + L + '" y="' + (H2 - 8) + '">' + dateDE(d1) + '</text><text x="' + (W2 - R) + '" y="' + (H2 - 8) + '" text-anchor="end">' + dateDE(d2) + "</text>";
   const line = (key, cls) => '<polyline class="' + cls + '" points="' + pts.map((p) => X(p.ms).toFixed(1) + "," + Y(p[key]).toFixed(1)).join(" ") + '"/>';
   const dots = pts.map((p) => '<circle class="dt" cx="' + X(p.ms).toFixed(1) + '" cy="' + Y(p.y).toFixed(1) + '" r="3.5"/>').join("");
@@ -4551,8 +4568,8 @@ window.addEventListener("resize", drawWheel);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawWheel);
 window.matchMedia && matchMedia("(prefers-color-scheme: dark)").addEventListener && matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawWheel);
 $$("[data-ic]").forEach((el) => { el.innerHTML = ic(el.dataset.ic); });
-showTab("heute", true); window.addEventListener("resize", () => { moveInd(); moveG(); });
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { moveInd(); moveG(); });
+showTab("heute", true); window.addEventListener("resize", () => { moveBoth(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { moveBoth(); });
 if (!SR) {
   setMic(false);
   $("#heard").textContent = FC.embedded ? "Online gibt es keine eingebaute Spracherkennung. Tippe auf „Diktat starten“ und nutze das Mikrofon deiner Tastatur." : "Dieser Browser hat keine eingebaute Spracherkennung. Klick auf „Diktat starten“ und nutze dann Windows + H.";
