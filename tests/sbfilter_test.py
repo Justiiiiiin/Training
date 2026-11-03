@@ -26,9 +26,9 @@ def run(token_status=200, logout=False):
             return r.fulfill(status=201, content_type="application/json", body="")
         c.route(SB + "/**", route)
         cfg = {"url": SB, "key": "anon", "email": "a@b.de", "rt": "rt", "at": JWT, "exp": int(time.time() * 1000) + 3600000}
-        c.add_init_script("if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('fc__sb', %s); }" % json.dumps(json.dumps(cfg)))
         pg = c.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
-        pg.goto(URL); pg.wait_for_timeout(1500)
+        pg.goto(URL); pg.evaluate("v => localStorage.setItem('fc__sb', v)", json.dumps(cfg))
+        pg.reload(); pg.wait_for_timeout(1500)
         st = pg.evaluate("FC.state()")
         if logout:
             pg.click("#b-settings") if pg.is_visible("#b-settings") else pg.evaluate("openSettings()")
