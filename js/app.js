@@ -869,13 +869,6 @@ const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Woch
 const LAST = {};
 let CUR = "heute";
 const greeting = () => { const h = new Date().getHours(); return h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend"; };
-function placeInd(i, b) {
-  if (!b || !i) return;
-  const w = b.offsetWidth, l = b.offsetLeft;
-  if (i.dataset.init !== "1") { i.style.transition = "none"; i.dataset.init = "1"; i.style.width = w + "px"; i.style.transform = "translateX(" + l + "px)"; void i.offsetWidth; i.style.transition = ""; return; }
-  i.style.width = w + "px";
-  i.style.transform = "translateX(" + l + "px)";
-}
 function moveBoth() {
   const a = $("#tabind"), ab = $('#subnav .tab[aria-selected="true"]'), g = $("#gind"), gb = $('.gbtn[aria-selected="true"]');
   const ra = a && ab ? [ab.offsetWidth, ab.offsetLeft] : null, rg = g && gb ? [gb.offsetWidth, gb.offsetLeft] : null;
@@ -1541,7 +1534,6 @@ function logEat(r, portions) {
   dayEns().items.push({ id: r.id, n: n, t: r.title + (n > 1 ? " ×" + n : ""), k: Math.round(r.kcal * n), p: Math.round(r.protein * n), c: Math.round(r.cost * n * 100) / 100 });
   saveToday(); renderToday();
 }
-function addWater(d) { const day = dayEns(); day.water = Math.max(0, Math.min(20, day.water + d)); saveToday(); renderToday(); }
 
 /* ======================= Wochen-Vorkochplan ======================= */
 const PREPDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa"];
