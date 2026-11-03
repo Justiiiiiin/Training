@@ -1935,7 +1935,6 @@ let shop = store.get("fc_shop", {});
 const _p2 = (n) => (n < 10 ? "0" : "") + n;
 const isoOf = (d) => isNaN(d) ? "Invalid Date" : d.getFullYear() + "-" + _p2(d.getMonth() + 1) + "-" + _p2(d.getDate());
 const todayISO = () => isoOf(new Date());
-const NDEF = new Intl.NumberFormat("de-DE");
 applyAlts();
 const lvl = (e) => Math.min(levels[e.id] != null ? levels[e.id] : e.def, e.ladder.length - 1);
 const levelName = (e) => e.ladder[lvl(e)];
@@ -2490,7 +2489,6 @@ function calcStats(c) {
     '<div class="stat"><span class="big">' + nf(c.lossLo) + "–" + nf(c.lossHi) + '<small>kg</small></span><span>Abnahme pro Woche (0,5 bis 1 % Körpergewicht), starte beim unteren Wert</span></div>' +
     '<div class="stat"><span class="big">' + nf(c.waist) + '<small>cm</small></span><span>Taille unter der halben Körpergröße</span></div>';
 }
-const MEALORDER = { "Frühstück": 0, "Snack": 1, "Mittag/Abend": 2 };
 function dayCard() {
   return '<div class="card"><h3>Wenn du morgens wenig isst</h3>' +
     "<p>Ein großes Frühstück ist kein Muss. Wichtiger ist, dass du über den Tag auf dein Eiweißziel kommst und es auf mehrere Mahlzeiten verteilst. Die Fachgesellschaft ISSN empfiehlt etwa 20 bis 40 g pro Mahlzeit, gleichmäßig über den Tag verteilt, und 30 bis 40 g Casein (zum Beispiel Quark) vor dem Schlafen.</p>" +
@@ -2797,8 +2795,6 @@ function moveBoth() {
   if (ra) put(a, ra);
   if (rg) put(g, rg);
 }
-function moveInd() { placeInd($("#tabind"), $('#subnav .tab[aria-selected="true"]')); }
-function moveG() { placeInd($("#gind"), $('.gbtn[aria-selected="true"]')); }
 function syncCoach() {
   const g = GROUPS.find((x) => x.tabs.includes(CUR)), run = isActive() || !!tm.id;
   document.body.dataset.group = g.id;
@@ -2835,7 +2831,6 @@ function showTab(name, quiet) {
     if (b && b.scrollIntoView) { try { b.scrollIntoView({ block: "nearest", inline: "center" }); } catch (e) {} }
   }
 }
-const activeTab = () => CUR;
 
 /* ======================= Glücksrad ======================= */
 const RAD = Object.assign({ mode: "day", meal: "Mittag/Abend", bfDay: true, bfWeek: false, noSpinat: true, cheap: true, work: false, maxDay: 0, people: 2 }, store.get("fc_rad", {}));
