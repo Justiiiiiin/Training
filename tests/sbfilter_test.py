@@ -12,7 +12,7 @@ def b64(o): return base64.urlsafe_b64encode(json.dumps(o).encode()).decode().rst
 JWT = b64({"alg": "HS256"}) + "." + b64({"sub": UID, "role": "authenticated"}) + ".sig"
 SB = "https://beispiel.supabase.co"
 
-def run(token_status=200):
+def run(token_status=200, logout=False):
     seen = []
     with sync_playwright() as p:
         b = p.chromium.launch(); c = b.new_context(); errs = []
@@ -26,10 +26,15 @@ def run(token_status=200):
             return r.fulfill(status=201, content_type="application/json", body="")
         c.route(SB + "/**", route)
         cfg = {"url": SB, "key": "anon", "email": "a@b.de", "rt": "rt", "at": JWT, "exp": int(time.time() * 1000) + 3600000}
-        c.add_init_script("localStorage.setItem('fc__sb', %s)" % json.dumps(json.dumps(cfg)))
+        c.add_init_script("if (!sessionStorage.getItem('seeded')) { sessionStorage.setItem('seeded', '1'); localStorage.setItem('fc__sb', %s); }" % json.dumps(json.dumps(cfg)))
         pg = c.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.goto(URL); pg.wait_for_timeout(1500)
         st = pg.evaluate("FC.state()")
+        if logout:
+            pg.click("#b-settings") if pg.is_visible("#b-settings") else pg.evaluate("openSettings()")
+            pg.evaluate("document.getElementById('sbbox').open = true"); pg.wait_for_timeout(200)
+            pg.click("#sb-logout"); pg.wait_for_timeout(1200)
+            st = pg.evaluate("localStorage.getItem('fc__sb')")
         b.close()
     return seen, st, errs
 
@@ -40,4 +45,8 @@ ck("Sync verbunden", st == "ok", st)
 ck("keine Fehler", not errs, str(errs[:2]))
 seen, st, errs = run(429)
 ck("429 beim Token-Erneuern: keine Abmeldung", st != "login", st)
+seen, st, errs = run(logout=True)
+lo = [u for m, u in seen if m == "POST" and "/auth/v1/logout" in u]
+ck("Abmelden beendet die Sitzung beim Server (nur dieses Gerät)", len(lo) == 1 and "scope=local" in lo[0], str(lo))
+ck("Abmelden löscht die lokale Verbindung", st is None, str(st))
 print("FAILS", fails)
