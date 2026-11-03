@@ -1,7 +1,7 @@
 /* Fitness Coach: Offline-Betrieb. Mit Netz kommt immer die neueste Version, ohne Netz die zuletzt geladene. */
 const CACHE = "fc-offline-v3";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "icon.svg", "styles.css",
-  "js/csp.js", "js/zoom.js", "js/sync.js", "js/boot.js", "js/data.js", "js/app.js", "js/v3.js", "js/start.js",
+  "js/zoom.js", "js/sync.js", "js/boot.js", "js/data.js", "js/app.js", "js/v3.js", "js/start.js",
   "fonts/hanken-grotesk-latin.woff2", "fonts/hanken-grotesk-latin-ext.woff2", "fonts/bricolage-grotesque-latin.woff2", "fonts/bricolage-grotesque-latin-ext.woff2"];
 
 self.addEventListener("install", (e) => {
