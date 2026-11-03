@@ -764,12 +764,20 @@ a.btn { text-decoration: none; }
 .swopt.fut > p, .swopt.fut > ol, .swopt.fut > .row { margin: 0 0 10px; }
 
 .swopt.locked { opacity: 0.85; border-style: dashed; }
+
+/* Reste */
+.card ul.restlist { list-style: none; padding-left: 0; gap: 12px; }
+.restlist li { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.restlist li:last-child { border-bottom: 0; padding-bottom: 0; }
+.restideas { margin-top: 6px; }
+.restlist .btn { white-space: normal; text-align: left; height: auto; min-height: 36px; padding: 6px 14px; line-height: 1.3; max-width: 100%; }
+.restlist ~ .row .btn { white-space: normal; text-align: left; height: auto; padding: 8px 18px; max-width: 100%; }
 </style>
 </head>
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.23 · 03.11. 12:53</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.24 · 03.11. 14:59</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -2216,7 +2224,7 @@ const F = { q: "", meal: "", diet: "", time: 0, minProt: false, prep: false, noc
 let EXC = store.get("fc_exc", []);
 let FAV = store.get("fc_fav", []);
 let MYD = store.get("fc_dishes", []);
-const PREPDEF = { people: 2, days: 6, n: 2, brk: true, snk: true, week: "", main: [], b: "", s: "", done: {}, plans: {}, autoDay: "" };
+const PREPDEF = { people: 2, days: 6, n: 2, brk: true, snk: true, eco: true, week: "", main: [], b: "", s: "", done: {}, plans: {}, autoDay: "" };
 let PREP = Object.assign({}, PREPDEF, store.get("fc_prep", {}));
 const isExc = (r) => EXC.some((x) => (x.startsWith("z:") ? r.ing.some((i) => i[4] === x.slice(2)) : x.startsWith("r:") ? r.id === x.slice(2) : r.contains.includes(x)));
 const zname = (k) => { const n = (PRICE[k] && PRICE[k].n || k).replace(/\s*\(.*?\)/g, "").replace(/^Scheibe /, "").replace(/^stückige /, "Stückige "); return n.charAt(0).toUpperCase() + n.slice(1); };
@@ -3176,7 +3184,7 @@ let WK = store.get("fc_wk", []);
   if (!isObj(settings.alt)) settings.alt = {}; Object.keys(settings.alt).forEach((k) => { const v = settings.alt[k], e = typeof v === "string" ? exById(v) : null; if (!e || e.slot !== k) delete settings.alt[k]; }); applyAlts();
   MYD = (Array.isArray(MYD) ? MYD : []).filter((d) => isObj(d) && typeof d.name === "string" && [d.k, d.p, d.w].every((x) => typeof x === "number" && isFinite(x)) && d.w > 0 && d.k >= 0 && d.p >= 0).slice(0, 60).map((d) => ({ id: String(d.id || d.name), name: d.name.slice(0, 60), k: d.k, p: d.p, c: typeof d.c === "number" && isFinite(d.c) ? d.c : 0, w: d.w, est: !!d.est, lg: typeof d.lg === "number" && d.lg > 0 ? d.lg : 250, text: typeof d.text === "string" ? d.text.slice(0, 400) : "" }));
   if (!isObj(PREP)) PREP = Object.assign({}, PREPDEF);
-  PREP.people = num(PREP.people, 1, 4, 2); PREP.days = num(PREP.days, 3, 6, 6); PREP.n = num(PREP.n, 1, 3, 2); PREP.brk = !!PREP.brk; PREP.snk = !!PREP.snk;
+  PREP.people = num(PREP.people, 1, 4, 2); PREP.days = num(PREP.days, 3, 6, 6); PREP.n = num(PREP.n, 1, 3, 2); PREP.brk = !!PREP.brk; PREP.snk = !!PREP.snk; PREP.eco = PREP.eco !== false;
   if (typeof PREP.week !== "string") PREP.week = ""; if (!isObj(PREP.done)) PREP.done = {};
   if (!isObj(PREP.plans)) PREP.plans = {}; if (typeof PREP.autoDay !== "string") PREP.autoDay = "";
   Object.keys(PREP.plans).forEach((k) => { const pl = PREP.plans[k]; if (!/^\d{4}-\d{2}-\d{2}$/.test(k) || !isObj(pl) || !Array.isArray(pl.main)) { delete PREP.plans[k]; return; } pl.main = pl.main.filter((id) => typeof id === "string" && byId(id)); pl.b = typeof pl.b === "string" && byId(pl.b) ? pl.b : ""; pl.s = typeof pl.s === "string" && byId(pl.s) ? pl.s : ""; if (!isObj(pl.done)) pl.done = {}; if (!pl.main.length) delete PREP.plans[k]; });
@@ -3390,23 +3398,58 @@ function prepPool(kind) {
   if (kind === "b") return RECIPES.filter((r) => ok(r) && r.meal === "Frühstück" && r.tags.includes("Meal-Prep"));
   return RECIPES.filter((r) => ok(r) && r.meal === "Snack" && r.tags.includes("Meal-Prep"));
 }
-function prepPick(kind, avoid) {
+/* Reste sparsam einplanen: Gewicht und Haltbarkeit offener Packungen */
+const RESTW = { quark: 1, skyr: 1, jog35: 1, moz: 1, schink: 1, paufs: 1, ruc: 1, eisb: 1, haehn: 0.5, pute: 0.5, schnitzel: 0.5, ghack: 0.5, rhack: 0.5, phack: 0.5, milch: 0.5, stueck: 0.7, kiche: 0.7, bohne: 0.7 };
+const RESTD = { quark: [4, 1], skyr: [4, 1], jog35: [4, 0], moz: [4, 0], schink: [3, 0], paufs: [3, 0], ruc: [3, 0], eisb: [4, 0], haehn: [2, 1], pute: [2, 1], schnitzel: [2, 1], ghack: [1, 1], rhack: [1, 1], phack: [1, 1], milch: [5, 0], stueck: [3, 0], kiche: [3, 0], bohne: [3, 0] };
+function restLines(calc) {
+  return calc.lines.filter((l) => RESTW[l.k] && !l.staple && l.left != null && !PRICE[l.k].loose && l.left >= 0.2 * PRICE[l.k].pack)
+    .map((l) => Object.assign({}, l, { val: l.left / PRICE[l.k].pack * PRICE[l.k].price }));
+}
+const restWaste = (calc) => restLines(calc).reduce((a, l) => a + l.val * RESTW[l.k], 0);
+function prepCalcWith(mains, b, s) {
+  const keep = { main: PREP.main, b: PREP.b, s: PREP.s };
+  PREP.main = mains; PREP.b = b || ""; PREP.s = s || "";
+  try { return prepCalc().calc; } finally { PREP.main = keep.main; PREP.b = keep.b; PREP.s = keep.s; }
+}
+const wdShort = (iso) => WD[new Date(iso + "T12:00:00").getDay()].slice(0, 2);
+function prepRestHTML(c) {
+  const rl = restLines(c.calc).sort((a, b) => b.val - a.val), tot = rl.reduce((a, l) => a + l.val, 0), cook = shiftDay(PREP.week, -1);
+  if (!rl.length) return '<div class="card" data-nofold><h3>Reste</h3><p>Der Plan passt gut zu den Packungsgrößen. Es bleibt kaum etwas übrig, das du verbrauchen musst.</p></div>';
+  const li = rl.map((l) => {
+    const p = PRICE[l.k], d = RESTD[l.k] || [3, 0];
+    let amt = "";
+    if (p.u === "g" || p.u === "ml") amt = "ca. " + Math.max(10, Math.round(l.left / 10) * 10) + " " + p.u;
+    else { const n = Math.floor(l.left / p.per); amt = n >= 1 ? n + " " + (n > 1 && p.pl ? p.pl : p.n) : "ein Rest"; }
+    const ideas = restIdeas(l.k, l.left, c.calc.used);
+    return "<li><b>" + l.name + ":</b> Rest " + amt + " (ca. " + eur(l.val) + "). Offen hält es etwa bis " + wdShort(shiftDay(cook, d[0])) + (d[1] ? ", sonst einfrieren" : "") + "." +
+      (ideas.length ? '<div class="row restideas"><span class="small muted">Dazu passt:</span>' + ideas.map((r) => '<button class="btn sm" type="button" data-recipe="' + r.id + '">' + r.title + "</button>").join("") + "</div>" : "") + "</li>";
+  }).join("");
+  const worth = restWaste(c.calc) >= 0.8;
+  return '<div class="card" data-nofold><h3>Reste</h3><p class="kicker">Was nach dem Kochen aus den Packungen übrig bleibt. Warenwert zusammen etwa ' + eur(tot) + ". Vieles davon lässt sich einfrieren.</p><ul class=\"restlist\">" + li + "</ul>" +
+    (worth ? '<div class="row"><button class="btn" type="button" data-prepgen="all">' + ic("repeat") + "<span>Plan mit weniger Resten würfeln</span></button></div>" : "") +
+    '<p class="small muted">' + (PREP.eco !== false ? "Beim Würfeln achtet der Plan auf passende Packungsgrößen. Das ist nur ein Anstoß, Geschmack und Eiweiß gehen vor." : "Reste sparsam einplanen ist aus.") + "</p></div>";
+}
+function prepPick(kind, avoid, ctx) {
   let pool = prepPool(kind).filter((r) => !avoid.includes(r.id));
   if (kind === "main") { const kinds = avoid.map(byId).filter(Boolean).map(mainKind), alt = pool.filter((r) => !kinds.includes(mainKind(r))); if (alt.length) pool = alt; }
   if (!pool.length) pool = prepPool(kind);
   if (!pool.length) return "";
-  return pool.map((r) => ({ r, s: -(FAV.includes(r.id) ? 3 : 0) - r.protein / 12 + r.cost * 0.8 + r.time / 45 + Math.random() * 1.6 })).sort((a, b) => a.s - b.s)[0].r.id;
+  const eco = PREP.eco !== false && ctx && (kind !== "main" || ctx.mains.length + 1 >= PREP.n) && (kind !== "b" || PREP.brk) && (kind !== "s" || PREP.snk);
+  return pool.map((r) => {
+    const w = eco ? restWaste(prepCalcWith(kind === "main" ? ctx.mains.concat(r.id) : ctx.mains, kind === "b" ? r.id : ctx.b, kind === "s" ? r.id : ctx.s)) : 0;
+    return { r, s: -(FAV.includes(r.id) ? 3 : 0) - r.protein / 12 + r.cost * 0.8 + r.time / 45 + w * 1.5 + Math.random() * 1.6 };
+  }).sort((a, b) => a.s - b.s)[0].r.id;
 }
 function prepGen(which) {
   if (which === "all" || !PREP.main.length) { PREP.main = []; PREP.b = ""; PREP.s = ""; PREP.done = {}; }
-  if (/^m\d$/.test(which)) { const i = parseInt(which[1], 10), others = PREP.main.filter((_, k) => k !== i); PREP.main[i] = prepPick("main", others.concat(PREP.main[i] || [])); PREP.done = {}; }
+  if (/^m\d$/.test(which)) { const i = parseInt(which[1], 10), others = PREP.main.filter((_, k) => k !== i); PREP.main[i] = prepPick("main", others.concat(PREP.main[i] || []), { mains: others, b: PREP.b, s: PREP.s }); PREP.done = {}; }
   PREP.main = PREP.main.slice(0, PREP.n);
-  while (PREP.main.length < PREP.n) PREP.main.push(prepPick("main", PREP.main));
+  while (PREP.main.length < PREP.n) PREP.main.push(prepPick("main", PREP.main, { mains: PREP.main.slice(), b: PREP.b, s: PREP.s }));
   PREP.main = PREP.main.filter(Boolean);
-  if (which === "b") { PREP.b = prepPick("b", [PREP.b]); PREP.done = {}; }
-  if (which === "s") { PREP.s = prepPick("s", [PREP.s]); PREP.done = {}; }
-  if (!PREP.b) PREP.b = prepPick("b", []);
-  if (!PREP.s) PREP.s = prepPick("s", []);
+  if (which === "b") { PREP.b = prepPick("b", [PREP.b], { mains: PREP.main.slice(), b: "", s: PREP.s }); PREP.done = {}; }
+  if (which === "s") { PREP.s = prepPick("s", [PREP.s], { mains: PREP.main.slice(), b: PREP.b, s: "" }); PREP.done = {}; }
+  if (!PREP.b) PREP.b = prepPick("b", [], { mains: PREP.main.slice(), b: "", s: PREP.s });
+  if (!PREP.s) PREP.s = prepPick("s", [], { mains: PREP.main.slice(), b: PREP.b, s: "" });
   PREP.week = PREP.week || prepWeekISO(); prepSave();
 }
 function prepSelect(iso) {
@@ -3479,9 +3522,9 @@ function prepHTML() {
   const steps = prepSteps(c).map((st) => '<li class="' + (PREP.done[st[0]] ? "done" : "") + '"><label class="sline"><input type="checkbox" data-prepchk="' + st[0] + '"' + (PREP.done[st[0]] ? " checked" : "") + '><span class="sname"><b>' + st[1] + '</b><br><span class="muted small">' + st[2] + "</span></span></label></li>").join("");
   return '<div class="card" data-nofold><h3>Vorkochplan</h3>' + picker +
     '<div class="prepopts"><div class="row"><span class="small muted">Personen</span><span class="stepper"><button class="btn icon" type="button" data-prepopt="people" data-d="-1" aria-label="Weniger Personen">−</button><b>' + P + '</b><button class="btn icon" type="button" data-prepopt="people" data-d="1" aria-label="Mehr Personen">+</button></span></div>' +
-    '<div class="row pseg"><span class="small muted">Tage</span>' + seg("days", [3, 4, 5, 6]) + '</div><div class="row pseg"><span class="small muted">Gerichte</span>' + seg("n", [1, 2, 3]) + '</div><div class="row pseg">' + tog("brk", "Frühstück") + tog("snk", "Snack") + "</div></div>" +
+    '<div class="row pseg"><span class="small muted">Tage</span>' + seg("days", [3, 4, 5, 6]) + '</div><div class="row pseg"><span class="small muted">Gerichte</span>' + seg("n", [1, 2, 3]) + '</div><div class="row pseg">' + tog("brk", "Frühstück") + tog("snk", "Snack") + tog("eco", "Reste sparsam einplanen") + "</div></div>" +
     '<p class="prepsum"><b>ca. ' + eur(c.calc.total) + "</b> · " + eur(c.calc.total / P) + " pro Person · " + c.mins + ' Min am Sonntag</p><div class="row"><button class="btn primary" type="button" data-prepcart="1">In die Einkaufsliste</button><button class="btn" type="button" data-prepgen="all" aria-label="Neu würfeln">' + ic("repeat") + "<span>Neu würfeln</span></button></div></div>" +
-    '<div class="card" data-nofold><h3>Deine Woche</h3><ul class="prepweek">' + week + "</ul></div>" +
+    '<div class="card" data-nofold><h3>Deine Woche</h3><ul class="prepweek">' + week + "</ul></div>" + prepRestHTML(c) +
     '<div class="grid2">' + items + "</div>" +
     '<details class="card acc" id="prepsteps" data-nofold' + (new Date().getDay() === 0 ? " open" : "") + '><summary><span class="acct">Sonntag: Reihenfolge zum Kochen</span></summary><div class="accbody"><ol class="prepsteps">' + steps + "</ol></div></details>" +
     '<details class="card acc radshop" data-nofold><summary><span class="acct">Einkauf ca. ' + eur(c.calc.total) + '</span></summary><div class="accbody">' + shopListHTML(c.calc) + "</div></details>";
