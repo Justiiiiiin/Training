@@ -1,0 +1,43 @@
+from playwright.sync_api import sync_playwright
+URL=__import__("fcenv").APP_URL
+errs=[]; fails=[]
+def ck(n,c,info=""):
+    print(("OK   " if c else "FAIL ")+n,info)
+    if not c: fails.append(n)
+with sync_playwright() as p:
+    b=p.chromium.launch(); c=b.new_context(viewport={"width":390,"height":844},has_touch=True,permissions=["clipboard-read","clipboard-write"]); pg=c.new_page()
+    pg.on("pageerror",lambda e:errs.append(str(e))); pg.on("console",lambda m: errs.append(m.text) if (m.type=="error" and "ERR_TUNNEL" not in m.text) else None)
+    pg.goto(URL); pg.wait_for_timeout(600)
+    ck("Neu: keine Karte (zu wenig Daten)", pg.evaluate("backupHTML()")=="")
+    pg.evaluate("sessions.push('2026-10-01','2026-10-03','2026-10-05'); store.set('fc_sessions',sessions); renderToday()"); pg.wait_for_timeout(200)
+    ck("Mit Daten, nie gesichert: Karte", "Sicherung fällig" in pg.inner_text("#panel-heute") and "noch keine Sicherung" in pg.inner_text("#panel-heute"))
+    pg.click('[data-bklater]'); pg.wait_for_timeout(200)
+    ck("Spaeter: Karte weg", "Sicherung fällig" not in pg.inner_text("#panel-heute"), pg.evaluate("GOALS.bkSnooze"))
+    pg.evaluate("delete GOALS.bkSnooze; renderToday()"); pg.wait_for_timeout(150)
+    pg.click('[data-bkdo]'); pg.wait_for_timeout(500)
+    clip=pg.evaluate("navigator.clipboard.readText()")
+    ck("Jetzt sichern: Zwischenablage hat Sicherung", clip.strip().startswith("{") and "fc_sessions" in clip, clip[:50])
+    ck("lastBackup gesetzt", pg.evaluate("GOALS.lastBackup")==pg.evaluate("todayISO()"))
+    ck("Karte danach weg", "Sicherung fällig" not in pg.inner_text("#panel-heute"))
+    pg.evaluate("GOALS.lastBackup=shiftDay(todayISO(),-8); renderToday()"); pg.wait_for_timeout(150)
+    ck("8 Tage alt: Karte wieder", "8 Tage alt" in pg.inner_text("#panel-heute"))
+    pg.evaluate("GOALS.lastBackup=shiftDay(todayISO(),-6); renderToday()"); pg.wait_for_timeout(150)
+    ck("6 Tage alt: keine Karte", "Sicherung fällig" not in pg.inner_text("#panel-heute"))
+    # Wiederherstellung aus der Sicherung funktioniert weiter
+    ck("Backup enthaelt Zeitplan-Daten", "fc_goals" in clip)
+    # Datenbank verbunden: keine Karte
+    pg.evaluate("GOALS.lastBackup=shiftDay(todayISO(),-30); renderToday()")
+    pg.evaluate("localStorage.setItem('fc__sb', JSON.stringify({url:'https://x.supabase.co',key:'k',rt:'r',email:'a@b.de'}))")
+    pg.reload(); pg.wait_for_timeout(900)
+    ck("Mit Datenbank: keine Karte", "Sicherung fällig" not in pg.inner_text("#panel-heute"))
+    pg.evaluate("localStorage.removeItem('fc__sb')")
+    # kaputte Felder
+    pg.evaluate("store.set('fc_goals',Object.assign({},GOALS,{lastBackup:5,bkSnooze:'x'}))"); pg.reload(); pg.wait_for_timeout(800)
+    ck("Kaputte Backup-Daten bereinigt", pg.evaluate("GOALS.lastBackup")==None and pg.evaluate("GOALS.bkSnooze")==None)
+    pg.evaluate("document.getElementById('dlg-settings').showModal()")
+    pg.click("#b-backup"); pg.wait_for_timeout(400)
+    ck("Settings-Sicherung setzt Datum", pg.evaluate("GOALS.lastBackup")==pg.evaluate("todayISO()"), pg.inner_text("#restoremsg")[:60])
+    ck("kein Ueberlauf", pg.evaluate("document.documentElement.scrollWidth<=window.innerWidth"))
+    print("Fehler:",errs); ck("keine Fehler", not errs)
+    b.close()
+print("FAILS",fails)

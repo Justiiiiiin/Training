@@ -1,0 +1,14 @@
+# Manuell startbar (Actions, "Run workflow"). Läuft nicht bei jedem Push, damit es keine Mails gibt.
+name: Tests
+on:
+  workflow_dispatch:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r tests/requirements.txt && python -m playwright install --with-deps chromium
+      - run: bash tests/run_all.sh
