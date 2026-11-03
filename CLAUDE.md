@@ -51,6 +51,7 @@ Bekannte Eigenheit: `Overnight Oats (dein Rezept)` hat 845 kcal und wird von `bu
 
 - Verhalten nicht verändern, wenn es nur um eine Prüfung geht. Erst die Funde nach Schwere auflisten, dann in kleinen Commits beheben, nach jedem Schritt `bash tests/run_all.sh`.
 - Keine neuen Abhängigkeiten, Build-Schritte oder Aufteilung der Datei ohne Rückfrage.
+- Veröffentlichen direkt auf `main` (committen und pushen, kein Pull Request): GitHub Pages veröffentlicht von `main`. Ändert sich die App selbst, vorher `python3 tools/stamp.py`, sonst meldet die App kein Update.
 - Die App ist öffentlich auf GitHub Pages. Keine Zugangsdaten, Schlüssel oder persönlichen Daten ins Repo.
 
 ## Was ich besonders prüfen lassen möchte
