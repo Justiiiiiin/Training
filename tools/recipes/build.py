@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Rezeptsammlung: berechnet Kalorien und Eiweiß aus einer Zutatentabelle und prüft Vielfalt und Gesundheit."""
-import json, re, sys, os, itertools, collections, unicodedata
-HERE = os.path.dirname(os.path.abspath(__file__))
+import json, re, sys, itertools, collections, unicodedata
 
 # key: (Name, Mehrzahl, Einheit, Gramm je Einheit, kcal/100g, Eiweiß/100g, Merkmale, Gruppe)
 # Einheit: g oder ml = Menge direkt, Stk/EL/TL = Anzahl mit Gramm je Einheit
@@ -962,9 +961,9 @@ if "--report" in sys.argv or True:
 
 pub = [{k: v for k, v in o.items() if not k.startswith("_") and v is not None} for o in out]
 PJ = {k: dict(pack=v[0], price=v[1], sec=v[2], label=v[3], loose=v[4], staple=v[5], per=DB[k][3], u=DB[k][2], n=DB[k][0], pl=DB[k][1], p=DB[k][5], kcal=DB[k][4]) for k, v in PRICE.items()}
-json.dump(PJ, open(os.path.join(HERE, "prices.json"), "w", encoding="utf-8"), ensure_ascii=False)
-json.dump(pub, open(os.path.join(HERE, "recipes.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=None)
-json.dump(out, open(os.path.join(HERE, "recipes_full.json"), "w", encoding="utf-8"), ensure_ascii=False)
+json.dump(PJ, open("/home/claude/recipes/prices.json", "w", encoding="utf-8"), ensure_ascii=False)
+json.dump(pub, open("/home/claude/recipes/recipes.json", "w", encoding="utf-8"), ensure_ascii=False, indent=None)
+json.dump(out, open("/home/claude/recipes/recipes_full.json", "w", encoding="utf-8"), ensure_ascii=False)
 print("geschrieben:", len(pub))
 
 # ======================= Beispieltage =======================
@@ -979,5 +978,5 @@ for name, idl in DAYS_DEF:
     for i in idl: assert i in byid, i
     days.append(dict(name=name, items=[dict(id=i, title=byid[i]["title"], meal=byid[i]["meal"], kcal=byid[i]["kcal"], protein=byid[i]["protein"]) for i in idl],
                      kcal=sum(byid[i]["kcal"] for i in idl), protein=sum(byid[i]["protein"] for i in idl)))
-json.dump(days, open(os.path.join(HERE, "days.json"), "w", encoding="utf-8"), ensure_ascii=False)
+json.dump(days, open("/home/claude/recipes/days.json", "w", encoding="utf-8"), ensure_ascii=False)
 for d in days: print("Tag:", d["name"], d["kcal"], "kcal", d["protein"], "g Eiweiß")

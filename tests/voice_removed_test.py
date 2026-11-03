@@ -39,7 +39,7 @@ with sync_playwright() as p:
         # alte Einstellung mit handsfree stoert nicht
         pg.evaluate("store.set('fc_settings',Object.assign({},settings,{handsfree:true}))"); pg.reload(); pg.wait_for_timeout(600)
         ck(f"{name}: alte handsfree-Einstellung harmlos", pg.evaluate("typeof settings.sets")=="number")
-        pg.screenshot(path=f"shots/v320_{name}.png")
+        pg.screenshot(path=__import__("fcenv").SHOTS + f"/v320_{name}.png")
         c.close()
     b.close()
 print("Fehler:",errs); ck("keine Fehler", not errs); print("FAILS",fails)

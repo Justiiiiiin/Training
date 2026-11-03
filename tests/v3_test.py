@@ -11,7 +11,7 @@ with sync_playwright() as p:
         n_info=pg.evaluate("document.querySelectorAll('[data-v3]').length"); print(name,"3D-Knoepfe",n_info)
         pg.click('button.infobtn[data-v3="push"]'); pg.wait_for_timeout(1200)
         print(" dialog offen",pg.evaluate("document.getElementById('dlg-3d').open"),"| titel",pg.inner_text("#v3-title"),"| aktive Stufe",pg.evaluate("document.querySelector('#v3-vars [aria-pressed=true]').textContent"))
-        pg.screenshot(path=f"shots/v3_{name}_push.png")
+        pg.screenshot(path=__import__("fcenv").SHOTS + f"/v3_{name}_push.png")
         # jede Stufe jeder Uebung/Extras per UI
         ids=pg.evaluate("[...new Set([...document.querySelectorAll('[data-v3]')].map(e=>e.dataset.v3))]"); print(" ids",ids)
         pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
@@ -29,7 +29,7 @@ with sync_playwright() as p:
         pg.click("#v3-play"); a=pg.evaluate("V3View.G.playing"); pg.click("#v3-speed"); pg.click("[data-v3view=front]"); pg.click("[data-v3view=top]"); pg.click("#v3-auto")
         pg.fill("#v3-scrub","500") if False else pg.evaluate("(()=>{const s=document.getElementById('v3-scrub');s.value=500;s.dispatchEvent(new Event('input'))})()")
         print(" pause",a,"speed",pg.inner_text("#v3-speed"),"yaw/pitch",pg.evaluate("[V3View.G.yaw,V3View.G.pitch]"))
-        pg.screenshot(path=f"shots/v3_{name}_top.png")
+        pg.screenshot(path=__import__("fcenv").SHOTS + f"/v3_{name}_top.png")
         pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
         # Training: Technik-Knopf
         pg.evaluate("showTab('heute')"); pg.evaluate("act('start')"); pg.evaluate("beginWork()"); pg.wait_for_timeout(300)

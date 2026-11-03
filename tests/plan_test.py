@@ -7,7 +7,7 @@ with sync_playwright() as p:
     pg.goto(URL); pg.wait_for_timeout(500); pg.evaluate("showTab('heute')"); pg.wait_for_timeout(300)
     def slots(): return pg.evaluate("[...document.querySelectorAll('.pslot')].map(e=>e.querySelector('.pl-when').textContent+' | '+e.querySelector('.pl-title').textContent)")
     print(slots())
-    pg.evaluate("scrollTo(0,document.body.scrollHeight)"); pg.screenshot(path="shots/plan_mob.png",full_page=True)
+    pg.evaluate("scrollTo(0,document.body.scrollHeight)"); pg.screenshot(path=__import__("fcenv").SHOTS + "/plan_mob.png",full_page=True)
     # Statistik der Plaene
     st=pg.evaluate("""()=>{const out={};for(const pause of ['small','meal']){GOALS.pause=pause;let P=0,K=0,C=0,n=200,four=0,kinds={};for(let i=0;i<n;i++){const ids=makeDayPlan(false);const r=ids.map(byId);if(ids.length===4)four++;P+=r.reduce((a,x)=>a+x.protein,0);K+=r.reduce((a,x)=>a+x.kcal,0);C+=r.reduce((a,x)=>a+x.cost,0);r.slice(0,3).forEach((x,k)=>{const key=k+':'+x.meal;kinds[key]=(kinds[key]||0)+1})}out[pause]={p:Math.round(P/n),k:Math.round(K/n),c:Math.round(C/n*100)/100,four,kinds}}GOALS.pause='small';return out}""")
     print(st)

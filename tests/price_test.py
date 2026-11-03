@@ -56,7 +56,7 @@ with sync_playwright() as p:
     pg.evaluate("store.set('fc_settings',Object.assign({},settings,{prices:'kaputt'}))"); pg.reload(); pg.wait_for_timeout(700)
     ck("prices als Text: App startet", pg.evaluate("typeof settings.prices")=="object" and pg.evaluate("RECIPES.length")==300)
     ck("kein Ueberlauf", pg.evaluate("document.documentElement.scrollWidth<=window.innerWidth"))
-    pg.evaluate("showTab('einkauf'); document.getElementById('pricebox').open=true; document.getElementById('pricebox').scrollIntoView()"); pg.wait_for_timeout(300); pg.screenshot(path="shots/v316_prices.png")
+    pg.evaluate("showTab('einkauf'); document.getElementById('pricebox').open=true; document.getElementById('pricebox').scrollIntoView()"); pg.wait_for_timeout(300); pg.screenshot(path=__import__("fcenv").SHOTS + "/v316_prices.png")
     print("Fehler:",errs); ck("keine Fehler", not errs)
     b.close()
 print("FAILS",fails)

@@ -62,7 +62,7 @@ with sync_playwright() as p:
     n0=pg.evaluate("document.querySelectorAll('[data-perf]').length"); pg.click('[data-perf="push"]'); pg.wait_for_timeout(150)
     ck("Chips wechseln die Uebung", pg.evaluate("PERF")=="push" and n0>=2, n0)
     ck("kein Ueberlauf", pg.evaluate("document.documentElement.scrollWidth<=window.innerWidth"))
-    pg.screenshot(path="shots/v315_eval.png", full_page=False)
+    pg.screenshot(path=__import__("fcenv").SHOTS + "/v315_eval.png", full_page=False)
     print("Fehler:",errs); ck("keine Fehler", not errs)
     b.close()
 print("FAILS",fails)

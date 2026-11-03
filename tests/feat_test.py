@@ -21,7 +21,7 @@ with sync_playwright() as p:
     pg.evaluate("showTab('fortschritt')"); pg.wait_for_timeout(300)
     print("Volumen:",pg.inner_text("#volcard").replace("\n"," | ")[:330])
     print("Erfolge:",pg.inner_text("#badgecard p"),"|",pg.evaluate("[...document.querySelectorAll('#badgecard li.got b')].map(e=>e.textContent)"))
-    pg.evaluate("scrollTo(0,0)"); pg.screenshot(path="shots/feat_progress.png",full_page=False)
+    pg.evaluate("scrollTo(0,0)"); pg.screenshot(path=__import__("fcenv").SHOTS + "/feat_progress.png",full_page=False)
     # Overflow
     print("overflow",pg.evaluate("document.documentElement.scrollWidth-document.documentElement.clientWidth"))
     # Sprache

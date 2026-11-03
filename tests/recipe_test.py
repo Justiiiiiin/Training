@@ -27,7 +27,7 @@ with sync_playwright() as p:
     pg.evaluate("ckGo(1)"); pg.wait_for_timeout(150); print("Weiter:",pg.inner_text("#dlg-cook .kicker"))
     for i in range(6): pg.evaluate("ckGo(1)")
     print("Ende:",pg.inner_text("#dlg-cook .kicker"))
-    pg.screenshot(path="shots/cook_end.png")
+    pg.screenshot(path=__import__("fcenv").SHOTS + "/cook_end.png")
     pg.evaluate("CK.i=2; ckDraw(); ckTimer(1)"); pg.wait_for_timeout(1500); print("Timer:",pg.inner_text("#cktimer"))
     pg.click('[data-ckclose]'); pg.wait_for_timeout(400); print("geschlossen:",not pg.evaluate("document.getElementById('dlg-cook').open"),"| Timer weg:",pg.evaluate("CK.timer===0"))
     # Nicht mehr vorschlagen

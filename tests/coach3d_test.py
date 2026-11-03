@@ -10,7 +10,7 @@ with sync_playwright() as p:
         print(n,"vor Start: Figur sichtbar",pg.is_visible("#coachfig"))
         pg.evaluate("showTab('uebungen')"); pg.evaluate("startWorkout(); beginWork()"); pg.wait_for_timeout(1400)
         print(" im Training: sichtbar",pg.is_visible("#coachfig"),"| Anim",pg.evaluate("V3Mini.G.id+':'+V3Mini.G.idx"),"| laeuft",pg.evaluate("!!V3Mini.G.raf"))
-        pg.evaluate("window.scrollTo(0,0)"); pg.screenshot(path=f"shots/coach3d_{n}.png")
+        pg.evaluate("window.scrollTo(0,0)"); pg.screenshot(path=__import__("fcenv").SHOTS + f"/coach3d_{n}.png")
         pg.evaluate("act('done')"); pg.wait_for_timeout(400)
         print(" Pause -> naechste Uebung:",pg.evaluate("V3Mini.G.id+':'+V3Mini.G.idx"))
         pg.evaluate("stopWorkout()"); pg.wait_for_timeout(300)

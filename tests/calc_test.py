@@ -34,5 +34,5 @@ with sync_playwright() as p:
     ck("Tagebuch-Eintrag", pg.evaluate("dayGet().items.some(x=>x.t.startsWith('Test-Pfanne (1 von 2)'))"), pg.evaluate("JSON.stringify(dayGet().items.slice(-1))"))
     ck("kein Claude-Knopf", pg.evaluate("!document.querySelector('[data-calcai]')"))
     ck("kein Ueberlauf", pg.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth"))
-    pg.fill("#calc-in","Pizza"); pg.click("[data-calcgo]"); pg.wait_for_timeout(300); pg.screenshot(path="shots/calc.png")
+    pg.fill("#calc-in","Pizza"); pg.click("[data-calcgo]"); pg.wait_for_timeout(300); pg.screenshot(path=__import__("fcenv").SHOTS + "/calc.png")
     ck("keine Fehler", not errs, str(errs[:3])); print("FAILS",fails); b.close()

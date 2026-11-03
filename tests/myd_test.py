@@ -34,6 +34,6 @@ with sync_playwright() as p:
     pg.evaluate("localStorage.setItem('fc_dishes', JSON.stringify([{name:5},{name:'x',k:'a',p:1,w:100},{name:'ok',k:100,p:5,w:200,c:1}]))"); pg.reload(); pg.wait_for_timeout(500)
     ck("kaputte Daten bereinigt", pg.evaluate("MYD.length")==1 and pg.evaluate("MYD[0].name")=="ok")
     ck("fc_dishes in KEYS", pg.evaluate("FC.KEYS ? FC.KEYS.includes('fc_dishes') : true"))
-    pg.evaluate("openEat()"); pg.wait_for_timeout(300); pg.screenshot(path="shots/myd.png")
+    pg.evaluate("openEat()"); pg.wait_for_timeout(300); pg.screenshot(path=__import__("fcenv").SHOTS + "/myd.png")
     ck("kein Ueberlauf", pg.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth"))
     ck("keine Fehler", not errs, str(errs[:3])); print("FAILS",fails); b.close()

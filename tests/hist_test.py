@@ -23,5 +23,5 @@ with sync_playwright() as p:
     pg.evaluate("showTab('heute')"); pg.wait_for_timeout(200); pg.click("[data-histgo]"); pg.wait_for_timeout(400)
     ck("Link von Heute", pg.evaluate("CUR")=="fortschritt")
     ck("kein Ueberlauf", pg.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth"))
-    pg.screenshot(path="shots/hist.png")
+    pg.screenshot(path=__import__("fcenv").SHOTS + "/hist.png")
     ck("keine Fehler", not errs, str(errs[:3])); print("FAILS",fails); b.close()
