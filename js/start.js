@@ -15,7 +15,7 @@ if (canCheckUpdate()) {
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkUpdate(false).catch(() => {}); });
   setInterval(() => { if (document.visibilityState === "visible") checkUpdate(false).catch(() => {}); }, 15 * 60 * 1000);
 }
-if (!FC.embedded && "serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
+if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
   const mf = document.createElement("link"); mf.rel = "manifest"; mf.href = "manifest.webmanifest"; document.head.appendChild(mf);
   window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
   if (standalone() && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});

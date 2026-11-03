@@ -428,14 +428,12 @@ function ingText(i, spoken) {
   return n + unit + " " + name;
 }
 const reduceMotion = () => !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-/* Pinch-Zoom sperren wie in einer App: Android über touch-action im CSS, iOS Safari über die eigenen Gesten-Ereignisse.
-   Größere Schrift gibt es stattdessen unter Einstellungen > Textgröße (bis 200 %), die Zoom-Funktionen des Systems bleiben nutzbar. */
+/* Textgröße (Einstellungen, bis 200 %) als Ersatz für Zoom. Die Zoom-Sperre selbst steht in js/zoom.js. */
 function applyTextSize() {
   document.documentElement.style.fontSize = settings.text && settings.text !== 100 ? settings.text + "%" : "";
   document.documentElement.toggleAttribute("data-big", settings.text >= 130);
   if (typeof moveBoth === "function") try { moveBoth(); drawWheel(); } catch (e) {}
 }
-["gesturestart", "gesturechange", "gestureend"].forEach((n) => document.addEventListener(n, (e) => e.preventDefault(), { passive: false }));
 const isSheet = () => !!(window.matchMedia && matchMedia("(max-width: 640px)").matches);
 function showDialog(d, src) {
   const was = d.open;
@@ -2862,7 +2860,7 @@ async function doBackup() {
   catch (e) { return { ok: false, txt }; }
 }
 function backupHTML() {
-  if (FC.embedded || FC.sbInfo()) return "";
+  if (FC.sbInfo()) return "";
   const t = todayISO(), used = sessions.length + Object.keys(DIARY).length + log.length;
   if (used < 3 || (GOALS.bkSnooze && GOALS.bkSnooze > t)) return "";
   const last = GOALS.lastBackup, ago = last ? isoDays(last, t) : null;
@@ -2907,7 +2905,6 @@ function toast(t) {
 let SAVEWARN = 0;
 FC.onSaveFail(() => {
   const local = FC.mode === "local";
-  if (FC.embedded) return; /* im Claude-Artifact liegen die Daten in dessen Datenbank */
   if (SAVEWARN && (!local || Date.now() - SAVEWARN < 300000)) return;
   SAVEWARN = Date.now();
   toast(local ? "Speichern klappt gerade nicht, der Speicher im Browser ist voll oder gesperrt. Kopiere unter Einstellungen eine Sicherung, sonst gehen Änderungen beim Schließen verloren." : "Der Speicher im Browser ist voll oder gesperrt. Deine Änderungen liegen gerade nur in der Datenbank.");
@@ -2915,7 +2912,7 @@ FC.onSaveFail(() => {
 /* Update-Prüfung: fragt den Server nach der aktuellen Versionsnummer */
 const verNum = (v) => { const m = /v(\d+)\.(\d+)/.exec(v || ""); return m ? [parseInt(m[1], 10), parseInt(m[2], 10)] : null; };
 const verNewer = (a, b) => { const x = verNum(a), y = verNum(b); return !!(x && y && (x[0] > y[0] || (x[0] === y[0] && x[1] > y[1]))); };
-const canCheckUpdate = () => !FC.embedded && /^https?:$/.test(location.protocol);
+const canCheckUpdate = () => /^https?:$/.test(location.protocol);
 async function remoteVersion() {
   const r = await fetch(location.pathname + "?fcv=" + Date.now(), { cache: "no-store" });
   if (!r.ok) throw new Error("http " + r.status);
@@ -2943,7 +2940,6 @@ async function checkUpdate(force) {
 function bindSync() {
   const msg = (t) => { $("#restoremsg").textContent = t; };
   $("#instinfo").textContent = standalone() ? "Du nutzt gerade die installierte App." : "Noch nicht installiert. Mit diesen Schritten bekommst du ein Symbol auf dem Home-Bildschirm, Vollbild und Betrieb ohne Netz.";
-  $("#instbox").hidden = FC.embedded;
   $("#b-ics").addEventListener("click", shareICS);
   $("#b-upd").addEventListener("click", async () => {
     const m = $("#updmsg"); m.textContent = "Prüfe …";
@@ -2954,14 +2950,12 @@ function bindSync() {
       else if (verNewer(r.cur, r.rv)) m.textContent = "Du hast " + r.cur + ", auf dem Server liegt noch " + r.rv + ". GitHub braucht manchmal ein paar Minuten.";
       else m.textContent = "Du hast die neueste Version: " + r.cur + ".";
     } catch (e) { m.textContent = "Keine Verbindung zum Server."; }
-  }); $("#icsbox").hidden = FC.embedded;
+  });
   $("#sb-copy").addEventListener("click", async () => { const i = FC.sbInfo(); if (!i) return; const t = "FCSB:" + JSON.stringify({ url: i.url, key: i.key, mail: i.email }); try { await navigator.clipboard.writeText(t); $("#sbmsg").textContent = "Verbindung kopiert. Füge sie in der App unter „Eigene Datenbank verbinden“ ein."; } catch (e) { $("#sbmsg").textContent = "Kopieren hat nicht geklappt."; } });
   $("#sb-paste").addEventListener("input", (ev) => {
     const v = ev.target.value.trim(); if (v.indexOf("FCSB:") !== 0) return;
     try { const o = JSON.parse(v.slice(5)); if (typeof o.url === "string" && typeof o.key === "string") { $("#sb-url").value = o.url; $("#sb-key").value = o.key; $("#sb-mail").value = typeof o.mail === "string" ? o.mail : ""; ev.target.value = ""; $("#sbmsg").textContent = "Verbindung eingefügt. Jetzt nur noch dein Passwort eingeben und auf Anmelden tippen."; $("#sb-pw").focus(); } } catch (e) { $("#sbmsg").textContent = "Das sieht nicht nach einer kopierten Verbindung aus."; }
   });
-  $("#b-syncnow").hidden = !FC.embedded;
-  $("#b-syncnow").addEventListener("click", () => { msg("Gleiche ab …"); FC.syncNow().then(() => msg("Abgeglichen.")).catch(() => msg("Das hat gerade nicht geklappt.")); });
   $("#b-backup").addEventListener("click", async () => {
     const r = await doBackup(), ta = $("#t-restore");
     if (r.ok) msg("Sicherung kopiert. Auf dem anderen Gerät unten einfügen und „Einspielen“ drücken.");
@@ -2973,7 +2967,6 @@ function bindSync() {
     try { const n = await FC.importAll(t); msg("Eingespielt (" + n + " Bereiche). Die App lädt neu …"); setTimeout(() => location.reload(), 700); }
     catch (e) { msg(e.message || "Das hat nicht geklappt."); }
   });
-  $("#sbbox").hidden = FC.embedded;
   const showSb = () => { const i = FC.sbInfo(); $("#sbform").hidden = !!i; $("#sbon").hidden = !i; if (i) $("#sb-who").textContent = i.email; };
   showSb();
   const sbDo = async (signup) => {

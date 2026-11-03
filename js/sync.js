@@ -1,9 +1,7 @@
-/* Fitness Coach: Speicher und Sync (localStorage, eigene Supabase-Datenbank oder Datenbank des Claude-Artifacts). */
+/* Fitness Coach: Speicher und Sync (localStorage, optional eigene Supabase-Datenbank). */
 window.FC = (function () {
   "use strict";
   var KEYS = ["fc_settings", "fc_levels", "fc_log", "fc_sessions", "fc_body", "fc_shop", "fc_exc", "fc_rad", "fc_radplans", "fc_cart", "fc_budget", "fc_chk", "fc_goals", "fc_diary", "fc_wk", "fc_fav", "fc_prep", "fc_dishes"];
-  var CH = 90000;
-  var embedded = !!(window.claude && typeof window.claude.use === "function");
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   /* Schreibfehler (Speicher voll oder gesperrt) werden gezählt und der App gemeldet, statt still zu verschwinden */
   var saveFails = 0, onSaveFail = null;
@@ -13,7 +11,7 @@ window.FC = (function () {
   }
   function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
   function sbCfg() { try { var c = JSON.parse(lsGet("fc__sb") || "null"); return c && c.url && c.key && c.rt ? c : null; } catch (e) { return null; } }
-  var mode = embedded ? "claude" : (sbCfg() ? "sb" : "local");
+  var mode = sbCfg() ? "sb" : "local";
   var mem = {}, ts = {}, pushed = {}, dirty = new Set(), pulledOnce = false;
   var base = {}, view = {};   /* base: letzter gemeinsamer Stand je geändertem Schlüssel (für den 3-Wege-Abgleich), view: was die App zuletzt gelesen oder geschrieben hat */
   var R = null, pulling = false, busy = false, flushTimer = 0, retryTimer = 0, mainStarted = false, watching = false;
@@ -31,10 +29,9 @@ window.FC = (function () {
     ok: "Synchronisiert. Deine Daten liegen privat in deiner Datenbank.",
     saving: "Speichert …",
     offline: "Gerade keine Verbindung. Änderungen werden nachgeholt, sobald es wieder klappt.",
-    nosync: "Hier ist keine Datenbank verfügbar. Die Daten bleiben nur in diesem Browser.",
     login: "Die Anmeldung ist abgelaufen. Melde dich unter Einstellungen neu an."
   };
-  var SHORT = { local: "", connecting: "Verbinde …", ok: "Synchronisiert", saving: "Speichert …", offline: "Offline, wird nachgeholt", nosync: "Nur in diesem Browser", login: "Bitte neu anmelden" };
+  var SHORT = { local: "", connecting: "Verbinde …", ok: "Synchronisiert", saving: "Speichert …", offline: "Offline, wird nachgeholt", login: "Bitte neu anmelden" };
   function setState(s) { state = s; paint(); }
   function paint() {
     var c = document.getElementById("syncst"), i = document.getElementById("syncinfo");
@@ -44,62 +41,7 @@ window.FC = (function () {
   function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function withTimeout(p, ms) { return Promise.race([Promise.resolve(p), delay(ms).then(function () { return null; })]); }
 
-  /* ---------- Backend 1: Datenbank des Claude-Artifacts ---------- */
-  function claudeBackend() {
-    var D = null, base = "", subscribed = false;
-    return {
-      name: "claude",
-      connect: async function () {
-        if (D) return true;
-        var db = await withTimeout(window.claude.use("db"), 6000);
-        var user = await withTimeout(window.claude.use("user"), 6000);
-        if (!db || !user) return false;
-        var id = await withTimeout(user.id(), 6000);
-        if (!id) return false;
-        D = db; base = "data/users/" + id; return true;
-      },
-      listAll: async function () {
-        var snap = await D.collection(base).get(), metas = {}, parts = {}, out = {};
-        snap.docs.forEach(function (d) {
-          if (!d.exists) return;
-          var x = d.data() || {};
-          if (d.id.indexOf("~") >= 0) parts[d.id] = x.v;
-          else if (KEYS.indexOf(d.id) >= 0) metas[d.id] = x;
-        });
-        KEYS.forEach(function (k) {
-          var m = metas[k]; if (!m || typeof m.t !== "number") return;
-          var val = null;
-          if (typeof m.v === "string") val = m.v;
-          else if (typeof m.n === "number" && m.n > 0) {
-            var a = [];
-            for (var i = 0; i < m.n; i++) { if (typeof parts[k + "~" + i] !== "string") { a = null; break; } a.push(parts[k + "~" + i]); }
-            if (a) val = a.join("");
-          }
-          if (val != null) out[k] = { t: m.t, v: val };
-        });
-        return out;
-      },
-      put: async function (k, t, s) {
-        var col = D.collection(base);
-        if (s.length <= CH) { await col.doc(k).set({ t: t, n: 1, v: s }); return; }
-        var n = 0;
-        for (var i = 0; i < s.length; i += CH, n++) await col.doc(k + "~" + n).set({ v: s.slice(i, i + CH) });
-        await col.doc(k).set({ t: t, n: n });
-      },
-      watch: function (onChange) {
-        if (subscribed || !D) return; subscribed = true;
-        try {
-          D.collection(base).onSnapshot(function (snap) {
-            var newer = false;
-            snap.docs.forEach(function (d) { if (d.exists && d.id.indexOf("~") < 0 && KEYS.indexOf(d.id) >= 0 && d.data() && d.data().t > (ts[d.id] || 0)) newer = true; });
-            if (newer) onChange();
-          }, function () { setState("offline"); });
-        } catch (e) {}
-      }
-    };
-  }
-
-  /* ---------- Backend 2: eigene Supabase-Datenbank ---------- */
+  /* ---------- Backend: eigene Supabase-Datenbank ---------- */
   async function sbAuth(url, key, path, body) {
     var r = await fetch(url + "/auth/v1/" + path, { method: "POST", headers: { apikey: key, "Content-Type": "application/json" }, body: JSON.stringify(body) });
     var j = {}; try { j = await r.json(); } catch (e) {}
@@ -312,9 +254,8 @@ window.FC = (function () {
   }
   async function start() {
     try {
-      R = mode === "claude" ? claudeBackend() : sbBackend();
-      var ok = await R.connect();
-      if (!ok) { R = null; setState("nosync"); return false; }
+      R = sbBackend();
+      await R.connect();
       var ch = await pullAll();
       setState(dirty.size ? "saving" : "ok");
       return ch;
@@ -398,7 +339,7 @@ window.FC = (function () {
     if (R) await flush();
     return n;
   }
-  return { KEYS: KEYS, embedded: embedded, mode: mode, raw: raw, save: save, boot: boot, paint: paint, syncNow: syncNow, exportAll: exportAll, importAll: importAll,
+  return { KEYS: KEYS, mode: mode, raw: raw, save: save, boot: boot, paint: paint, syncNow: syncNow, exportAll: exportAll, importAll: importAll,
     sbLogin: sbLogin, sbLogout: sbLogout, sbInfo: sbInfo, state: function () { return state; }, dirtyCount: function () { return dirty.size; },
     _merge: mergeStr,
     onSaveFail: function (fn) { onSaveFail = fn; if (saveFails && fn) { try { fn(); } catch (e) {} } } };

@@ -1,14 +1,15 @@
 # Fitness Coach: Hinweise für Claude Code
 
-Persönliche Fitness- und Ernährungs-App für Einsteiger, Deutsch (Du-Form, einfache Sprache). Läuft als Webseite (`index.html` mit `styles.css` und `js/`) auf GitHub Pages und wird auf dem iPhone als Home-Bildschirm-App benutzt. Ausprobiert wird auch als Claude-Artifact.
+Persönliche Fitness- und Ernährungs-App für Einsteiger, Deutsch (Du-Form, einfache Sprache). Läuft als Webseite (`index.html` mit `styles.css` und `js/`) auf GitHub Pages und wird auf dem iPhone als Home-Bildschirm-App benutzt.
 Live: https://justiiiiiin.github.io/Training/
 
 ## Aufbau
 
-- `js/csp.js` (erstes Skript im Kopf) setzt eine Content-Security-Policy (nur Skripte von hier, Verbindungen nur hierher und zu `*.supabase.co`), nicht im Claude-Artifact. Deshalb keine Inline-Skripte und keine `on…`-Attribute verwenden, Ereignisse per `addEventListener`.
+- Im Kopf von `index.html` steht eine Content-Security-Policy (nur Skripte von hier, Verbindungen nur hierher und zu `*.supabase.co`). Deshalb keine Inline-Skripte und keine `on…`-Attribute verwenden, Ereignisse per `addEventListener`.
+- `js/zoom.js` (erstes Skript im Kopf) sperrt Pinch- und Doppeltipp-Zoom sofort beim Laden, auch auf iOS und als Home-Bildschirm-App (Gesten- und Touch-Ereignisse; Android über `touch-action` in `styles.css`). Eingabefelder brauchen mindestens 16 px, sonst zoomt iOS beim Antippen. Größere Schrift gibt es über Einstellungen > Textgröße.
 - `index.html`: nur HTML, keine Inline-Skripte. `styles.css`: das gesamte CSS (inkl. `@font-face` für `fonts/`).
 - `js/`: klassische Skripte, die sich den globalen Bereich teilen. `sync.js` und `boot.js` stehen am Ende von `index.html`. `boot.js` lädt nach dem ersten Abgleich der Reihe nach `data.js` (Übungen, Rezepte, Preise, Tipps), `app.js` (Zustand, Oberfläche, Logik), `v3.js` (3D-Ansicht) und `start.js` (Start, setzt `window.__fcReady`), jeweils mit `?v=<Versionslabel>`.
-- Der Sync-Block (`js/sync.js`, `window.FC`): Speicher über localStorage, optional Supabase (Tabelle `kv`) oder die Artifact-Datenbank. Schema und Row-Level-Security der Tabelle stehen in `docs/supabase.sql`.
+- Der Sync-Block (`js/sync.js`, `window.FC`): Speicher über localStorage, optional Supabase (Tabelle `kv`). Schema und Row-Level-Security der Tabelle stehen in `docs/supabase.sql`.
 - `sw.js`: Service Worker (Netz zuerst, Offline-Rückfall, Cache `fc-offline-v3`). Neue Dateien gehören in seine Liste `FILES`. `manifest.webmanifest` und die Icons gehören zur Installation auf dem Home-Bildschirm.
 - Daten in `js/data.js`: `RECIPES` (300 Rezepte), `DAYS`, `PRICE` (Lidl-Richtwerte) werden aus `tools/recipes/` eingesetzt. Übungen: `EX`, `EXALT`, `EXFUT`, `GEAR`. 3D-Animationen: `V3A`.
 - Wichtige Stellen: `sanitizeState()` (prüft alle gespeicherten Daten), `showTab()`/`GROUPS`/`TABN` (Navigation), `renderEx`, `renderAusblick`, `prepCalc`/`prepGen` (Vorkochen), `shopCalc` (Einkaufsliste), `buyEstimate` (Ausgaben), `cParse` (Kalorien-Rechner mit `CEXTRA`, `CDISH`).
@@ -44,7 +45,6 @@ Bekannte Eigenheit: `Overnight Oats (dein Rezept)` hat 845 kcal und wird von `bu
 - Im Rechner (`cParse`) prüft `CDISH` (Gerichte) vor `CFOODS` (Zutaten), und ein einzelnes Wort in `CDISH` trifft auch als Teil eines längeren Wortes. Nimm dort nur eindeutige oder mehrwortige Schlüssel.
 - Beim Hinzufügen von Übungen ohne 3D-Animation (`V3A`) muss die Oberfläche das berücksichtigen (siehe `techBtn`, `coachFig`).
 - `index.html` wird bei Veröffentlichung nur durch `tools/stamp.py` versioniert. Das Label steht in `#appver`, der Update-Check vergleicht es, und `boot.js` hängt es an die Skript-Adressen (frischer Cache nach Updates).
-- Als Claude-Artifact braucht die Seite jetzt ihre Dateien mit (`styles.css`, `js/`, `fonts/`), z. B. über `files` beim Veröffentlichen.
 - Texte stehen auf Deutsch mit echten Umlauten. Keine langen Gedankenstriche in Texten.
 
 ## So bitte arbeiten
