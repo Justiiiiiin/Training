@@ -4785,7 +4785,7 @@ function buildICS() {
   const t = todayISO(), stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z"), L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Fitness Coach//DE", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:Fitness Coach"];
   const dt = (iso, hm) => iso.replace(/-/g, "") + "T" + hm.replace(":", "") + "00";
   const plus = (hm, min) => { const m = parseInt(hm.slice(0, 2), 10) * 60 + parseInt(hm.slice(3), 10) + min; return _p2(Math.floor(m / 60) % 24) + ":" + _p2(m % 60); };
-  const ie = (x) => String(x).replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  const ie = (x) => String(x).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
   const ev = (uid, iso, hm, min, sum, desc, alarm) => { sum = ie(sum); desc = ie(desc); L.push("BEGIN:VEVENT", "UID:" + uid + "@fitness-coach", "DTSTAMP:" + stamp, "DTSTART:" + dt(iso, hm), "DTEND:" + dt(iso, plus(hm, min)), "SUMMARY:" + sum, "DESCRIPTION:" + desc, "BEGIN:VALARM", "TRIGGER:-PT" + alarm + "M", "ACTION:DISPLAY", "DESCRIPTION:" + sum, "END:VALARM", "END:VEVENT"); };
   let n = 0;
   for (let i = 0; i < 56; i++) {
