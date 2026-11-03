@@ -238,6 +238,15 @@ dialog::backdrop { background: rgba(8, 12, 14, 0.56); }
 .dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: sticky; top: 0; z-index: 4; background: var(--surface); margin: -26px -26px 0; padding: 22px 26px 12px; box-shadow: 0 1px 0 var(--line); }
 .dlg-head .btn.icon { width: 48px; min-height: 48px; flex: none; }
 .shiftrow { align-items: center; gap: 10px; }
+.buylist li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
+.buyform { align-items: flex-end; gap: 10px; }
+.buyform .field { flex: 1 1 120px; }
+.pricebox summary { cursor: pointer; font-weight: 650; font-size: 1.0625rem; }
+.pricebox h4 { margin: 14px 0 4px; }
+.prow { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 6px 0; border-top: 1px solid var(--line); }
+.prow small { display: block; }
+.prow input { width: 96px; min-height: 40px; text-align: right; flex: none; }
+.prow.mod span { color: var(--accent); }
 .coacheval p { margin: 0; }
 .cev b { font-weight: 650; text-align: right; }
 .perf li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: baseline; }
@@ -366,7 +375,7 @@ details.src ul { margin: 8px 0 0; padding-left: 20px; font-size: 0.9375rem; disp
 .meter span.over { background: var(--warn); }
 .warnt { color: var(--warn); font-weight: 600; }
 .ptable { list-style: none; margin: 0; padding: 0 !important; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0 28px; }
-.ptable li { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--line); max-width: none !important; font-variant-numeric: tabular-nums; }
+.ptable li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); max-width: none !important; font-variant-numeric: tabular-nums; }
 .empty-in { display: flex; flex-direction: column; gap: 12px; }
 .radshop .sline { cursor: pointer; }
 @media (max-width: 640px) { .tab { padding: 0 14px; } }
@@ -723,7 +732,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.15 · 03.11. 09:22</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.16 · 03.11. 09:32</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -893,6 +902,10 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
       <li>Öffne die App vom Home-Bildschirm. Sie startet leer, weil das iPhone den Speicher trennt.</li>
       <li>Hole deine Daten zurück: Tippe hier in Safari unter „Eigene Datenbank verbinden“ auf <b>Verbindung kopieren</b>. In der App fügst du sie ein und gibst dein Passwort ein.</li>
     </ol></div>
+    <h3>Kalender</h3>
+    <p class="note">Trainingstage und Vorkochen der nächsten 8 Wochen als Kalender-Termine mit Erinnerung. Die Uhrzeit richtet sich nach deiner Schicht (Früh: 18:00, Spät oder frei: 10:00). Ändern kannst du sie später im Kalender.</p>
+    <div class="row syncrow"><button class="btn" id="b-ics" type="button">Termine in den Kalender</button></div>
+    <p class="muted small" id="icsmsg" role="status" aria-live="polite"></p>
     <h3>Daten und Sync</h3>
     <p class="note" id="syncinfo"></p>
     <div class="row syncrow"><button class="btn" id="b-syncnow" type="button">Jetzt abgleichen</button><button class="btn" id="b-backup" type="button">Sicherung kopieren</button></div>
@@ -2137,7 +2150,7 @@ function renderFilters() {
     (filterActive() ? '<div class="fgroup"><button class="fchip" data-freset="1">Filter zurücksetzen</button></div>' : "") +
     "</details>";
 }
-document.addEventListener("toggle", (ev) => { if (ev.target && ev.target.id === "fmore") FOPEN = ev.target.open; if (ev.target && ev.target.id === "ingex") IOPEN = ev.target.open; }, true);
+document.addEventListener("toggle", (ev) => { if (ev.target && ev.target.id === "pricebox") PRICEOPEN = ev.target.open; if (ev.target && ev.target.id === "fmore") FOPEN = ev.target.open; if (ev.target && ev.target.id === "ingex") IOPEN = ev.target.open; }, true);
 function renderRecipes() {
   const list = filtered();
   $("#rcount").textContent = list.length + " von " + RECIPES.length + " Rezepten" + excLabel();
@@ -3022,7 +3035,7 @@ function renderShop() {
       (BUDGET > 0 ? '<div class="meter" role="img" aria-label="Anteil des Budgets"><span class="' + (left < 0 ? "over" : "") + '" style="width:' + Math.min(100, Math.round(calc.total / BUDGET * 100)) + '%"></span></div><p class="small ' + (left < 0 ? "warnt" : "muted") + '">' + (left >= 0 ? "Noch " + eur(left) + " Luft." : eur(-left) + " über dem Budget. Tausch teure Gerichte gegen günstigere aus.") + "</p>" : "") + "</div>";
   }
   $("#panel-einkauf").innerHTML =
-    '<div class="card" data-nofold><div><h3>Einkaufsliste</h3><p class="muted small">Richtwerte für Lidl, Stand Nov 2026.</p></div>' +
+    spendHTML() + '<div class="card" data-nofold><div><h3>Einkaufsliste</h3><p class="muted small">Richtwerte für Lidl, Stand Nov 2026.</p></div>' +
     (CART.length
       ? '<ul class="crows">' + rows + '</ul><div class="row"><button class="btn sm" data-cartclear="1">Liste leeren</button><button class="btn sm" data-tab="rezepte">Rezept hinzufügen</button><button class="btn sm" data-tab="rad">Vom Glücksrad</button></div>' +
         '<div class="stats"><div class="stat"><span class="big">' + eur(calc.total).replace("\u00a0€", "") + '<small>€</small></span><span>Einkauf gesamt, ca.</span></div><div class="stat"><span class="big">' + eur(calc.total / portions).replace("\u00a0€", "") + '<small>€</small></span><span>pro Portion im Schnitt</span></div><div class="stat"><span class="big">' + portions + '</span><span>Portionen</span></div></div>' + budget
@@ -3036,7 +3049,7 @@ function renderShop() {
     "<li><b>Tiefkühl statt frisch</b> bei Erdbeeren und Spinat. Tomaten und Paprika lose kaufen und nur so viel, wie du in der Woche isst.</li>" +
     "<li><b>Teuer pro Mahlzeit:</b> Rucola, Aufschnitt, Parmesan und Mandeln. Sparsam einsetzen.</li>" +
     "<li><b>Erst planen, dann kaufen.</b> Schau vorher in Prospekt und Lidl-Plus-App und dreh dann das Rad mit „Günstig“.</li></ul></div>" +
-    storeCardHTML() +
+    storeCardHTML() + pricesHTML() +
     '<div class="card"><h3>Eiweiß pro Euro</h3><p class="muted small">So viel Eiweiß bekommst du für 1 € (Rohgewicht, Lidl-Richtwerte). Je höher, desto günstiger.</p><ol class="ptable">' +
     protTable().map((x) => "<li><span>" + x.name + "</span><b>" + Math.round(x.gpe) + " g</b></li>").join("") + "</ol></div>" +
     '<div class="card"><h3>Grundvorrat für den Anfang</h3><div class="shop">' + SHOP.map((g, gi) => "<div><h4>" + g[0] + "</h4>" + g[1].map((n, i) => '<label><input type="checkbox" data-shop="' + gi + "-" + i + '"' + (shop[gi + "-" + i] ? " checked" : "") + "> " + n + "</label>").join("") + "</div>").join("") + "</div></div>";
@@ -3096,6 +3109,7 @@ if (!GOALS.sched || typeof GOALS.sched !== "object" || Array.isArray(GOALS.sched
 Object.keys(GOALS.sched).forEach((k) => { if (!/^\d{4}-\d{2}-\d{2}$/.test(k) || !shOk(GOALS.sched[k])) delete GOALS.sched[k]; });
 if (GOALS.shift === "late") { const w0 = weekStartISO(todayISO()); if (!GOALS.sched[w0]) GOALS.sched[w0] = "llllllf"; }
 delete GOALS.shift;
+GOALS.buys = (Array.isArray(GOALS.buys) ? GOALS.buys : []).filter((x) => x && typeof x === "object" && /^\d{4}-\d{2}-\d{2}$/.test(x.d) && typeof x.a === "number" && isFinite(x.a) && x.a > 0 && x.a <= 2000).map((x) => ({ d: x.d, a: Math.round(x.a * 100) / 100 })).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0)).slice(-400);
 ["lastBackup", "bkSnooze"].forEach((k) => { if (typeof GOALS[k] !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(GOALS[k])) delete GOALS[k]; });
 function shGet(ws) {
   const S = GOALS.sched;
@@ -3218,7 +3232,7 @@ function planAll() {
 }
 function shiftHintHTML() {
   const t = todayISO(), a = shiftOf(t), b = shiftOf(shiftDay(t, 1)), N = { n: "Frühschicht", l: "Spätschicht", f: "frei" };
-  const H = { n: "Trainiere am besten nach der Arbeit oder abends.", l: "Trainiere am besten vormittags und iss danach in Ruhe, bevor du losmusst.", f: "Zeit für ein längeres Training und fürs Kochen." };
+  const H = { n: "Training eher abends.", l: "Training vormittags, dann in Ruhe essen.", f: "Zeit fürs Kochen und Training." };
   return '<p class="small shifthint"><b>Heute ' + N[a] + ", morgen " + N[b] + ".</b> " + H[a] + "</p>";
 }
 function shAfter() {
@@ -3398,14 +3412,14 @@ function renderToday() {
   const sug = suggestList(3);
   const glasses = Array.from({ length: GOALS.water }, (_, i) => '<button class="gl' + (i < day.water ? " on" : "") + '" data-water="' + i + '" aria-pressed="' + (i < day.water) + '" aria-label="Glas ' + (i + 1) + '"></button>').join("");
   $("#panel-heute").innerHTML =
-    backupHTML() + '<div class="card hero"><div class="tdhead"><div><h3>' + title + '</h3><p class="muted">' + (plan[2] ? "Ganzkörper, etwa " + estMinutes() + " Minuten" : plan[1]) + "</p></div>" +
+    backupHTML() + '<div class="card hero"><div class="tdhead"><div><h3>' + title + '</h3><p class="muted">' + (plan[2] ? "Ganzkörper, etwa " + estMinutes() + " Minuten" : "Ruhetag: Erholung gehört zum Training") + "</p></div>" +
     '<div class="row">' + (plan[2] && !doneToday && !isActive() ? '<button class="btn primary" data-act="start">Training starten</button>' : "") + '<button class="btn" data-eatopen="1">Essen eintragen</button><button class="btn" data-tab="rad">Essen wählen</button></div></div>' +
     shiftHintHTML() + '<div class="rings">' +
     ringHTML(e.p / pg, "var(--good)", e.p, "von " + pg + " g", "Eiweiß") +
     ringHTML(e.k / GOALS.kcal, e.k > GOALS.kcal + 150 ? "var(--warn)" : "var(--accent)", e.k.toLocaleString("de-DE"), "von " + GOALS.kcal.toLocaleString("de-DE") + " kcal", "Kalorien") +
     ringHTML(wc / trainDays(), "var(--ink)", wc, "von " + trainDays(), "Training") + "</div>" +
-    '<p class="small muted">Eiweiß ist für den Muskelaufbau am wichtigsten. Die Ziele änderst du bei den Einstellungen (Zahnrad).</p></div>' +
-    prepTodayHTML() +
+    '</div>' +
+    prepTodayHTML() + reviewToday() +
     '<div class="card"><div class="rday-h"><h3>Heute gegessen</h3>' + (day.items.length ? '<span class="rtot">ca. ' + eur(e.c) + " bei Lidl</span>" : "") + "</div>" +
     (day.items.length
       ? '<ul class="eatlist">' + day.items.map((x, i) => "<li><div><b>" + esc(x.t) + '</b><span class="muted small">' + x.p + " g Eiweiß, " + x.k + ' kcal</span></div><button class="btn icon sm" data-eatdel="' + i + '" aria-label="Eintrag löschen">' + ic("close") + "</button></li>").join("") + "</ul>"
@@ -3792,6 +3806,84 @@ function perfHTML() {
   const chips = have.map((x) => '<button class="fchip" type="button" data-perf="' + x.id + '" aria-pressed="' + (x.id === PERF) + '">' + esc(x.name) + "</button>").join("");
   return '<div class="card"><div class="rday-h"><h3>Leistung pro Übung</h3></div><div class="row">' + chips + '</div><ul class="eatlist perf">' + rows.join("") + '</ul><p class="small muted">Die letzten Einheiten mit Stufe und Wiederholungen je Satz.</p></div>';
 }
+/* Eigene Preise: überschreiben die Lidl-Richtwerte, Rezeptkosten werden neu berechnet */
+const CHEAPMAX = { "Frühstück": 1.0, "Mittag/Abend": 2.0, "Snack": 0.8 };
+const PRICE0 = {}; Object.keys(PRICE).forEach((k) => { PRICE0[k] = PRICE[k].price; });
+function applyPrices() {
+  if (!settings.prices || typeof settings.prices !== "object" || Array.isArray(settings.prices)) settings.prices = {};
+  Object.keys(settings.prices).forEach((k) => { const v = settings.prices[k]; if (!PRICE[k] || typeof v !== "number" || !isFinite(v) || v < 0.05 || v > 99.99) delete settings.prices[k]; });
+  Object.keys(PRICE).forEach((k) => { PRICE[k].price = settings.prices[k] != null ? settings.prices[k] : PRICE0[k]; });
+  RECIPES.forEach((r) => {
+    let c = 0; r.ing.forEach((i) => { const k = i[4]; if (k && PRICE[k]) c += i[0] * PRICE[k].per * PRICE[k].price / PRICE[k].pack; });
+    r.cost = Math.round(c * 100) / 100;
+    r.tags = r.tags.filter((t) => t !== "Günstig"); if (r.cost <= CHEAPMAX[r.meal]) r.tags.push("Günstig");
+  });
+}
+let PRICEOPEN = false;
+function pricesHTML() {
+  const secs = {}; Object.keys(PRICE).forEach((k) => { (secs[PRICE[k].sec] = secs[PRICE[k].sec] || []).push(k); });
+  const changed = Object.keys(settings.prices).length;
+  const body = SECS.filter((sc) => secs[sc]).map((sc) => "<h4>" + sc + "</h4>" + secs[sc].sort((a, b) => PRICE[a].n.localeCompare(PRICE[b].n, "de")).map((k) => {
+    const pr = PRICE[k], mod = settings.prices[k] != null;
+    return '<label class="prow' + (mod ? " mod" : "") + '"><span>' + esc(pr.n) + '<small class="muted"> ' + esc(pr.label) + (mod ? ", Richtwert " + eur(PRICE0[k]) : "") + '</small></span><input type="text" inputmode="decimal" autocomplete="off" data-price="' + k + '" value="' + (Math.round(pr.price * 100) / 100).toFixed(2).replace(".", ",") + '" aria-label="Preis ' + esc(pr.n) + ' in Euro"></label>';
+  }).join("")).join("");
+  return '<details class="card pricebox" id="pricebox" data-nofold' + (PRICEOPEN ? " open" : "") + '><summary>Meine Preise' + (changed ? " (" + changed + " angepasst)" : "") + '</summary><p class="small muted">Trag den Preis pro Packung ein, den du wirklich zahlst. Kosten der Rezepte und die Einkaufsliste rechnen damit. Leeres Feld oder der Richtwert setzt zurück.</p>' + body + '<div class="row"><button class="btn sm" type="button" data-pricereset="1">Alle auf Richtwerte zurück</button></div></details>';
+}
+/* Ausgaben fürs Essen: echte Einkäufe und das, was nach Preisliste gegessen wurde */
+let SPM = "";
+const MONN = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+const monthShift = (ym, k) => { const y = parseInt(ym.slice(0, 4), 10), m = parseInt(ym.slice(5, 7), 10) - 1 + k, d = new Date(y, m, 1); return d.getFullYear() + "-" + _p2(d.getMonth() + 1); };
+function spendMonth(ym) {
+  const buys = GOALS.buys.filter((b) => b.d.slice(0, 7) === ym);
+  let eaten = 0, days = 0;
+  Object.keys(DIARY).forEach((d) => { if (d.slice(0, 7) !== ym) return; const e = dsum(d); if (DIARY[d].items.length) { eaten += e.c; days++; } });
+  return { buys, bought: buys.reduce((a, b) => a + b.a, 0), eaten, days };
+}
+function spendHTML() {
+  if (!/^\d{4}-\d{2}$/.test(SPM)) SPM = todayISO().slice(0, 7);
+  const sp = spendMonth(SPM), cur = SPM === todayISO().slice(0, 7);
+  const list = sp.buys.slice().reverse().map((b) => { const i = GOALS.buys.indexOf(b); return "<li><span>" + dateDE(b.d) + '</span><b>' + eur(b.a) + '</b><button class="btn icon sm" type="button" data-buydel="' + i + '" aria-label="Einkauf löschen">' + ic("close") + "</button></li>"; }).join("");
+  return '<div class="card" data-nofold id="spendcard"><div class="rday-h"><h3>Ausgaben fürs Essen</h3><span class="row" style="gap:4px"><button class="btn icon sm" type="button" data-spm="-1" aria-label="Voriger Monat">‹</button><b>' + MONN[parseInt(SPM.slice(5, 7), 10) - 1] + " " + SPM.slice(0, 4) + '</b><button class="btn icon sm" type="button" data-spm="1" aria-label="Nächster Monat"' + (cur ? " disabled" : "") + ">›</button></span></div>" +
+    '<div class="stats"><div class="stat"><span class="big">' + eur(sp.bought).replace(" €", "") + '<small>€</small></span><span>eingekauft (' + sp.buys.length + (sp.buys.length === 1 ? " Einkauf" : " Einkäufe") + ')</span></div><div class="stat"><span class="big">' + eur(sp.eaten).replace(" €", "") + '<small>€</small></span><span>gegessen nach Preisliste' + (sp.days ? ", Ø " + eur(sp.eaten / sp.days) + " pro Tag" : "") + "</span></div></div>" +
+    (list ? '<ul class="eatlist buylist">' + list + "</ul>" : '<p class="muted small">Noch kein Einkauf eingetragen.</p>') +
+    '<div class="row buyform"><label class="field">Betrag in €<input type="text" inputmode="decimal" id="buy-a" autocomplete="off" placeholder="z. B. 38,40"></label><label class="field">Datum<input type="date" id="buy-d" value="' + todayISO() + '" max="' + todayISO() + '"></label><button class="btn primary" type="button" data-buyadd="1">Eintragen</button></div><p class="small muted" id="buymsg" role="status" aria-live="polite"></p></div>';
+}
+/* Wochenrückblick: Montag bis Sonntag */
+let REVW = "";
+function weekReview(ws) {
+  const days = [0, 1, 2, 3, 4, 5, 6].map((i) => shiftDay(ws, i)), we = days[6], t = todayISO();
+  const past = days.filter((d) => d <= t);
+  const trained = sessions.filter((d) => d >= ws && d <= we).length;
+  const eaten = past.map((d) => ({ d, e: dsum(d) })).filter((x) => x.e.k >= 1000);
+  const water = past.filter((d) => dayGet(d).water >= GOALS.water).length;
+  const wl = log.filter((x) => typeof x.weight === "number").sort((a, b) => (a.date < b.date ? -1 : 1));
+  const last = wl.filter((x) => x.date <= we).pop(), prev = wl.filter((x) => x.date < ws).pop();
+  const inWeek = last && last.date >= ws;
+  const sp = { bought: GOALS.buys.filter((b) => b.d >= ws && b.d <= we).reduce((a, b) => a + b.a, 0), eaten: past.reduce((a, d) => a + dsum(d).c, 0) };
+  return { ws, we, trained, goal: trainDays(), nEaten: eaten.length, nPast: past.length, kcal: eaten.length ? eaten.reduce((a, x) => a + x.e.k, 0) / eaten.length : null, prot: eaten.length ? eaten.reduce((a, x) => a + x.e.p, 0) / eaten.length : null, water, dWeight: inWeek && prev ? last.weight - prev.weight : null, weight: inWeek ? last.weight : null, sp };
+}
+function reviewHTML(ws, nav) {
+  const r = weekReview(ws), pg = protGoal(), ok = (c) => (c ? ' <span class="tag g">geschafft</span>' : "");
+  const sg = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + nf(Math.abs(Math.round(v * 10) / 10));
+  const rows = [
+    ["Training", r.trained + " von " + r.goal + ok(r.trained >= r.goal)],
+    ["Eiweiß", r.prot == null ? "keine Einträge" : "Ø " + Math.round(r.prot) + " g (Ziel " + pg + " g)" + ok(r.prot >= pg * 0.95)],
+    ["Kalorien", r.kcal == null ? "keine Einträge" : "Ø " + Math.round(r.kcal).toLocaleString("de-DE") + " kcal (Ziel " + GOALS.kcal.toLocaleString("de-DE") + " kcal)"],
+    ["Essen eingetragen", r.nEaten + " von " + r.nPast + " Tagen"],
+    ["Wasser", r.water + " von " + r.nPast + " Tagen im Ziel"],
+    ["Gewicht", r.weight == null ? "kein Wert in dieser Woche" : nf(r.weight) + " kg" + (r.dWeight != null ? " (" + sg(r.dWeight) + " kg zur Vorwoche)" : "")],
+    ["Ausgaben", (r.sp.bought > 0 ? eur(r.sp.bought) + " eingekauft, " : "") + eur(r.sp.eaten) + " gegessen (Preisliste)"]
+  ];
+  const range = dateDE(r.ws) + " bis " + dateDE(r.we);
+  return '<div class="card review" data-nofold><div class="rday-h"><div><h3>Wochenrückblick</h3><p class="muted small">' + range + "</p></div>" + (nav ? '<span class="row" style="gap:4px"><button class="btn icon sm" type="button" data-rvw="-1" aria-label="Vorige Woche">‹</button><button class="btn icon sm" type="button" data-rvw="1" aria-label="Nächste Woche"' + (r.we >= todayISO() && r.ws >= weekStartISO(todayISO()) ? " disabled" : "") + ">›</button></span>" : "") + '</div><ul class="ptable rvl">' +
+    rows.map((x) => "<li><span>" + x[0] + "</span><b>" + x[1] + "</b></li>").join("") + "</ul></div>";
+}
+function reviewToday() {
+  const wd = (new Date().getDay() + 6) % 7, ws = weekStartISO(todayISO());
+  if (wd === 6) return reviewHTML(ws, false);
+  if (wd === 0) return reviewHTML(shiftDay(ws, -7), false);
+  return "";
+}
 function heatHTML() {
   const start = shiftDay(weekStartISO(todayISO()), -77), set = new Set(sessions), today = todayISO();
   let cells = "";
@@ -3805,7 +3897,8 @@ function renderCharts() {
   const wpts = ti ? ti.pts : [];
   const cpts = log.filter((x) => x.waist != null).map((x) => ({ ms: new Date(x.date + "T12:00:00").getTime(), y: x.waist }));
   const recent = WK.slice(-5).reverse().map((w) => '<li><b>' + dateDE(w.date) + '</b><span class="muted small">' + w.min + " Min, " + exOf(w).map((e) => { const ev = evalEx(e, w.sets); return ev ? e.name + " " + ev.vals.join("/") : ""; }).filter(Boolean).join(", ") + "</span></li>").join("");
-  el.innerHTML = coachEvalHTML() +
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(REVW)) REVW = weekStartISO(todayISO());
+  el.innerHTML = reviewHTML(REVW, true) + coachEvalHTML() +
     '<div class="card"><div class="rday-h"><h3>Gewicht</h3><span class="rtot">' + wtxt + "</span></div>" + chartSVG(wpts, "dein Gewicht", true) +
     '<p class="small muted">Die Linie zeigt deinen Trend und glättet Schwankungen durch Wasser und Essen. Wiege dich morgens nach dem Toilettengang und achte auf den Trend, nicht auf einzelne Tage. Ein gutes Tempo sind etwa 0,5 bis 1 % deines Gewichts pro Woche.</p></div>' +
     '<div class="card"><h3>Taille</h3>' + chartSVG(cpts, "deine Taille", false) + "</div>" +
@@ -3916,6 +4009,16 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.prepcart) { const c = prepCalc(); c.entries.forEach((e) => cartAdd(e.id, e.n)); t.textContent = "Übernommen"; return; }
   if (t.dataset.eatagain != null) { const x = RECENT[parseInt(t.dataset.eatagain, 10)]; if (x) { const o = Object.assign({}, x, { again: true }); dayEns().items.push(o); saveToday(); renderToday(); drawEat("Nochmal eingetragen: " + x.t); } return; }
   if (t.dataset.calcgo) return calcGo();
+  if (t.dataset.rvw) { const nx = shiftDay(/^\d{4}-\d{2}-\d{2}$/.test(REVW) ? REVW : weekStartISO(todayISO()), 7 * parseInt(t.dataset.rvw, 10)); if (nx <= weekStartISO(todayISO())) REVW = nx; return renderCharts(); }
+  if (t.dataset.spm) { SPM = monthShift(/^\d{4}-\d{2}$/.test(SPM) ? SPM : todayISO().slice(0, 7), parseInt(t.dataset.spm, 10)); if (SPM > todayISO().slice(0, 7)) SPM = todayISO().slice(0, 7); return renderShop(); }
+  if (t.dataset.buydel != null && t.dataset.buydel !== "") { GOALS.buys.splice(parseInt(t.dataset.buydel, 10), 1); saveToday(); return renderShop(); }
+  if (t.dataset.buyadd) {
+    const a = parseFloat(String($("#buy-a").value).replace(",", ".")), d = $("#buy-d").value, m = $("#buymsg");
+    if (!(a > 0 && a <= 2000)) { m.textContent = "Trag einen Betrag zwischen 0,01 und 2000 € ein."; return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d > todayISO()) { m.textContent = "Das Datum passt nicht. Es darf nicht in der Zukunft liegen."; return; }
+    GOALS.buys.push({ d: d, a: Math.round(a * 100) / 100 }); GOALS.buys.sort((x, y) => (x.d < y.d ? -1 : x.d > y.d ? 1 : 0)); GOALS.buys = GOALS.buys.slice(-400); SPM = d.slice(0, 7); saveToday(); return renderShop();
+  }
+  if (t.dataset.pricereset) { settings.prices = {}; store.set("fc_settings", settings); applyPrices(); renderRecipes(); renderShop(); renderToday(); return; }
   if (t.dataset.setkcal) { const k = parseInt(t.dataset.setkcal, 10); if (k >= 1000 && k <= 6000) { GOALS.kcal = k; saveToday(); renderProgress(); renderToday(); } return; }
   if (t.dataset.perf) { PERF = t.dataset.perf; renderCharts(); return; }
   if (t.dataset.bkdo) { return doBackup().then((r) => { const m = $("#bkmsg"); if (r.ok) { renderToday(); } else if (m) { m.innerHTML = ""; const ta = document.createElement("textarea"); ta.rows = 3; ta.value = r.txt; ta.readOnly = true; m.appendChild(ta); ta.focus(); ta.select(); } }); }
@@ -4003,6 +4106,13 @@ document.addEventListener("input", (ev) => {
     const v = parseFloat(t.value);
     if (v > 0) { prof[t.id === "b-weight" ? "weight" : "height"] = v; store.set("fc_body", prof); $("#calc").innerHTML = calcStats(bodyCalc()); $("#waistnote").textContent = waistNote(); }
   }
+  if (t.dataset && t.dataset.price) {
+    const k = t.dataset.price; if (!PRICE[k]) return;
+    const v = parseFloat(String(t.value).replace(",", "."));
+    if (!isFinite(v) || v <= 0 || Math.abs(v - PRICE0[k]) < 0.005) delete settings.prices[k];
+    else if (v >= 0.05 && v <= 99.99) settings.prices[k] = Math.round(v * 100) / 100;
+    store.set("fc_settings", settings); applyPrices(); renderRecipes(); renderShop(); renderToday(); return;
+  }
   if (t.id === "plan-small") {
     GOALS.pause = t.checked ? "small" : "meal"; const d = dayEns();
     if (d.plan && !d.plan.free) {
@@ -4074,10 +4184,37 @@ function backupHTML() {
   return '<div class="card bkcard"><div class="rday-h"><h3>Sicherung fällig</h3></div><p class="muted">' + (ago == null ? "Du hast noch keine Sicherung gemacht." : "Die letzte Sicherung ist " + ago + " Tage alt.") + " Deine Daten liegen nur auf diesem Gerät. Tippe auf „Jetzt sichern“ und füge den Text in eine Notiz ein.</p>" +
     '<div class="row"><button class="btn primary" type="button" data-bkdo="1">Jetzt sichern</button><button class="btn" type="button" data-bklater="1">Später</button></div><p class="small muted" id="bkmsg" role="status" aria-live="polite"></p></div>';
 }
+/* Kalender-Datei (.ics): Training und Vorkochen der nächsten 8 Wochen, Uhrzeit nach Schicht */
+function buildICS() {
+  const t = todayISO(), stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z"), L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Fitness Coach//DE", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:Fitness Coach"];
+  const dt = (iso, hm) => iso.replace(/-/g, "") + "T" + hm.replace(":", "") + "00";
+  const plus = (hm, min) => { const m = parseInt(hm.slice(0, 2), 10) * 60 + parseInt(hm.slice(3), 10) + min; return _p2(Math.floor(m / 60) % 24) + ":" + _p2(m % 60); };
+  const ie = (x) => String(x).replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  const ev = (uid, iso, hm, min, sum, desc, alarm) => { sum = ie(sum); desc = ie(desc); L.push("BEGIN:VEVENT", "UID:" + uid + "@fitness-coach", "DTSTAMP:" + stamp, "DTSTART:" + dt(iso, hm), "DTEND:" + dt(iso, plus(hm, min)), "SUMMARY:" + sum, "DESCRIPTION:" + desc, "BEGIN:VALARM", "TRIGGER:-PT" + alarm + "M", "ACTION:DISPLAY", "DESCRIPTION:" + sum, "END:VALARM", "END:VEVENT"); };
+  let n = 0;
+  for (let i = 0; i < 56; i++) {
+    const iso = shiftDay(t, i), wd = shIdx(iso), sh = shiftOf(iso);
+    if (settings.tdays[wd]) { ev("fc-training-" + iso.replace(/-/g, ""), iso, sh === "n" ? "18:00" : "10:00", 60, "Training", "Ganzkörper, ca. " + estMinutes() + " Minuten. Aufwärmen nicht vergessen.", 30); n++; }
+    if (wd === 6) { ev("fc-vorkochen-" + iso.replace(/-/g, ""), iso, "14:00", 120, "Vorkochen", "Die Woche vorkochen. Einkaufsliste in der App.", 60); n++; }
+  }
+  L.push("END:VCALENDAR");
+  return { text: L.join("\r\n") + "\r\n", count: n };
+}
+async function shareICS() {
+  const r = buildICS(), msg = $("#icsmsg");
+  const blob = new Blob([r.text], { type: "text/calendar" });
+  try {
+    const f = new File([blob], "fitness-coach.ics", { type: "text/calendar" });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: "Fitness Coach" }); msg.textContent = r.count + " Termine bereit. Wähle in der Liste „Kalender“."; return; }
+  } catch (e) { if (e && e.name === "AbortError") { msg.textContent = "Abgebrochen."; return; } }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "fitness-coach.ics"; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  msg.textContent = r.count + " Termine als Datei geladen. Öffne sie, dann fragt der Kalender nach dem Hinzufügen.";
+}
 function bindSync() {
   const msg = (t) => { $("#restoremsg").textContent = t; };
   $("#instinfo").textContent = standalone() ? "Du nutzt gerade die installierte App." : "Noch nicht installiert. Mit diesen Schritten bekommst du ein Symbol auf dem Home-Bildschirm, Vollbild und Betrieb ohne Netz.";
   $("#instbox").hidden = FC.embedded;
+  $("#b-ics").addEventListener("click", shareICS);
   $("#sb-copy").addEventListener("click", async () => { const i = FC.sbInfo(); if (!i) return; const t = "FCSB:" + JSON.stringify({ url: i.url, key: i.key, mail: i.email }); try { await navigator.clipboard.writeText(t); $("#sbmsg").textContent = "Verbindung kopiert. Füge sie in der App unter „Eigene Datenbank verbinden“ ein."; } catch (e) { $("#sbmsg").textContent = "Kopieren hat nicht geklappt."; } });
   $("#sb-paste").addEventListener("input", (ev) => {
     const v = ev.target.value.trim(); if (v.indexOf("FCSB:") !== 0) return;
@@ -4744,7 +4881,7 @@ function bindV3() {
 /* ======================= Start ======================= */
 $("#b-settings").innerHTML = ic("gear"); $("#b-settings2").innerHTML = ic("gear") + "<span>Einstellungen</span>"; $("#micfab").innerHTML = ic("mic"); document.body.classList.toggle("has-sr", !!SR);
 $("#x-settings").innerHTML = ic("close");
-bindV3(); renderEx(); renderRecipes(); renderNutrition(); renderTips(); renderSources(); renderProgress(); bindSettings(); render(); bindGoals(); renderToday();
+applyPrices(); bindV3(); renderEx(); renderRecipes(); renderNutrition(); renderTips(); renderSources(); renderProgress(); bindSettings(); render(); bindGoals(); renderToday();
 function radShowAll() { rad.shown = new Set(); const P = RPL[RAD.mode]; if (P) P.days.forEach((d, di) => d.slots.forEach((x, si) => rad.shown.add(di + ":" + si))); }
 Object.keys(RPL).forEach((k) => { if (!RPL[k] || !RPL[k].days || RPL[k].days.some((d) => d.slots.some((x) => !byId(x.id)))) delete RPL[k]; });
 radShowAll(); renderRadOpts(); radIdle(); radRender(); renderShop();
