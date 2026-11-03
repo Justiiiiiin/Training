@@ -3033,10 +3033,10 @@ function radRender() {
     const recs = d.slots.map((s) => byId(s.id));
     const kcal = recs.reduce((a, r) => a + r.kcal, 0), prot = recs.reduce((a, r) => a + r.protein, 0), cost = recs.reduce((a, r) => a + r.cost, 0);
     const tot = RAD.mode === "meal" || !all ? "" : '<span class="rtot' + (prot >= tgt ? " ok" : "") + '">' + kcal.toLocaleString("de-DE") + " kcal, " + prot + " g Eiweiß, ca. " + eur(cost) + (prot >= tgt ? ", Ziel erreicht" : " (Ziel " + tgt + " g)") + "</span>";
-    return '<section class="card rday">' + (d.name ? '<div class="rday-h"><h3>' + d.name + "</h3>" + tot + "</div>" : "") +
+    return '<section class="card rday">' + (d.name ? '<div class="rday-h"><h3>' + esc(d.name) + "</h3>" + tot + "</div>" : "") +
       '<ul class="rslots">' + d.slots.map((s, si) => {
         const key = di + ":" + si, r = byId(s.id), on = rad.shown.has(key);
-        return '<li class="rslot"><span class="rlab">' + s.label + "</span>" +
+        return '<li class="rslot"><span class="rlab">' + esc(s.label) + "</span>" +
           (on ? '<div class="rbody"><button class="rtitle" data-recipe="' + r.id + '">' + r.title + '</button><span class="rsub">' + r.protein + " g Eiweiß, " + r.kcal + " kcal, " + r.time + " Min, ca. " + eur(r.cost) + "</span></div>" +
             '<div class="ract"><button class="fchip" data-rlock="' + key + '" aria-pressed="' + (s.locked ? "true" : "false") + '">' + (s.locked ? "Fixiert" : "Fixieren") + '</button><button class="fchip" data-rspin="' + key + '"' + (rad.busy ? " disabled" : "") + ">Neu drehen</button></div>"
             : '<div class="rbody"><span class="rpend">…</span></div><div></div>') + "</li>";
@@ -4307,7 +4307,7 @@ function drawSummary(idx) {
   }).join("");
   const eff = [["leicht", "Eher leicht"], ["genau", "Genau richtig"], ["schwer", "Eher schwer"]].map((x) => '<button class="fchip" data-effort="' + x[0] + '" aria-pressed="' + (w.effort === x[0]) + '">' + x[1] + "</button>").join("");
   const hint = w.effort === "leicht" ? "Wenn es sich leicht anfühlte, gehst du eine Stufe hoch, sobald du oben im Bereich bist." : w.effort === "schwer" ? "Wenn es zu schwer war, geh bei der härtesten Übung eine Stufe zurück und gönn dir einen Tag mehr Pause." : "";
-  $("#dlg-sum").innerHTML = '<div class="dlg"><div class="dlg-head"><div><h3>Training geschafft</h3><p class="muted">' + w.sets.length + " Sätze in etwa " + w.min + ' Minuten. Dehne jetzt noch kurz Brust, Oberschenkel und Rücken.</p></div><button class="btn icon" data-close aria-label="Schließen">' + ic("close") + "</button></div>" + rows +
+  $("#dlg-sum").innerHTML = '<div class="dlg"><div class="dlg-head"><div><h3>Training geschafft</h3><p class="muted">' + w.sets.length + " Sätze in etwa " + esc(w.min) + ' Minuten. Dehne jetzt noch kurz Brust, Oberschenkel und Rücken.</p></div><button class="btn icon" data-close aria-label="Schließen">' + ic("close") + "</button></div>" + rows +
     '<div><p><b>Wie fühlte sich das Training an?</b></p><div class="row">' + eff + "</div>" + (hint ? '<p class="small muted">' + hint + "</p>" : "") + "</div>" +
     '<div class="row"><button class="btn primary" data-close>Fertig</button></div></div>';
 }
@@ -4384,7 +4384,7 @@ function perfHTML() {
   const rows = []; for (let i = WK.length - 1; i >= 0 && rows.length < 8; i--) {
     const w = WK[i], ev = evalEx(e, w.sets); if (!ev) continue;
     const lv = (w.sets.find((x) => x.ex === e.id) || {}).lvl, pb = prevBest(e, lv, i);
-    rows.push('<li><b>' + dateDE(w.date) + '</b><span class="muted small">' + esc(e.ladder[lv] || "") + "</span><span>" + ev.vals.join(" / ") + (ev.best > 0 && pb > 0 && ev.best > pb ? ' <span class="tag g">Rekord</span>' : "") + "</span></li>");
+    rows.push('<li><b>' + esc(dateDE(w.date)) + '</b><span class="muted small">' + esc(e.ladder[lv] || "") + "</span><span>" + ev.vals.join(" / ") + (ev.best > 0 && pb > 0 && ev.best > pb ? ' <span class="tag g">Rekord</span>' : "") + "</span></li>");
   }
   const chips = have.map((x) => '<button class="fchip" type="button" data-perf="' + x.id + '" aria-pressed="' + (x.id === PERF) + '">' + esc(x.name) + "</button>").join("");
   return '<div class="card"><div class="rday-h"><h3>Leistung pro Übung</h3></div><div class="row">' + chips + '</div><ul class="eatlist perf">' + rows.join("") + '</ul><p class="small muted">Die letzten Einheiten mit Stufe und Wiederholungen je Satz.</p></div>';
@@ -4540,7 +4540,7 @@ function renderCharts() {
   const wtxt = ti ? "Trend " + nf(Math.round(ti.now * 10) / 10) + " kg" + (ti.week != null ? ", 7 Tage " + (ti.week > 0 ? "+" : ti.week < 0 ? "−" : "") + nf(Math.abs(Math.round(ti.week * 10) / 10)) + " kg" : "") : "";
   const wpts = ti ? ti.pts : [];
   const cpts = log.filter((x) => x.waist != null).map((x) => ({ ms: new Date(x.date + "T12:00:00").getTime(), y: x.waist }));
-  const recent = WK.slice(-5).reverse().map((w) => '<li><b>' + dateDE(w.date) + '</b><span class="muted small">' + w.min + " Min, " + exOf(w).map((e) => { const ev = evalEx(e, w.sets); return ev ? e.name + " " + ev.vals.join("/") : ""; }).filter(Boolean).join(", ") + "</span></li>").join("");
+  const recent = WK.slice(-5).reverse().map((w) => '<li><b>' + esc(dateDE(w.date)) + '</b><span class="muted small">' + esc(w.min) + " Min, " + exOf(w).map((e) => { const ev = evalEx(e, w.sets); return ev ? e.name + " " + ev.vals.join("/") : ""; }).filter(Boolean).join(", ") + "</span></li>").join("");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(REVW)) REVW = weekStartISO(todayISO());
   el.innerHTML = reviewHTML(REVW, true) + coachEvalHTML() +
     '<div class="card"><div class="rday-h"><h3>Gewicht</h3><span class="rtot">' + wtxt + "</span></div>" + chartSVG(wpts, "dein Gewicht", true) +

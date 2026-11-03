@@ -33,6 +33,13 @@ CASES = {
 }
 with sync_playwright() as p:
     b = p.chromium.launch()
+    # gültigen Rad-Plan erzeugen, damit Name und Label mit HTML geprüft werden können
+    c = b.new_context(); pg = c.new_page(); pg.goto(URL); pg.wait_for_timeout(500)
+    rpl = pg.evaluate("(() => { RAD.mode = 'week'; return radBuild(); })()"); c.close()
+    for d in rpl["days"]:
+        d["name"] += X
+        for s in d["slots"]: s["label"] += X
+    CASES["HTML im Rad-Plan"] = {"fc_rad": {"mode": "week"}, "fc_radplans": {"week": rpl}}
     for name, data in CASES.items():
         c = b.new_context(viewport={"width": 390, "height": 844})
         seed = "".join("localStorage.setItem(%s,%s);" % (json.dumps(k), json.dumps(json.dumps(v))) for k, v in data.items())
