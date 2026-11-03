@@ -992,9 +992,13 @@ window.FC = (function () {
   function sbCfg() { try { var c = JSON.parse(lsGet("fc__sb") || "null"); return c && c.url && c.key && c.rt ? c : null; } catch (e) { return null; } }
   var mode = embedded ? "claude" : (sbCfg() ? "sb" : "local");
   var mem = {}, ts = {}, pushed = {}, dirty = new Set(), pulledOnce = false;
+  var base = {}, view = {};   /* base: letzter gemeinsamer Stand je geändertem Schlüssel (für den 3-Wege-Abgleich), view: was die App zuletzt gelesen oder geschrieben hat */
   var R = null, pulling = false, busy = false, flushTimer = 0, retryTimer = 0, mainStarted = false, watching = false;
   var state = mode === "local" ? "local" : "connecting";
   try { ts = JSON.parse(lsGet("fc__ts") || "{}") || {}; if (typeof ts !== "object" || Array.isArray(ts)) ts = {}; } catch (e) { ts = {}; }
+  try { base = JSON.parse(lsGet("fc__base") || "{}") || {}; if (typeof base !== "object" || Array.isArray(base)) base = {}; } catch (e) { base = {}; }
+  function has(o, k) { return Object.prototype.hasOwnProperty.call(o, k); }
+  function saveBase() { if (Object.keys(base).length) lsSet("fc__base", JSON.stringify(base)); else lsDel("fc__base"); }
   function raw(k) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : lsGet(k); }
   function setRaw(k, s) { mem[k] = s; lsSet(k, s); }
   function saveTs() { lsSet("fc__ts", JSON.stringify(ts)); }
@@ -1128,6 +1132,66 @@ window.FC = (function () {
     };
   }
 
+  /* ---------- Zusammenführen statt Überschreiben (3-Wege-Abgleich) ----------
+     b = gemeinsamer Stand, l = dieses Gerät, r = Datenbank. Was nur eine Seite geändert hat, wird übernommen.
+     Objekte: Feld für Feld (Löschungen zählen). Listen von Texten und von Einträgen mit date, d oder t (Tagebuch,
+     Trainings, Einkäufe): als Multimenge, Hinzugefügtes beider Seiten bleibt. Andere Listen und einzelne Werte:
+     bei echtem Widerspruch gewinnt die neuere Seite (lw = dieses Gerät ist neuer). */
+  var KEYED = { fc_log: "date", fc_cart: "id", fc_dishes: "id" };
+  function isObj(x) { return x !== null && typeof x === "object" && !Array.isArray(x); }
+  function sj(x) {
+    if (Array.isArray(x)) return "[" + x.map(sj).join(",") + "]";
+    if (isObj(x)) return "{" + Object.keys(x).sort().map(function (k) { return JSON.stringify(k) + ":" + sj(x[k]); }).join(",") + "}";
+    var j = JSON.stringify(x); return j === undefined ? "null" : j;
+  }
+  function same(a, b) { return a === undefined || b === undefined ? a === b : sj(a) === sj(b); }
+  function dateOf(x) { return typeof x === "string" ? x : isObj(x) ? (typeof x.date === "string" ? x.date : typeof x.d === "string" ? x.d : null) : null; }
+  function setLike(a) { return a.every(function (x) { return typeof x === "string" || (isObj(x) && (typeof x.date === "string" || typeof x.d === "string" || typeof x.t === "string")); }); }
+  function mergeArr(b, l, r, lw) {
+    if (!setLike(l) || !setLike(r)) {
+      if (l.length === r.length) return l.map(function (x, i) { return merge3(b && b.length === l.length ? b[i] : undefined, x, r[i], lw); });
+      return lw ? l : r;
+    }
+    var cnt = function (a) { var m = {}; (a || []).forEach(function (x) { var k = sj(x); m[k] = (m[k] || 0) + 1; }); return m; };
+    var cb = cnt(b), cl = cnt(l), cr = cnt(r), out = [], done = {};
+    var want = function (k) { return b ? Math.max(0, (cr[k] || 0) + (cl[k] || 0) - (cb[k] || 0)) : Math.max(cr[k] || 0, cl[k] || 0); };
+    r.concat(l).forEach(function (x) { var k = sj(x); if ((done[k] || 0) < want(k)) { out.push(x); done[k] = (done[k] || 0) + 1; } });
+    var dated = out.length && out.every(function (x) { return /^\d{4}-\d{2}-\d{2}/.test(dateOf(x) || ""); });
+    if (dated) out = out.map(function (x, i) { return [x, i]; }).sort(function (p, q) { var a = dateOf(p[0]), c = dateOf(q[0]); return a < c ? -1 : a > c ? 1 : p[1] - q[1]; }).map(function (p) { return p[0]; });
+    return out;
+  }
+  function merge3(b, l, r, lw) {
+    if (same(l, r)) return r;
+    if (b !== undefined && same(l, b)) return r;
+    if (b !== undefined && same(r, b)) return l;
+    if (isObj(l) && isObj(r)) {
+      var bo = isObj(b) ? b : null, o = {};
+      Object.keys(r).concat(Object.keys(l).filter(function (k) { return !has(r, k); })).forEach(function (k) {
+        var hb = !!bo && has(bo, k), hl = has(l, k), hr = has(r, k);
+        if (k === "plan" && hl && hr) { o[k] = hb && same(l[k], bo[k]) ? r[k] : hb && same(r[k], bo[k]) ? l[k] : (lw ? l[k] : r[k]); return; }
+        if (hl && hr) o[k] = merge3(hb ? bo[k] : undefined, l[k], r[k], lw);
+        else if (hl) { if (!(hb && same(l[k], bo[k]))) o[k] = l[k]; }
+        else if (!(hb && same(r[k], bo[k]))) o[k] = r[k];
+      });
+      return o;
+    }
+    if (Array.isArray(l) && Array.isArray(r)) return mergeArr(Array.isArray(b) ? b : null, l, r, lw);
+    return lw ? l : r;
+  }
+  function byKey(a, f) { var o = {}; (Array.isArray(a) ? a : []).forEach(function (x) { if (isObj(x) && typeof x[f] === "string") o[x[f]] = x; }); return o; }
+  function mergeStr(k, bs, ls, rs, lw) {
+    try {
+      var b = bs == null ? undefined : JSON.parse(bs), l = JSON.parse(ls), r = JSON.parse(rs), out;
+      var f = KEYED[k];
+      if (f && Array.isArray(l) && Array.isArray(r)) {
+        var m = merge3(b === undefined ? undefined : byKey(b, f), byKey(l, f), byKey(r, f), lw);
+        out = Object.keys(m).sort().map(function (x) { return m[x]; });
+        if (f === "id") { var order = r.concat(l).map(function (x) { return isObj(x) ? x.id : null; }); out.sort(function (p, q) { return order.indexOf(p.id) - order.indexOf(q.id); }); }
+      } else out = merge3(b, l, r, lw);
+      return JSON.stringify(out);
+    } catch (e) { return lw ? ls : rs; }
+  }
+
   /* ---------- gemeinsamer Abgleich ---------- */
   function fail(e) {
     if (e && e.login) setState("login"); else setState("offline");
@@ -1140,33 +1204,43 @@ window.FC = (function () {
       var rem = await R.listAll(), changed = false;
       KEYS.forEach(function (k) {
         var m = rem[k]; if (!m) return;
-        if (m.t > (ts[k] || 0)) {
-          try { JSON.parse(m.v); } catch (e) { return; }
-          setRaw(k, m.v); ts[k] = m.t; pushed[k] = m.v; changed = true;
-        } else if (m.t === (ts[k] || 0)) pushed[k] = m.v;
+        try { JSON.parse(m.v); } catch (e) { return; }
+        var loc = raw(k), lt = ts[k] || 0;
+        if (loc === m.v) { pushed[k] = m.v; if (m.t > lt) ts[k] = m.t; if (has(base, k)) delete base[k]; return; }
+        var mine = loc != null && has(base, k);   /* dieses Gerät hat seit dem letzten Abgleich etwas geändert */
+        if (m.t > lt && !mine) { setRaw(k, m.v); ts[k] = m.t; pushed[k] = m.v; if (has(base, k)) delete base[k]; changed = true; return; }
+        if (loc == null) return;
+        /* beide Seiten haben sich verändert (oder die Datenbank hat einen älteren, anderen Stand): zusammenführen */
+        var b0 = has(base, k) ? base[k] : (has(pushed, k) ? pushed[k] : null);
+        var merged = mergeStr(k, b0, loc, m.v, lt > m.t);
+        if (merged === m.v) { setRaw(k, m.v); ts[k] = m.t; pushed[k] = m.v; delete base[k]; dirty.delete(k); changed = true; return; }
+        if (merged !== loc) { setRaw(k, merged); changed = true; }
+        base[k] = m.v; pushed[k] = m.v; ts[k] = Math.max(Date.now(), lt, m.t + 1); dirty.add(k);
       });
       KEYS.forEach(function (k) {
         var m = rem[k], s = raw(k);
         if (s == null) return;
         if (!m || (ts[k] || 0) > m.t) { if (!(ts[k] > 0)) ts[k] = 1; dirty.add(k); }
       });
-      saveTs(); pulledOnce = true; lsSet("fc__synced", "1");
+      saveTs(); saveBase(); pulledOnce = true; lsSet("fc__synced", "1");
       return changed;
     } finally { pulling = false; }
   }
   async function push(k) {
-    var s = raw(k); if (s == null || pushed[k] === s) return;
-    await R.put(k, ts[k] || Date.now(), s);
-    pushed[k] = s;
+    var s = raw(k); if (s == null) return;
+    if (pushed[k] !== s) { await R.put(k, ts[k] || Date.now(), s); pushed[k] = s; }
+    if (raw(k) === s && has(base, k)) { delete base[k]; saveBase(); }
   }
   async function flush() {
     if (!R || busy || !pulledOnce) return;
     clearTimeout(flushTimer); clearTimeout(retryTimer); retryTimer = 0;
     if (!dirty.size) { setState("ok"); return; }
     busy = true; setState("saving");
-    var err = null;
+    var err = null, fresh = false;
     try {
-      while (dirty.size) {
+      /* erst lesen, dann schreiben: Änderungen anderer Geräte werden zusammengeführt statt überschrieben */
+      try { fresh = await pullAll(); } catch (e) { err = e; }
+      while (!err && dirty.size) {
         var k = dirty.values().next().value; dirty.delete(k);
         try { await push(k); } catch (e) { dirty.add(k); err = e; break; }
       }
@@ -1174,12 +1248,19 @@ window.FC = (function () {
     if (err) fail(err);
     else if (dirty.size) schedule();
     else setState("ok");
+    if (fresh && mainStarted && !err) reloadWhenIdle();
   }
   function schedule() { clearTimeout(flushTimer); flushTimer = setTimeout(flush, 1200); }
-  function save(k, s) {
+  function save(k, s, force) {
+    var cur = raw(k), synced = KEYS.indexOf(k) >= 0 && mode !== "local";
+    if (synced && !force && mainStarted && has(view, k) && view[k] != null && cur != null && cur !== view[k]) {
+      /* Der Sync hat diesen Bereich verändert, seit die App ihn gelesen hat: App-Änderung und Sync-Stand zusammenführen */
+      var app = s; s = mergeStr(k, view[k], app, cur, true); view[k] = app;
+    } else view[k] = s;
     setRaw(k, s);
-    if (KEYS.indexOf(k) < 0 || mode === "local") return;
+    if (!synced) return;
     if (!pulledOnce && !lsGet("fc__synced")) return; /* neues Gerät: erst abgleichen, damit leere Startwerte nichts überschreiben */
+    if (!has(base, k)) { base[k] = cur; saveBase(); }   /* Stand vor der ersten eigenen Änderung seit dem letzten Abgleich */
     ts[k] = Date.now(); saveTs();
     dirty.add(k);
     if (R) { if (state !== "saving") setState("saving"); schedule(); }
@@ -1190,14 +1271,17 @@ window.FC = (function () {
       return !(typeof isActive === "function" && isActive()) && !document.querySelector("dialog[open]") && !(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) && !(typeof rad !== "undefined" && rad.busy);
     } catch (e) { return true; }
   }
+  var reloading = false;
   async function reloadWhenIdle() {
+    if (reloading) return; reloading = true;
     for (var i = 0; i < 600; i++) {
       if (idle()) {
-        if (dirty.size) { await flush(); if (dirty.size && !lsGet("fc__ts")) return; }
+        if (dirty.size) { await flush(); if (dirty.size && !lsGet("fc__ts")) { reloading = false; return; } }
         location.reload(); return;
       }
       await delay(4000);
     }
+    reloading = false;
   }
   function onRemoteChange() {
     if (pulling) return;
@@ -1228,6 +1312,7 @@ window.FC = (function () {
     if (mode === "local") { mainStarted = true; runMain(); return; }
     var p = start();
     var done = await Promise.race([p.then(function () { return true; }), delay(7000).then(function () { return false; })]);
+    KEYS.forEach(function (k) { view[k] = raw(k); });
     mainStarted = true; runMain(); paint();
     p.then(function (ch) {
       if (!R) return;
@@ -1285,13 +1370,14 @@ window.FC = (function () {
     var o; try { o = JSON.parse(text); } catch (e) { throw new Error("Das ist keine gültige Sicherung."); }
     if (!o || o.app !== "fitness-coach" || !o.data || typeof o.data !== "object") throw new Error("Das ist keine Sicherung aus dieser App.");
     var n = 0;
-    KEYS.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(o.data, k)) { save(k, JSON.stringify(o.data[k])); n++; } });
+    KEYS.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(o.data, k)) { save(k, JSON.stringify(o.data[k]), true); n++; } });
     if (!n) throw new Error("In der Sicherung waren keine Daten.");
     if (R) await flush();
     return n;
   }
   return { KEYS: KEYS, embedded: embedded, mode: mode, raw: raw, save: save, boot: boot, paint: paint, syncNow: syncNow, exportAll: exportAll, importAll: importAll,
     sbLogin: sbLogin, sbLogout: sbLogout, sbInfo: sbInfo, state: function () { return state; }, dirtyCount: function () { return dirty.size; },
+    _merge: mergeStr,
     onSaveFail: function (fn) { onSaveFail = fn; if (saveFails && fn) { try { fn(); } catch (e) {} } } };
 })();
 </script>
