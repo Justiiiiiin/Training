@@ -36,6 +36,24 @@ with sync_playwright() as p:
         pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
     pg.evaluate("localStorage.setItem('fc_settings', JSON.stringify(Object.assign({}, settings, {text: 999})))"); pg.reload(); pg.wait_for_timeout(600)
     ck("Ungültiger Wert wird zu 100 %", pg.evaluate("settings.text") == 100 and pg.evaluate("document.documentElement.style.fontSize") == "")
+    # iOS: Zoom-Sperre greift sofort (vor dem Hauptcode) über Gesten- und Touch-Ereignisse
+    c2 = b.new_context(viewport={"width": 390, "height": 844}, has_touch=True, is_mobile=True)
+    pz = c2.new_page(); pz.route("**/js/app.js*", lambda r: r.abort()); pz.goto(URL); pz.wait_for_timeout(500)
+    ck("Sperre aktiv, auch wenn der Hauptcode noch nicht da ist", pz.evaluate("typeof renderToday") == "undefined")
+    ck("gesturestart wird abgefangen", pz.evaluate("(() => { const e = new Event('gesturestart', { cancelable: true }); document.dispatchEvent(e); return e.defaultPrevented; })()"))
+    ck("Pinch per touchmove (scale 2) wird abgefangen", pz.evaluate("(() => { const e = new Event('touchmove', { cancelable: true }); Object.defineProperty(e, 'scale', { value: 2 }); document.dispatchEvent(e); return e.defaultPrevented; })()"))
+    ck("normales Scrollen (scale 1) bleibt frei", not pz.evaluate("(() => { const e = new Event('touchmove', { cancelable: true }); Object.defineProperty(e, 'scale', { value: 1 }); document.dispatchEvent(e); return e.defaultPrevented; })()"))
+    c2.close()
+    # Kein Eingabefeld unter 16 px (sonst zoomt iOS beim Antippen), auch in den Dialogen
+    pg.evaluate("settings.text = 100; applyTextSize(); logEat(RECIPES[0], 1); MYD.unshift({id:'1',name:'Gericht',k:500,p:30,c:2,w:400,est:false,lg:250,text:'200 g Reis'}); mydSave()")
+    Q = "() => Array.from(document.querySelectorAll('input:not([type=checkbox]):not([type=radio]):not([type=range]), select, textarea')).filter(e => e.offsetParent !== null || e.closest('dialog[open]')).filter(e => parseFloat(getComputedStyle(e).fontSize) < 16).map(e => e.id || e.className || e.tagName)"
+    small = []
+    for t in TABS:
+        pg.evaluate(f"showTab('{t}')"); pg.evaluate("document.querySelectorAll('details').forEach(d => d.open = true)"); small += pg.evaluate(Q)
+    for js in ["openEat()", "openSettings()", "openRecipe(RECIPES[0].id)", "openCook(RECIPES[0].id)"]:
+        pg.evaluate(js); pg.wait_for_timeout(250); pg.evaluate("document.querySelectorAll('details').forEach(d => d.open = true)"); small += pg.evaluate(Q)
+        pg.evaluate("document.querySelectorAll('dialog[open]').forEach(d => d.close())")
+    ck("alle Eingabefelder mindestens 16 px", not small, str(small[:5]))
     ck("keine Fehler", not errs, str(errs[:2]))
     b.close()
 print("FAILS", fails)
