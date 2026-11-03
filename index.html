@@ -635,6 +635,8 @@ body[data-coach="0"] .side { display: none; }
 .cats { gap: 6px; flex-wrap: wrap; }
 .cats .btn { min-height: 36px; padding: 0 12px; }
 .ver { position: fixed; top: calc(3px + env(safe-area-inset-top, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); z-index: 5; font-size: 0.6875rem; line-height: 1; color: var(--muted); pointer-events: none; font-variant-numeric: tabular-nums; background: var(--bg); padding: 3px 7px; border-radius: 999px; }
+/* Am Handy nicht mehr fest am oberen Rand: iOS legt sonst einen Weichzeichner über den Kopfbereich */
+@media (max-width: 979px) { .ver { position: absolute; top: calc(16px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); background: none; padding: 0; } }
 
 .hday { border-top: 1px solid var(--line); padding: 4px 0; }
 .hday { content-visibility: auto; contain-intrinsic-size: auto 48px; }
@@ -733,7 +735,7 @@ em.tag { font-style: normal; font-size: 0.75rem; font-weight: 650; padding: 2px 
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.18 · 03.11. 10:07</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.19 · 03.11. 10:14</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
