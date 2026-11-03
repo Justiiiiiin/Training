@@ -8,10 +8,16 @@ self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES.map((f) => new Request(f, { cache: "reload" })))).then(() => self.skipWaiting()));
 });
 
+/* Ein Eintrag pro Datei: ohne ?v=… gespeichert, damit der Speicher nicht mit jeder Version wächst und offline immer die neueste Fassung kommt */
+const keyOf = (url) => { const u = new URL(url); u.search = ""; u.hash = ""; return u.href; };
+
 self.addEventListener("activate", (e) => {
   e.waitUntil((async () => {
     const ks = await caches.keys(), old = ks.filter((k) => k !== CACHE);
     await Promise.all(old.map((k) => caches.delete(k)));
+    /* ältere Einträge mit ?v=… aufräumen */
+    const c = await caches.open(CACHE), reqs = await c.keys();
+    await Promise.all(reqs.filter((r) => new URL(r.url).search).map((r) => c.delete(r)));
     await self.clients.claim();
     /* Hat eine ältere Version dieses Offline-Speichers die Seite womöglich veraltet gehalten, lade offene Fenster einmal neu. */
     if (old.length) {
@@ -29,10 +35,10 @@ async function netFirst(req) {
       fetch(req.url, { cache: "no-cache", credentials: "same-origin" }),
       new Promise((_, no) => setTimeout(() => no(new Error("timeout")), 4500))
     ]);
-    if (r && r.ok) c.put(req.url, r.clone());
+    if (r && r.ok) c.put(keyOf(req.url), r.clone());
     return r;
   } catch (err) {
-    const hit = (await c.match(req.url, { ignoreSearch: true })) || (req.mode === "navigate" ? (await c.match("index.html")) || (await c.match("./")) : null);
+    const hit = (await c.match(keyOf(req.url))) || (req.mode === "navigate" ? (await c.match("index.html")) || (await c.match("./")) : null);
     return hit || Response.error();
   }
 }
