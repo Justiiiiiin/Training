@@ -189,6 +189,18 @@ with sync_playwright() as p:
         ck("große Schrift, kein Überlauf: " + tab, noscroll(p2))
     c2.close()
 
+    # Desktop: Glücksrad komplett sichtbar, Einstellungen links, Rad rechts
+    c3 = b.new_context(viewport={"width": 1280, "height": 800})
+    p3 = c3.new_page(); p3.on("pageerror", lambda e: errs.append(str(e)))
+    p3.goto(URL); ready(p3)
+    p3.evaluate("showTab('rad')"); p3.wait_for_timeout(400)
+    wb, db, sb = box(p3, "#wheel"), box(p3, ".raddeck"), box(p3, "#spin")
+    ck("D1 Desktop: Rad komplett im Bild", wb["y"] >= 0 and wb["y"] + wb["h"] <= 800, wb)
+    ck("D1 Desktop: Einstellungen links vom Rad", db["x"] + db["w"] <= wb["x"] + 1, [db, wb])
+    ck("D1 Desktop: Drehen sichtbar", sb["y"] + sb["h"] <= 800, sb)
+    ck("D1 Desktop: kein seitlicher Überlauf", noscroll(p3))
+    c3.close()
+
     ck("keine Fehler", not errs, errs)
     b.close()
 print("FAILS", fails)
