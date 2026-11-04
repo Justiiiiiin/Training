@@ -124,6 +124,77 @@ def nudeln():
                  "Die Nudeln mit einem Schuss Nudelwasser untermischen und mit Parmesan bestreuen."])
 
 
+def sahnenudeln():
+    """Nudeln mit Sahne: Tomaten-Sahne-Soße mit Burrata obendrauf, Parmesan-Sahne-Soße, überbackene Sahne-Nudeln und Zitronen-Nudeln mit Burrata.
+    Burrata kommt immer erst zum Schluss auf den Teller (nicht erhitzen). Eine Kugel (125 g) reicht für zwei Portionen."""
+    nw = CARB["nudel"][3] + " Etwas Nudelwasser aufheben."
+    tipb = "Eine Kugel Burrata (125 g) reicht für zwei Portionen. Nach dem Öffnen bald essen (siehe Packung)."
+    kurz = {"schink": ("Schinken", 60, "Den Schinken in Würfel schneiden und im Öl 2 Minuten anbraten.", 0.5)}
+
+    def fleisch(m, g_fleisch):
+        """(Titelwort, Menge, Brat-Schritt, Öl in TL) für Fleisch aus MEAT oder Schinken."""
+        if m in kurz:
+            n, g, st, o = kurz[m]
+            return n, g_fleisch or g, st, o
+        pre, g, art = MEAT[m]
+        return pre, g_fleisch or g, meat_step(m), meat_oel(m)
+
+    # (a) Tomaten-Sahne-Soße mit Burrata
+    soss = ("Die stückigen Tomaten zugeben, mit dem Löffel etwas zerdrücken und 6 Minuten köcheln lassen. "
+            "Die Sahne einrühren und 2 Minuten sanft kochen, mit Salz, Pfeffer und Basilikum abschmecken.")
+    for vn, vd, vp, vc, top, sa in [
+        ("Rucola", dict(tom=1, ruc=20), "Zwiebel würfeln, Knoblauch fein hacken, Tomate in Stücke schneiden.",
+         "Zwiebel im Öl 3 Minuten glasig dünsten, Knoblauch kurz mitbraten. ",
+         "Die Nudeln mit der Soße mischen, bei Bedarf einen Schuss Nudelwasser zugeben. Auf Tellern verteilen, die Burrata darauf zerzupfen und Rucola und Parmesan darübergeben.", 30),
+        ("Paprika", dict(pap=1), "Zwiebel würfeln, Knoblauch fein hacken, Paprika in Stücke schneiden.",
+         "Zwiebel und Paprika im Öl 4 Minuten anbraten, Knoblauch kurz mitbraten. ",
+         "Die Nudeln mit der Soße mischen, bei Bedarf einen Schuss Nudelwasser zugeben. Auf Tellern verteilen, die Burrata darauf zerzupfen und mit dem Parmesan bestreuen.", 25)]:
+        i = join(ing(nudel=60, burrata=60, parm=15, oel=0.5), ing(zwie=0.5, knob=1, stueck=200, sahne=sa, T="Basilikum, Salz und Pfeffer"), ing(**vd))
+        add(f"Tomaten-Sahne-Nudeln mit Burrata und {vn}", "M", 25, "", i, [nw, vp, vc + soss, top], tipb)
+    for m in ["haehn", "pute", "schink", "haehnst"]:
+        pre, g, st, o = fleisch(m, 80 if m != "schink" else 60)
+        i = join(ing(**{m: g, "nudel": 60, "burrata": 60, "oel": 0.5}), ing(zwie=0.5, knob=1, stueck=200, sahne=25, tom=1, T="Basilikum, Salz und Pfeffer"))
+        add(f"{pre}-Nudeln in Tomaten-Sahne-Soße mit Burrata", "M", 30, "", i,
+            [nw, "Zwiebel würfeln, Knoblauch fein hacken, Tomate in Stücke schneiden.", st,
+             "Zwiebel und Knoblauch zum Fleisch geben und 3 Minuten mitbraten. " + soss,
+             "Die Nudeln mit der Soße mischen, bei Bedarf einen Schuss Nudelwasser zugeben. Auf Tellern verteilen und die Burrata darauf zerzupfen."], tipb)
+
+    # (b) Parmesan-Sahne-Soße
+    for m in ["haehn", "pute", "schink"]:
+        pre, g, st, o = fleisch(m, 90 if m != "schink" else 70)
+        i = join(ing(**{m: g, "nudel": 70, "sahne": 40, "parm": 15, "oel": o}), ing(zwie=0.5, knob=1, tom=2, ruc=20, T="Muskat, Salz und Pfeffer"))
+        add(f"{pre}-Nudeln in Parmesan-Sahne-Soße mit Tomate und Rucola", "M", 25, "p", i,
+            [nw, "Zwiebel würfeln, Knoblauch fein hacken, Tomaten in Stücke schneiden.", st,
+             "Zwiebel und Knoblauch zum Fleisch geben und 2 Minuten mitbraten. Die Sahne zugießen und bei niedriger Hitze 2 Minuten köcheln lassen. Den Parmesan einrühren, bis er geschmolzen ist, und mit Muskat, Salz und Pfeffer würzen.",
+             "Die Tomaten zugeben und 2 Minuten ziehen lassen. Die Nudeln untermischen, bei Bedarf einen Schuss Nudelwasser zugeben, und den Rucola daraufgeben."])
+
+    # (c) Überbackene Tomaten-Sahne-Nudeln
+    for m in ["haehn", "pute", "schink"]:
+        pre, g, st, o = fleisch(m, 80 if m != "schink" else 60)
+        nm = {"Hähnchen": "Hähnchen", "Puten": "Pute", "Schinken": "Schinken"}[pre]
+        i = join(ing(**{m: g, "nudel": 60, "moz": 40, "oel": o}), ing(zwie=0.5, knob=1, stueck=200, sahne=30, tom=1, T="Oregano, Salz und Pfeffer"))
+        add(f"Überbackene Tomaten-Sahne-Nudeln mit {nm} und Mozzarella", "M", 40, "p", i,
+            ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. Die Nudeln 3 Minuten kürzer als auf der Packung angegeben kochen.", "Zwiebel würfeln, Knoblauch fein hacken, Tomate in Stücke schneiden, Mozzarella zupfen.", st,
+             "Zwiebel und Knoblauch zum Fleisch geben und 3 Minuten mitbraten. Stückige Tomaten, Tomate und Sahne zugeben, 5 Minuten köcheln lassen und mit Oregano, Salz und Pfeffer abschmecken.",
+             "Nudeln und Soße in einer Auflaufform mischen, den Mozzarella darauf verteilen und 15 bis 20 Minuten backen, bis der Käse goldbraun ist."])
+
+    # (d) Zitronen-Nudeln mit Burrata
+    for m, g_f in [(None, 0), ("haehn", 90)]:
+        if m:
+            pre, g, st, o = fleisch(m, g_f)
+            titel = f"{pre}-Zitronen-Nudeln mit Rucola, Tomate und Burrata"
+            i = join(ing(**{m: g, "nudel": 70, "burrata": 50, "parm": 10, "oel": o + 0.5}), ing(tom=2, ruc=30, zitrone=2, knob=1, T="Chiliflocken, Salz und Pfeffer"))
+            steps = [nw, "Tomaten in Stücke schneiden, Knoblauch fein hacken.", st,
+                     "Knoblauch und Chili zum Fleisch geben und 1 Minute mitbraten (der Knoblauch soll nicht braun werden). Tomaten zugeben und 3 Minuten schmoren."]
+        else:
+            titel = "Zitronen-Nudeln mit Rucola, Tomate und Burrata"
+            i = join(ing(nudel=70, burrata=75, parm=15, oel=1), ing(tom=3, ruc=30, zitrone=2, knob=1, T="Chiliflocken, Salz und Pfeffer"))
+            steps = [nw, "Tomaten in Stücke schneiden, Knoblauch fein hacken.",
+                     "Knoblauch und Chili im Öl 1 Minute anbraten (der Knoblauch soll nicht braun werden). Tomaten zugeben und 3 Minuten schmoren."]
+        add(titel, "M", 25, "", i, steps + ["Die Nudeln mit Zitronensaft und einem Schuss Nudelwasser untermischen, bis eine leicht cremige Soße entsteht. Den Rucola unterheben.",
+                                           "Auf Tellern verteilen, die Burrata darauf zerzupfen und den Parmesan darüberhobeln."], tipb)
+
+
 def auflaeufe():
     # (a) Nudelauflauf
     for mi, m in enumerate(["haehn", "pute", "phack", "rhack", "schink"]):

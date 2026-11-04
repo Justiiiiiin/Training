@@ -123,6 +123,7 @@ def run():
     bowls()
     gen_main2.wraps()
     gen_main2.nudeln()
+    gen_main2.sahnenudeln()
     gen_main2.auflaeufe()
     import gen_main3, gen_main4
     gen_main3.suppen()

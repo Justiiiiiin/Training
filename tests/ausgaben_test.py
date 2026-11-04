@@ -14,13 +14,14 @@ with sync_playwright() as p:
     pg.on("pageerror",lambda e:errs.append(str(e))); pg.on("console",lambda m: errs.append(m.text) if m.type=="error" else None)
     pg.goto(URL); pg.wait_for_timeout(600)
     pg.evaluate(SETUP)
+    QP=pg.evaluate("PRICE.quark.price")  # Packungspreis Magerquark aus der Preisliste, damit der Test bei neuen Preisen nicht bricht
     ev=lambda: pg.evaluate("(()=>{const E=buyEstimate(); return E.packs.filter(x=>x.k==='quark').map(x=>({d:x.d,n:x.n,cost:Math.round(x.cost*100)/100,uses:x.uses.length}))})()")
     # Dein Beispiel: 300 g Montag, 200 g Donnerstag -> eine Packung
     pg.evaluate("""()=>{ DIARY['2026-10-05']={items:[{id:'t300',t:'t300',k:1,p:1,c:0.3}],water:0}; DIARY['2026-10-08']={items:[{id:'t200',t:'t200',k:1,p:1,c:0.2}],water:0}; }""")
-    r=ev(); ck("300 g Mo + 200 g Do = eine Packung", len(r)==1 and r[0]['n']==1 and r[0]['uses']==2 and abs(r[0]['cost']-0.99)<0.01, r)
+    r=ev(); ck("300 g Mo + 200 g Do = eine Packung", len(r)==1 and r[0]['n']==1 and r[0]['uses']==2 and abs(r[0]['cost']-QP)<0.01, r)
     # zu spaet -> zwei Packungen
     pg.evaluate("""()=>{ DIARY['2026-10-08']=undefined; delete DIARY['2026-10-08']; DIARY['2026-10-12']={items:[{id:'t200',t:'t200',k:1,p:1,c:0.2}],water:0}; }""")
-    r=ev(); ck("Donnerstag knapp danach, aber ueber Haltbarkeit -> zwei Packungen", len(r)==2 and abs(sum(x['cost'] for x in r)-1.98)<0.01, r)
+    r=ev(); ck("Donnerstag knapp danach, aber ueber Haltbarkeit -> zwei Packungen", len(r)==2 and abs(sum(x['cost'] for x in r)-2*QP)<0.01, r)
     # Randfall: genau am letzten Tag (4 Tage) noch erlaubt
     pg.evaluate("""()=>{ delete DIARY['2026-10-12']; DIARY['2026-10-09']={items:[{id:'t200',t:'t200',k:1,p:1,c:0.2}],water:0}; }""")
     r=ev(); ck("am 4. Tag noch dieselbe Packung", len(r)==1, r)
@@ -50,7 +51,7 @@ with sync_playwright() as p:
     pg.wait_for_timeout(300)
     t=pg.inner_text("#spendcard")
     ck("Karte zeigt geschaetzten Einkauf", "Einkauf geschätzt, 1 Packung" in t, t[:200].replace("\n"," | "))
-    ck("Betrag 0,99", "0,99" in t)
+    ck("Betrag = ein Quark-Packungspreis", ("%.2f" % QP).replace(".", ",") in t)
     pg.evaluate("document.getElementById('estbox').open=true"); pg.wait_for_timeout(200)
     t=pg.inner_text("#estbox")
     ck("Aufschluesselung nennt beide Tage", "300 g" in t and "200 g" in t and "zusammen 1 Packung" in t, t[:300].replace("\n"," | "))
