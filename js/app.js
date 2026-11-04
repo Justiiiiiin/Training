@@ -661,7 +661,7 @@ function renderNutrition() {
 }
 function renderTips() {
   $("#panel-tipps").innerHTML =
-    '<div class="card"><h3>Deine Woche</h3><div class="week">' + weekPlan().map((d) => '<div class="' + (d[2] ? "on" : "") + '"><b>' + d[0] + "</b>" + d[1] + "</div>").join("") + "</div></div>" +
+    '<div class="card"><h3>Deine Woche</h3><div class="week">' + weekPlan().map((d, i) => '<div class="' + (d[2] ? "on" : "") + (i === (new Date().getDay() + 6) % 7 ? " today" : "") + '"><b>' + d[0] + (i === (new Date().getDay() + 6) % 7 ? ' <small class="wtoday">Heute</small>' : "") + "</b>" + d[1] + "</div>").join("") + "</div></div>" +
     '<div class="grid2">' + TIPS.map((g) => '<article class="card"><h3>' + g.h + "</h3><ul>" + g.items.map((i) => "<li>" + i + "</li>").join("") + "</ul></article>").join("") + "</div>";
   $("#panel-tipps .card").setAttribute("data-nofold", "");
   foldCards($("#panel-tipps"));
