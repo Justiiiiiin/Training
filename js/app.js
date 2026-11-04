@@ -398,7 +398,7 @@ function renderFilters() {
   const base = JSON.parse(FDEF);
   const nAct = FKEYS.filter((k) => k !== "meal" && F[k] !== base[k]).length + EXC.length;
   $("#filters").innerHTML =
-    '<div class="search">' + ic("search") + '<input type="search" id="rsearch" placeholder="Suchen, z. B. Quark, Linsen, Hähnchen" value="' + F.q.replace(/"/g, "&quot;") + '" aria-label="Rezepte suchen"></div>' +
+    '<div class="search">' + ic("search") + '<input type="search" id="rsearch" placeholder="Suchen, z. B. Quark, Linsen" value="' + F.q.replace(/"/g, "&quot;") + '" aria-label="Rezepte suchen"></div>' +
     '<div class="fgroup">' + ["Frühstück", "Mittag/Abend", "Snack"].map((m) => chip("meal", m, m, F.meal === m)).join("") + "</div>" +
     '<details class="more" id="fmore"' + (FOPEN ? " open" : "") + '><summary>Weitere Filter' + (nAct ? '<span class="badge">' + nAct + "</span>" : "") + "</summary>" +
     '<div class="fgroup"><span class="lbl">Ernährung</span>' + chip("diet", "vegetarisch", "Vegetarisch", F.diet === "vegetarisch") + chip("diet", "vegan", "Vegan", F.diet === "vegan") + "</div>" +
@@ -2394,7 +2394,7 @@ function drawEat(msg) {
   const q = EATQ.trim().toLowerCase();
   const l = q ? RECIPES.filter((r) => (r.title + " " + r.ing.map((i) => i[2]).join(" ")).toLowerCase().includes(q)).slice(0, 8) : suggestList(8);
   $("#dlg-eat").innerHTML = '<div class="dlg"><div class="dlg-head"><h3>Essen eintragen</h3><button class="btn icon" data-close aria-label="Schließen">' + ic("close") + "</button></div>" +
-    '<div class="search">' + ic("search") + '<input type="search" id="eatq" placeholder="Rezept suchen, z. B. Quark oder Wrap" value="' + EATQ.replace(/"/g, "&quot;") + '" aria-label="Rezept suchen"></div>' +
+    '<div class="search">' + ic("search") + '<input type="search" id="eatq" placeholder="Rezept suchen, z. B. Quark" value="' + EATQ.replace(/"/g, "&quot;") + '" aria-label="Rezept suchen"></div>' +
     (RECENT.length ? '<div class="recent"><span class="small muted">Zuletzt gegessen, ein Tipp trägt es nochmal ein:</span><div class="row recentrow">' + RECENT.map((x, i) => '<button class="fchip" type="button" data-eatagain="' + i + '">' + esc(x.t.length > 28 ? x.t.slice(0, 26) + "…" : x.t) + " · " + x.k + " kcal</button>").join("") + "</div></div>" : "") +
     '<div class="row eatjump"><button class="btn sm" type="button" data-eatjump="calc-sec">Selbst berechnen</button><button class="btn sm" type="button" data-eatjump="myd-sec">Meine Gerichte' + (MYD.length ? " (" + MYD.length + ")" : "") + '</button></div><p class="small muted" role="status">' + esc(msg || (q ? l.length + " Treffer" : "Vorschläge für heute")) + "</p>" +
     '<ul class="eatlist">' + (l.length ? l.map((r) => "<li><div><b>" + r.title + '</b><span class="muted small">' + r.protein + " g Eiweiß, " + r.kcal + " kcal, ca. " + eur(r.cost) + '</span></div><button class="btn sm" data-eat="' + r.id + '">Eintragen</button></li>').join("") : '<li class="muted">Kein Rezept gefunden. Trag es unten selbst ein.</li>') + "</ul>" +
