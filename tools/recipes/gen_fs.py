@@ -78,12 +78,12 @@ def fruehstueck():
             if (vi + fi) % 2:
                 continue
             add(f"Gefülltes Omelett mit {nl(vn, fn)}", "F", 12, "g", join(ing(ei=3, oel=1, brot=1), ing(**vd), ing(**fd), ing(T="Salz und Pfeffer")),
-                [vs, "Das Gemüse im Öl 3 Minuten anbraten und herausnehmen (Spinat zusammenfallen lassen).", "Die Eier verquirlen, würzen und in die Pfanne geben. Bei mittlerer Hitze fast stocken lassen.", f"Gemüse und {fn} auf eine Hälfte legen, zuklappen und 1 bis 2 Minuten ziehen lassen, bis das Ei ganz fest ist.", "Mit einer Scheibe Brot essen."])
+                [vs, "Das Gemüse im Öl 3 Minuten anbraten" + (", bis der Spinat zusammengefallen ist," if "spin" in vd else "") + " und herausnehmen.", "Die Eier verquirlen, würzen und in die Pfanne geben. Bei mittlerer Hitze fast stocken lassen.", f"Gemüse und {fn} auf eine Hälfte legen, zuklappen und 1 bis 2 Minuten ziehen lassen, bis das Ei ganz fest ist.", "Mit einer Scheibe Brot essen."])
     # (6) Ei-Muffins
     for fi, (fn, fd) in enumerate([("Schinken", dict(schink=30)), ("Putenaufschnitt", dict(paufs=40)), ("Mozzarella", dict(moz=40))]):
         for vi, (vn, vd) in enumerate([("Paprika", dict(pap=0.5, zwie=0.25)), ("Tomate", dict(tom=1, zwie=0.25))]):
             add(f"Ei-Muffins mit {nl(fn, vn)}", "F", 25, "pga", join(ing(ei=3, gouda=20), ing(**fd), ing(**vd), ing(T="Salz und Pfeffer")),
-                ["Ofen auf 180 °C Ober- und Unterhitze vorheizen. Eine Muffinform einfetten oder mit Papierförmchen auslegen.", "Gemüse und Fleisch (oder Mozzarella) klein schneiden und in den Mulden verteilen.", "Die Eier verquirlen, würzen, mit dem Gouda mischen und darübergießen. Pro Portion reichen etwa 3 Mulden.",
+                ["Ofen auf 180 °C Ober- und Unterhitze vorheizen. Eine Muffinform einfetten oder mit Papierförmchen auslegen.", f"{vn}, Zwiebel und {fn} klein schneiden und in den Mulden verteilen.", "Die Eier verquirlen, würzen, mit dem Gouda mischen und darübergießen. Pro Portion reichen etwa 3 Mulden.",
                  "18 bis 20 Minuten backen, bis die Eier ganz fest sind. Die Muffins halten sich gekühlt 2 Tage und schmecken auch kalt."])
     # (7) Pfannkuchen und French Toast
     for ti, (tn, td, ts) in enumerate([("Erdbeeren", dict(erdb=100), "Mit den Erdbeeren servieren."), ("Honig", dict(honig=1), "Mit Honig beträufeln."), ("Kakao und Skyr", dict(kakao=1, skyr=80), "Skyr mit Kakao verrühren und dazu essen."), ("Joghurt und Honig", dict(jogGr=60, honig=1), "Mit Joghurt und Honig servieren."), ("Mandeln", dict(mandel=10), "Mit gehackten Mandeln bestreuen.")]):
@@ -126,7 +126,7 @@ def snacks():
     for mi, (m, g, mn) in enumerate([("schink", 40, "Schinken"), ("paufs", 50, "Putenaufschnitt"), ("ei", 1, "Ei"), ("gouda", 30, "Gouda")]):
         for vi, (vn, vd, vs) in enumerate([("Tomate", dict(tom=1), "Die Tomate in Stücke schneiden."), ("Gurke und Tomate", dict(gurke=60, tom=1), "Gurke und Tomate in Stücke schneiden.")]):
             pre = "Eier mindestens 8 Minuten hart kochen, abschrecken, pellen und vierteln. " if m == "ei" else ""
-            add(f"Mozzarella-Spieße mit {nl(mn, vn)}", "S", 6, "ka", join(ing(moz=60), ing(**{m: g}), ing(**vd), ing(T="Basilikum und Pfeffer")), [pre + vs, "Den Mozzarella würfeln, Fleisch (oder Gouda) in Stücke schneiden.", "Abwechselnd auf Spieße stecken und mit Basilikum und Pfeffer bestreuen."])
+            add(f"Mozzarella-Spieße mit {nl(mn, vn)}", "S", 6, "ka", join(ing(moz=60), ing(**{m: g}), ing(**vd), ing(T="Basilikum und Pfeffer")), [pre + vs, "Den Mozzarella würfeln." + {"schink": " Den Schinken in Stücke schneiden.", "paufs": " Den Putenaufschnitt in Stücke schneiden.", "gouda": " Den Gouda würfeln.", "ei": ""}[m], "Abwechselnd auf Spieße stecken und mit Basilikum und Pfeffer bestreuen."])
     # (3) Cremes
     for bi, (bn, bd) in enumerate([("Skyr", dict(skyr=150)), ("Quark", dict(quark=150)), ("Speisequark", dict(speisequark=130)), ("Joghurt-Quark", dict(jogGr=70, quark=80))]):
         for fi, (fk, (fd, fn, fs)) in enumerate(FR_S.items()):
@@ -136,7 +136,7 @@ def snacks():
                 add(f"{bn}-Creme mit {nl(fn, tn)}", "S", 4, "kgl", join(ing(**bd), ing(**fd), ing(**td)), [fs, f"{bn} glatt rühren und die Frucht unterheben oder daraufgeben.", ts])
     for bi, (bn, bd) in enumerate([("Quark", dict(quark=150)), ("Skyr", dict(skyr=150))]):
         for fi, (fk, (fd, fn, fs)) in enumerate(FR_S.items()):
-            add(f"Gefrorenes {bn}-Eis mit {fn}", "S", 5, "kp", join(ing(**bd), ing(**fd), ing(honig=1)), [fs, "Alles im Mixer cremig mixen (Bananen vorher einfrieren, dann wird es eisig).", "In ein Gefäß füllen, mindestens 2 Stunden einfrieren und vor dem Essen 10 Minuten antauen lassen."])
+            add(f"Gefrorenes {bn}-Eis mit {fn}", "S", 5, "kp", join(ing(**bd), ing(**fd), ing(honig=1)), [fs, "Alles im Mixer cremig mixen.", "In ein Gefäß füllen und mindestens 2 Stunden einfrieren (das ist reine Wartezeit). Vor dem Essen 10 Minuten antauen lassen."])
     # (4) Eier-Snacks
     for ti, (tn, td, ts) in enumerate([("Paprikapulver", dict(paprikap=0.5), "mit Paprikapulver und Salz bestreuen"), ("Senf", dict(senf=1), "mit Senf anrichten"), ("Joghurt-Dip", dict(jogGr=40, T="Kräuter"), "mit dem Joghurt-Dip servieren")]):
         for vi, (vn, vd, vs) in enumerate([("Gurke", dict(gurke=100), "Gurke in Scheiben"), ("Tomate", dict(tom=1), "Tomate in Spalten"), ("Paprika", dict(pap=0.5), "Paprika in Streifen")]):
@@ -144,7 +144,7 @@ def snacks():
     for fi, (fn, fd) in enumerate([("Saurer Gurke", dict(sgurke=2)), ("Gurke", dict(gurke=60)), ("Tomate", dict(tom=0.5))]):
         for bi, (bn, bd) in enumerate([("Quark", dict(quark=50)), ("Joghurt", dict(jogGr=40))]):
             add(f"Eiersalat mit {bn} und {fn} auf Brot", "S", 12, "ga", join(ing(ei=2, brot=1), ing(**fd), ing(**bd), ing(senf=0.5, T="Salz und Pfeffer")),
-                ["Eier mindestens 8 Minuten hart kochen, abschrecken und pellen.", "Die Eier mit einer Gabel zerdrücken, mit Quark (oder Joghurt), Senf, klein geschnittenem Gemüse, Salz und Pfeffer vermischen.", "Auf das Brot streichen."])
+                ["Eier mindestens 8 Minuten hart kochen, abschrecken und pellen.", f"Die Eier mit einer Gabel zerdrücken, mit {bn}, Senf, klein geschnittener {fn}, Salz und Pfeffer vermischen.", "Auf das Brot streichen."])
     # (5) Mini-Brote und Mini-Wraps
     MB = [("Speisequark und Tomate", dict(speisequark=60, tom=1), "Den Quark auf {a} {c} streichen und die Tomate in Scheiben darauflegen."),
           ("Putenaufschnitt und Gurke", dict(paufs=50, gurke=60), "Aufschnitt und Gurkenscheiben auf {a} {c} legen."),
@@ -167,9 +167,9 @@ def snacks():
                 ["Ofen auf 200 °C Ober- und Unterhitze vorheizen.", "Das Fleisch in mundgerechte Stücke schneiden. Das Ei verquirlen, die Haferflocken mit Paprikapulver und Salz mischen.", "Die Stücke erst im Ei, dann in den Haferflocken wenden und auf ein geöltes Blech legen.",
                  "12 bis 15 Minuten backen, bis das Fleisch durch ist, einmal wenden. Den Dip verrühren und dazu essen."])
     for mi, (m, g) in enumerate([("rhack", 80), ("phack", 90)]):
-        for di, (dn, dd) in enumerate([("Joghurt-Gurken", dict(jogGr=40, gurke=80, T="Salz und Pfeffer")), ("Paprika-Quark", dict(quark=50, pap=0.5, paprikap=0.5)), ("Tomaten-Senf", dict(tom=1, senf=1, quark=40))]):
+        for di, (dn, dd, dv) in enumerate([("Joghurt-Gurken", dict(jogGr=40, gurke=80, T="Salz und Pfeffer"), "Die Gurke klein schneiden und mit dem Joghurt verrühren"), ("Paprika-Quark", dict(quark=50, pap=0.5, paprikap=0.5), "Die Paprika klein schneiden und mit Quark und Paprikapulver verrühren"), ("Tomaten-Senf", dict(tom=1, senf=1, quark=40), "Die Tomate klein schneiden und mit Quark und Senf verrühren")]):
             add(f"Mini-Frikadellen ({MEAT[m][0]}) mit {dn}-Dip", "S", 20, "pa", join(ing(**{m: g, "hafer": 10, "paprikap": 1, "oel": 0.5}), ing(**dd)),
-                ["Hack mit Haferflocken, Paprikapulver, Salz und Pfeffer verkneten und zu kleinen Bällchen formen.", "Im Öl rundum 8 bis 10 Minuten braten, bis sie innen nicht mehr rosa sind.", "Den Dip aus den Zutaten verrühren (Gurke oder Tomate klein schneiden) und dazu essen."])
+                ["Hack mit Haferflocken, Paprikapulver, Salz und Pfeffer verkneten und zu kleinen Bällchen formen.", "Im Öl rundum 8 bis 10 Minuten braten, bis sie innen nicht mehr rosa sind.", dv + " und als Dip dazu essen."])
     for mi, m in enumerate(["haehn", "pute", "haehnst"]):
         for di, (dn, dd) in enumerate([("Honig-Senf", dict(senf=1, honig=1)), ("Joghurt", dict(jogGr=50, T="Kräuter"))]):
             g = 90
@@ -179,7 +179,7 @@ def snacks():
     for si, (sn, sd) in enumerate([("Paprika", dict(paprikap=1)), ("Kreuzkümmel", dict(kreuz=1)), ("Curry", dict(curry=1))]):
         for di, (dn, dd) in enumerate([("Joghurt", dict(jogGr=60)), ("Quark", dict(quark=70))]):
             add(f"Ofen-Kichererbsen mit {sn} und {dn}-Dip", "S", 35, "pa", join(ing(kiche=120, oel=0.5), ing(**sd), ing(**dd), ing(T="Salz")),
-                ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. Die Kichererbsen abtropfen und gut trocken tupfen.", "Mit Öl, Gewürz und Salz mischen und auf einem Blech verteilen.", "25 bis 30 Minuten backen, zwischendurch einmal schütteln, bis sie knusprig sind.", "Dazu den Dip aus Joghurt (oder Quark) und etwas Salz reichen."])
+                ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. Die Kichererbsen abtropfen und gut trocken tupfen.", "Mit Öl, Gewürz und Salz mischen und auf einem Blech verteilen.", "25 bis 30 Minuten backen, zwischendurch einmal schütteln, bis sie knusprig sind.", f"Dazu den Dip aus {dn} und etwas Salz reichen."])
     for bi, (bn, bd, bs) in enumerate([("Paprika", dict(pap=0.5), "Paprika in Streifen"), ("Tomate", dict(tom=1), "Tomate in Scheiben"), ("Gurke", dict(gurke=60), "Gurke in Scheiben")]):
         add(f"Bohnen-Aufstrich auf Brot mit {bn}", "S", 8, "kg", join(ing(bohne=80, quark=40, brot=1, knob=0.5, paprikap=0.5, zitrone=1), ing(**bd), ing(T="Salz und Pfeffer")),
             ["Die Bohnen abtropfen und mit Quark, Knoblauch, Paprikapulver und Zitronensaft pürieren, mit Salz und Pfeffer abschmecken.", f"{bs} schneiden.", "Den Aufstrich auf das Brot streichen und mit dem Gemüse belegen."])

@@ -76,7 +76,7 @@ def nudeln():
             add(f"Spinat-Quark-Nudeln mit {nm} und {vn}", "M", 25, "p", i,
                 [CARB["nudel"][3], vs + " Knoblauch fein hacken."] + fleisch +
                 ["Spinat mit dem Knoblauch in einer Pfanne zusammenfallen lassen (Tiefkühlspinat 5 bis 7 Minuten garen) und das Gemüse kurz mitbraten.",
-                 "Quark unterrühren, mit Salz, Pfeffer und Muskat würzen und die Nudeln untermischen. Fleisch (oder Ei) und Parmesan daraufgeben."])
+                 f"Quark unterrühren, mit Salz, Pfeffer und Muskat würzen und die Nudeln untermischen. {({'haehn': 'Das Hähnchen', 'pute': 'Die Pute', 'schink': 'Den Schinken', 'ei': 'Die Eier'})[m]} und den Parmesan daraufgeben."])
     # (d) Carbonara-Art mit Ei, voll gegart
     for mi, (m, g) in enumerate([("schink", 60), ("paufs", 60), ("lyoner", 50), ("haehn", 100)]):
         for vi, (vn, vd, vs) in enumerate([("Tomate und Rucola", dict(tom=2, ruc=30), "Tomaten würfeln."), ("Paprika und Tomate", dict(pap=1, tom=1), "Paprika und Tomate würfeln."), ("Tomate", dict(tom=3), "Tomaten würfeln.")]):

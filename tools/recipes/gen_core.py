@@ -57,6 +57,9 @@ FIT = {"oel": (0.5, 0.5), "reis": (10, 40), "nudel": (10, 50), "couscous": (10, 
 LIMIT = {"M": 640, "F": 600, "S": 360}
 MINPROT = {"M": 23, "F": 13, "S": 9}   # wie die Prüfung in build.py: wer darunter liegt, wird gar nicht erst erzeugt
 LOWPROT = []          # Titel, die wegen zu wenig Eiweiß weggefallen sind
+BADTASTE = []         # Titel, die wegen unpassender Kombination weggefallen sind
+KAESE_MILD = {"moz", "gouda"}
+WUERZ_STARK = {"kokos", "soja", "curry", "garam", "kurkuma"}
 LIGHT = {"M": 460, "F": 320, "S": 190}
 
 
@@ -106,9 +109,18 @@ def fit(ingredients, meal):
     return _unparse(parts), sum(_kcal(k, a) for k, a in parts if k)
 
 
+def unpassend(keys):
+    """Kombinationen, die selten gut schmecken: milder Käse zu Curry, Kokos oder Soja, Parmesan zu Curry, Kokos, Soja oder Honig."""
+    if keys & KAESE_MILD and keys & WUERZ_STARK:
+        return True
+    return "parm" in keys and bool(keys & (WUERZ_STARK | {"honig"}))
+
+
 def add(title, meal, time, tags, ingredients, steps, tip=None):
     if slug(title) in USED:
         SKIPPED.append(title); return False
+    if unpassend({k for k, _ in _parse(ingredients) if k}):
+        BADTASTE.append(title); return False
     USED.add(slug(title))
     if DB:
         ingredients, kc = fit(ingredients, meal)

@@ -8,9 +8,9 @@ from gen_main2 import NAME
 def suppen():
     BR = "Brühe (am besten aus Brühepulver) aufkochen."
     # (a) Rote Linsensuppe mit Einlage
-    SP = [("Curry", dict(curry=2, zwie=1, knob=1), "Curry"), ("Kreuzkümmel", dict(kreuz=1.5, zwie=1, knob=1), "Kreuzkümmel"),
-          ("Paprika", dict(paprikap=2, zwie=1, knob=1), "Paprikapulver"), ("Garam Masala", dict(garam=2, zwie=1, knob=1), "Garam Masala")]
-    EIN = [("Hähnchen", dict(haehn=100, oel=1)), ("Putenhack", dict(phack=100, oel=0.5)), ("Rinderhack", dict(rhack=90, oel=0.5)), ("Schinken-Joghurt", dict(jogGr=50, schink=50)), ("Ei", dict(ei=2))]
+    SP = [("Curry", dict(curry=1.5, zwie=1, knob=1), "Curry"), ("Kreuzkümmel", dict(kreuz=1.5, zwie=1, knob=1), "Kreuzkümmel"),
+          ("Paprika", dict(paprikap=2, zwie=1, knob=1), "Paprikapulver"), ("Garam Masala", dict(garam=1.5, zwie=1, knob=1), "Garam Masala")]
+    EIN = [("Hähnchen", dict(haehn=100, oel=1)), ("Putenhack", dict(phack=100, oel=0.5)), ("Rinderhack", dict(rhack=90, oel=0.5)), ("Schinken und Joghurt", dict(jogGr=50, schink=50)), ("Ei", dict(ei=2))]
     for si, (sn, sd, sw) in enumerate(SP):
         for ei, (en, ed) in enumerate(EIN):
             if (si + ei) % 2:
@@ -23,9 +23,9 @@ def suppen():
                 einl = "Den Schinken in Streifen schneiden."
             else:
                 einl = "Die Eier mindestens 8 Minuten hart kochen, abschrecken, pellen und halbieren."
-            i = join(ing(linse=50, brot=1, bruehe=400), ing(**sd), ing(**gem), ing(**ed), ing(T="Salz und Pfeffer"))
-            add(f"Rote Linsensuppe mit {sn} und {en}", "M", 35, "pa", i,
-                [("Zwiebel, Paprika und Tomaten" if "tom" in gem else "Zwiebel und Paprika") + " in Stücke schneiden, Knoblauch fein hacken.", "Zwiebel und Knoblauch mit " + sw + " in einem Topf 2 Minuten anrösten. Linsen, Gemüse und Brühe zugeben.",
+            i = join(ing(linse=50, brot=1, bruehe=400), ing(**sd), ing(**gem), ing(**ed), ing(oel=0.5) if "oel" not in ed else "", ing(T="Salz und Pfeffer"))
+            add(f"Rote Linsensuppe mit {nl(sn, en)}", "M", 35, "pa", i,
+                [("Zwiebel, Paprika und Tomaten" if "tom" in gem else "Zwiebel und Paprika") + " in Stücke schneiden, Knoblauch fein hacken.", "Zwiebel und Knoblauch mit " + sw + " in einem Topf in etwas Öl 2 Minuten anrösten. Linsen, Gemüse und Brühe zugeben.",
                  "Alles 15 bis 20 Minuten köcheln, bis die Linsen weich sind, dann grob pürieren. Würzen.", einl,
                  ("Die Suppe mit der Einlage servieren, Joghurt daraufgeben. " if key == "jogGr" else "Die Suppe mit der Einlage servieren. ") + "Dazu eine Scheibe Vollkornbrot essen."])
     # (b) Kichererbsen-Eintopf
@@ -58,9 +58,9 @@ def suppen():
                                         ("Hähnchenstreifen", dict(haehn=120, oel=1), "Hähnchen in Streifen schneiden, im Öl 6 bis 8 Minuten braten, bis es durch ist, und in die fertige Suppe geben."),
                                         ("Mozzarella und Schinken", dict(moz=60, schink=60), "Mozzarella zupfen und den Schinken in Streifen schneiden. Beides in die Schalen geben und die heiße Suppe darübergießen.")]):
         for vi, (vn, vd, vs) in enumerate([("Paprika", dict(pap=1, zwie=1, knob=1), "Paprika und Zwiebel würfeln, Knoblauch hacken."), ("Tomate", dict(tom=2, zwie=1, knob=1), "Tomaten und Zwiebel würfeln, Knoblauch hacken.")]):
-            i = join(ing(stueck=300, bruehe=200, brot=1, tmark=1), ing(**vd), ing(**ed), ing(T="Basilikum, Salz und Pfeffer"))
+            i = join(ing(stueck=300, bruehe=200, brot=1, tmark=1), ing(**vd), ing(**ed), ing(oel=0.5) if "oel" not in ed else "", ing(T="Basilikum, Salz und Pfeffer"))
             add(("Paprika-Tomatensuppe" if vn == "Paprika" else "Tomatensuppe") + f" mit {en}", "M", 30, "pa", i,
-                [vs, "Gemüse im Topf 3 Minuten anbraten, Tomatenmark, stückige Tomaten und Brühe zugeben und 15 Minuten köcheln.", "Die Suppe pürieren und würzen.", es, "Mit einer Scheibe Vollkornbrot servieren."])
+                [vs, "Gemüse im Topf in etwas Öl 3 Minuten anbraten, Tomatenmark, stückige Tomaten und Brühe zugeben und 15 Minuten köcheln.", "Die Suppe pürieren und würzen.", es, "Mit einer Scheibe Vollkornbrot servieren."])
     # (e) Reis- oder Nudelsuppe mit Hähnchen
     for ci, c in enumerate(["reis", "nudel"]):
         for vi, (vn, vd, vs) in enumerate([("Paprika", dict(pap=1, zwie=1), "Paprika und Zwiebel würfeln."), ("Tomate", dict(tom=2, zwie=1), "Tomaten und Zwiebel würfeln."), ("Paprika und Tomate", dict(pap=1, tom=1, zwie=1), "Paprika, Tomate und Zwiebel würfeln.")]):

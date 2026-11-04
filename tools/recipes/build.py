@@ -346,7 +346,7 @@ r("Linsen-Bolognese mit Vollkornnudeln", "M", 25, "pg", "linse:60;nudel:70;stuec
   "Mit etwas Parmesan bestreut schmeckt sie noch besser, dann ist sie aber nicht mehr vegan.")
 r("Kichererbsen-Salat mit Mozzarella", "M", 10, "kga", "kiche:150;gurke:100;tom:2;zwie:0.5;moz:60;oel:1;zitrone:1;~Salz und Pfeffer",
   "Kichererbsen abspülen und abtropfen lassen.|Gurke und Tomaten würfeln, Zwiebel fein schneiden.|Mit Öl, Zitronensaft, Salz und Pfeffer mischen und Mozzarella (gewürfelt) unterheben.")
-r("Chili sin Carne mit Reis", "M", 30, "pg", "bohne:120;kiche:60;stueck:200;pap:1;zwie:1;tmark:1;knob:1;reis:50;gouda:20;~Paprikapulver, Chili, Salz und Pfeffer",
+r("Chili sin Carne mit Reis", "M", 30, "pg", "bohne:120;kiche:60;stueck:200;pap:1;zwie:1;tmark:1;knob:1;reis:50;gouda:20;oel:0.5;~Paprikapulver, Chili, Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Zwiebel und Knoblauch anbraten, Paprika in Stücken, Tomatenmark, Tomaten, Bohnen und Kichererbsen zugeben.|20 Minuten köcheln lassen und würzen.|Mit Reis servieren und mit dem Gouda bestreuen.")
 r("Linsen-Tomaten-Suppe mit Parmesan", "M", 25, "pg", "linse:70;stueck:250;zwie:1;knob:1;bruehe:300;oel:1;parm:10;~Salz und Pfeffer",
   "Zwiebel und Knoblauch im Öl anbraten.|Linsen, Tomaten und Brühe zugeben und 15 bis 20 Minuten köcheln lassen, bis die Linsen weich sind.|Mit Salz und Pfeffer abschmecken und mit Parmesan bestreuen.")
@@ -530,7 +530,7 @@ r("Eier-Reis-Bowl mit Schinken und Gurke", "M", 15, "g", "reis:70;ei:2;schink:40
   "Reis nach Packungsanleitung kochen.|Zwiebel klein schneiden und im Öl 2 Minuten anbraten. Schinken in Streifen kurz mitbraten, die Eier darüber verquirlen und unter Rühren fest werden lassen.|Reis mit Sojasauce vermengen, Ei-Mischung und Gurkenscheiben daraufgeben.")
 r("Hähnchen-Linsen-Pfanne mit Tomate", "M", 25, "", "haehn:120;linse:50;stueck:200;zwie:1;knob:1;curry:1;oel:1;bruehe:200;~Salz und Pfeffer",
   "Hähnchen in Würfeln im Öl rundherum anbraten, bis es außen gar ist. Zwiebel und Knoblauch klein schneiden und kurz mitbraten.|Curry, Linsen, Tomaten und Brühe zugeben und 15 bis 18 Minuten köcheln lassen, bis die Linsen weich und das Hähnchen innen ganz durch ist.")
-r("Pizza-Nudelpfanne mit Putenaufschnitt", "M", 20, "", "nudel:70;stueck:200;paufs:50;moz:40;zwie:1;pap:1;~Oregano, Salz und Pfeffer",
+r("Pizza-Nudelpfanne mit Putenaufschnitt", "M", 20, "", "nudel:70;stueck:200;paufs:50;moz:40;zwie:1;pap:1;oel:0.5;~Oregano, Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Zwiebel und Paprika klein schneiden und in einer Pfanne 4 Minuten anbraten. Tomaten und Oregano zugeben und 5 Minuten köcheln lassen.|Putenaufschnitt in Streifen und die Nudeln unterheben, Mozzarella in Stücken darauflegen und mit Deckel schmelzen lassen.")
 r("Enchiladas aus dem Ofen mit Hack und Bohnen", "M", 35, "p", "wrap:1;ghack:60;bohne:50;reis:20;stueck:150;gouda:20;zwie:0.5;~Paprikapulver, Salz und Pfeffer",
   "Ofen auf 200 °C Ober- und Unterhitze vorheizen. Reis nach Packungsanleitung kochen.|Hack mit klein geschnittener Zwiebel krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Bohnen, Reis und die Hälfte der Tomaten zugeben, würzen.|Füllung in den Wrap einrollen, in eine Form legen, mit den restlichen Tomaten und dem Gouda bedecken und 15 Minuten überbacken.")
@@ -538,7 +538,7 @@ r("Kichererbsen-Tomatensuppe mit Ei", "M", 25, "pg", "kiche:120;stueck:250;zwie:
   "Zwiebel und Knoblauch klein schneiden und in einem Topf mit einem Schuss Wasser 3 Minuten dünsten.|Curry, Tomaten, Kichererbsen und Brühe zugeben und 12 Minuten köcheln lassen.|Das Ei in die leicht köchelnde Suppe schlagen und 3 bis 4 Minuten garen, bis es fest ist.|Mit Parmesan bestreuen.")
 r("Putenfrikadellen-Wrap mit Joghurt-Gurkensalat", "M", 25, "a", "phack:100;ei:0.5;hafer:15;wrap:1;jog35:50;gurke:100;tom:1;oel:1;~Salz und Pfeffer",
   "Putenhack mit Ei, Haferflocken, Salz und Pfeffer verkneten und zu zwei flachen Frikadellen formen.|Im Öl bei mittlerer Hitze von jeder Seite 5 bis 6 Minuten braten, bis sie innen ganz durch sind.|Gurke und Tomate würfeln und mit Joghurt vermischen.|Frikadellen in Stücken mit dem Salat in den Wrap geben und einrollen.")
-r("Linsen-Nudelsuppe mit Tomate", "M", 30, "pg", "linse:60;nudel:30;stueck:200;zwie:1;knob:1;bruehe:400;tmark:1;parm:10;~Salz und Pfeffer",
+r("Linsen-Nudelsuppe mit Tomate", "M", 30, "pg", "linse:60;nudel:30;stueck:200;zwie:1;knob:1;bruehe:400;tmark:1;parm:10;oel:0.5;~Salz und Pfeffer",
   "Zwiebel und Knoblauch klein schneiden und mit Tomatenmark 2 Minuten anrösten.|Linsen, Tomaten und Brühe zugeben und 10 Minuten köcheln lassen.|Nudeln zugeben und weitere 8 bis 10 Minuten garen.|Mit Parmesan bestreuen.",
   "Wird beim Stehen dicker. Mit etwas Wasser verdünnen.")
 r("Hähnchen-Fajita-Wrap", "M", 20, "a", "haehn:120;pap:2;zwie:1;wrap:1;jog35:40;oel:1;~Paprikapulver, Kreuzkümmel, Salz und Pfeffer",
@@ -619,7 +619,7 @@ r("Putenspieße mit Paprika, Joghurt-Dip und Couscous", "M", 35, "", "pute:160;p
 r("Putenhack-Chili mit Bohnen und Reis", "M", 35, "pg", "phack:120;bohne:100;stueck:200;pap:1;zwie:1;tmark:1;reis:40;paprikap:1;kreuz:1;oel:1;~Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Zwiebel und Paprika klein schneiden und im Öl anbraten. Putenhack zugeben und krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Tomatenmark, Paprikapulver und Kreuzkümmel kurz mitrösten, dann Tomaten, Bohnen und 100 ml Wasser zugeben.|15 Minuten köcheln und mit Salz und Pfeffer abschmecken.",
   "Schmeckt am zweiten Tag noch besser. Gekühlt 2 Tage haltbar, vor dem Essen vollständig erhitzen.")
-r("Puten-Tomaten-Auflauf mit Nudeln und Gouda", "M", 40, "p", "pute:130;nudel:60;stueck:200;pap:1;zwie:1;gouda:30;knob:1;~Oregano, Salz und Pfeffer",
+r("Puten-Tomaten-Auflauf mit Nudeln und Gouda", "M", 40, "p", "pute:130;nudel:60;stueck:200;pap:1;zwie:1;gouda:30;knob:1;oel:0.5;~Oregano, Salz und Pfeffer",
   "Ofen auf 200 °C vorheizen. Nudeln 2 Minuten kürzer als auf der Packung angegeben kochen.|Pute in Würfeln, Paprika und Zwiebel anbraten, bis die Pute durch ist. Stückige Tomaten, Knoblauch und Gewürze zugeben.|Mit den Nudeln in eine Auflaufform geben und mit Gouda bestreuen.|15 bis 20 Minuten backen, bis der Käse goldbraun ist.")
 r("Puten-Salat-Wrap mit Honig-Senf-Dressing", "M", 15, "ka", "pute:120;wrap:1;eisb:60;tom:1;gurke:80;senf:1;jogGr:40;honig:0.5;~Salz und Pfeffer",
   "Joghurt mit Senf, Honig, Salz und Pfeffer verrühren.|Die Pute in einer Pfanne ohne Fett braten, bis sie durch ist, oder fertig gegarte Pute verwenden. In Streifen schneiden.|Salat, Tomate und Gurke auf dem Wrap verteilen und das Dressing daraufgeben.|Pute darauflegen, einrollen und halbieren.")
@@ -686,7 +686,7 @@ r("Lyoner-Wurstsalat mit Ei, Gurke und Saurer Gurke", "M", 15, "kg", "lyoner:70;
 # ======================= NEU (Runde 4): vegetarisch, Hülsenfrüchte, Eier =======================
 r("Kichererbsen-Curry mit Spiegelei und Reis", "M", 30, "p", "kiche:120;kokos:100;curry:1;garam:1;pap:1;zwie:1;stueck:150;reis:30;ei:2;oel:0.5;~Salz",
   "Reis nach Packungsanleitung kochen.|Zwiebel und Paprika klein schneiden und im Öl 4 Minuten anbraten. Curry und Garam Masala kurz mitrösten.|Kichererbsen, stückige Tomaten und Kokosmilch zugeben und 12 Minuten köcheln. Mit Salz abschmecken.|Spiegeleier in einer zweiten Pfanne ohne zusätzliches Fett braten, bis das Eiweiß ganz fest ist, und auf dem Curry servieren.")
-r("Rotes Linsen-Dal mit Reis und Joghurt", "M", 30, "pg", "linse:70;reis:50;zwie:1;stueck:150;kurkuma:1;garam:1;kreuz:1;knob:1;jogGr:50;oel:1;~Salz",
+r("Rotes Linsen-Dal mit Reis und Joghurt", "M", 30, "pg", "linse:70;reis:50;zwie:1;stueck:150;kurkuma:0.5;garam:1;kreuz:0.5;knob:1;jogGr:50;oel:1;~Salz",
   "Reis nach Packungsanleitung kochen.|Zwiebel und Knoblauch im Öl andünsten, Kurkuma, Kreuzkümmel und Garam Masala kurz mitrösten.|Linsen, stückige Tomaten und 300 ml Wasser zugeben und 15 Minuten köcheln, bis die Linsen weich sind. Mit Salz abschmecken.|Mit Reis und einem Klecks Joghurt servieren.",
   "Rote Linsen brauchen keine Einweichzeit. Das Dal lässt sich gut einfrieren.")
 r("Menemen mit Ei, Paprika, Tomate und Brot", "M", 20, "g", "ei:3;pap:1;tom:2;zwie:1;brot:2;oel:1;~Salz und Pfeffer",
@@ -865,6 +865,7 @@ for _rec in gen_core.OUT:
     r(*_rec)
 if gen_core.SKIPPED: print('Übersprungen (Titel schon vorhanden):', gen_core.SKIPPED)
 if gen_core.LOWPROT: print('Weggefallen (zu wenig Eiweiß):', gen_core.LOWPROT)
+if gen_core.BADTASTE: print('Weggefallen (passt geschmacklich nicht):', gen_core.BADTASTE)
 
 # ======================= Berechnung =======================
 def slug(t):

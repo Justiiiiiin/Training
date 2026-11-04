@@ -92,15 +92,17 @@ def eier():
     SPI = [("Kreuzkümmel", dict(kreuz=1, paprikap=1), "Kreuzkümmel und Paprikapulver"), ("Paprika", dict(paprikap=2), "Paprikapulver"), ("Curry", dict(curry=1.5), "Curry"), ("Garam Masala", dict(garam=1.5), "Garam Masala")]
     ADD = [("Putenhack", dict(phack=60, oel=0.5), "Das Hack in einer Pfanne krümelig anbraten, bis nichts Rosa mehr zu sehen ist.", "dem gebratenen Putenhack"),
            ("Schinken", dict(schink=40), "Den Schinken in Streifen schneiden.", "dem Schinken"),
-           ("Mozzarella", dict(moz=40), "Den Mozzarella zupfen.", "dem Mozzarella"), ("Gouda", dict(gouda=25), "Den Gouda reiben.", "dem Gouda")]
+           ("Mozzarella", dict(moz=40), "Den Mozzarella zupfen.", "dem Mozzarella"), ("Gouda", dict(gouda=25), "Den Gouda reiben.", "dem Gouda"),
+           ("Joghurt", dict(jogGr=60), "Den Joghurt glatt rühren.", "einem Klecks Joghurt")]
     for si, (sn, sd, sw) in enumerate(SPI):
         for ai, (an, ad, ast, aphr) in enumerate(ADD):
-            if (si + ai) % 2:
+            # Curry und Garam Masala passen zu Joghurt und Hack, nicht zu Käse; Kreuzkümmel und Paprika zu allem außer Joghurt
+            if (ai not in (0, 4)) if si >= 2 else (ai == 4 or (si + ai) % 2):
                 continue
             i = join(ing(ei=3, stueck=200, pap=1, zwie=1, knob=1, brot=2, oel=0.5), ing(**sd), ing(**ad), ing(T="Salz und Pfeffer"))
             add(f"Shakshuka mit {sn} und {an}", "M", 30, "", i,
                 [ast + " Paprika und Zwiebel würfeln, Knoblauch hacken.", "Paprika, Zwiebel und Knoblauch mit " + sw + " im Öl 5 Minuten braten. Stückige Tomaten zugeben und 8 Minuten köcheln, mit Salz und Pfeffer abschmecken.",
-                 "Mit einem Löffel drei Mulden in die Soße drücken und die Eier hineingleiten lassen. Zugedeckt bei niedriger Hitze 8 bis 10 Minuten garen, bis Eiweiß und Eigelb fest sind.", f"Mit {aphr} bestreuen und mit dem Brot essen."])
+                 "Mit einem Löffel drei Mulden in die Soße drücken und die Eier hineingleiten lassen. Zugedeckt bei niedriger Hitze 8 bis 10 Minuten garen, bis Eiweiß und Eigelb fest sind.", f"Mit {aphr} " + ("garnieren" if an == "Joghurt" else "bestreuen") + " und mit dem Brot essen."])
     # (2) Frittata
     for mi, (m, g) in enumerate([("schink", 50), ("paufs", 60), ("phack", 60)]):
         for vi, (vn, vd, vs) in enumerate([("Paprika und Tomate", dict(pap=1, tom=1, zwie=0.5), "Paprika, Tomate und Zwiebel klein schneiden."), ("Spinat und Tomate", dict(spin=100, tom=1, zwie=0.5), "Tomate und Zwiebel klein schneiden."), ("Paprika und Rucola", dict(pap=1, ruc=20, zwie=0.5), "Paprika und Zwiebel klein schneiden, den Rucola zupfen.")]):
@@ -110,7 +112,7 @@ def eier():
                 ci_, cs = cooked_protein(m, g)
                 i = join(ing(ei=3, brot=1, oel=1), ci_, ing(**vd), ing(**cd), ing(T="Salz und Pfeffer"))
                 add(f"Frittata mit {nl(WORD[m], vn, cn)}", "M", 25, "ga", i,
-                    ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. " + vs, cs.replace(" Kurz abkühlen lassen.", ""), "Das Gemüse im Öl in einer ofenfesten Pfanne 4 Minuten anbraten (Spinat zusammenfallen lassen). Die Eier verquirlen, würzen und mit dem Fleisch darübergießen.",
+                    ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. " + vs, cs.replace(" Kurz abkühlen lassen.", ""), "Das Gemüse im Öl in einer ofenfesten Pfanne 4 Minuten anbraten" + (", bis der Spinat zusammengefallen ist" if "spin" in vd else "") + (" (den Rucola erst zum Schluss untermischen)" if "ruc" in vd else "") + ". Die Eier verquirlen, würzen und mit dem Fleisch darübergießen.",
                      "Mit dem Käse belegen und im Ofen 12 bis 15 Minuten backen, bis die Eier ganz fest sind. Mit einer Scheibe Vollkornbrot essen."])
     # (3) Rührei-Pfannen
     for mi, m in enumerate(["rhack", "phack", "ghack"]):
@@ -140,17 +142,22 @@ def huelsen():
             for ti, (tn, td, ts) in enumerate([("Joghurt", dict(jogGr=60), "Joghurt glatt rühren."), ("Ei", dict(ei=2), "Die Eier mindestens 8 Minuten hart kochen, abschrecken, pellen und halbieren."), ("Gurken-Quark", dict(speisequark=60, gurke=100), "Gurke fein würfeln und mit dem Quark verrühren.")]):
                 if (si + bi + ti) % 3:
                     continue
-                i = join(ing(linse=70, kokos=100, tom=2, zwie=1, knob=1, bruehe=200), ing(**sd), ing(**bd), ing(**td), ing(T="Salz und Pfeffer"))
+                i = join(ing(linse=70, kokos=100, tom=2, zwie=1, knob=1, bruehe=200, oel=0.5), ing(**sd), ing(**bd), ing(**td), ing(T="Salz und Pfeffer"))
                 add(f"Linsen-Dal mit {nl(sn, bn, tn)}", "M", 35, "pa", i,
-                    [bs, "Tomaten und Zwiebel würfeln, Knoblauch fein hacken. " + ts, "Zwiebel und Knoblauch mit " + sw + " in einem Topf 2 Minuten anrösten. Linsen, Tomaten, Kokosmilch und Brühe zugeben.", "15 bis 20 Minuten köcheln lassen, bis die Linsen weich sind, und mit Salz und Pfeffer abschmecken.", f"Mit {bn} und {tn} servieren."])
+                    [bs, "Tomaten und Zwiebel würfeln, Knoblauch fein hacken. " + ts, "Zwiebel und Knoblauch mit " + sw + " in einem Topf in etwas Öl 2 Minuten anrösten. Linsen, Tomaten, Kokosmilch und Brühe zugeben.", "15 bis 20 Minuten köcheln lassen, bis die Linsen weich sind, und mit Salz und Pfeffer abschmecken.", f"Mit {bn} und {tn} servieren."])
     # (2) Kichererbsen-Curry
-    for ti, (tn, td, ts) in enumerate([("Ei", dict(ei=2), "Die Eier mindestens 8 Minuten hart kochen, abschrecken, pellen und halbieren."), ("Joghurt", dict(jogGr=80), "Joghurt glatt rühren."), ("Gouda", dict(gouda=30), "Den Gouda reiben.")]):
+    for ti, (tn, td, ts) in enumerate([("Ei", dict(ei=2), "Die Eier mindestens 8 Minuten hart kochen, abschrecken, pellen und halbieren."), ("Joghurt", dict(jogGr=80), "Joghurt glatt rühren."), ("Hähnchen", dict(haehn=90, oel=0.5), "Das Hähnchen in mundgerechte Stücke schneiden.")]):
         for vi, (vn, vd, vs) in enumerate([("Paprika", dict(pap=1, zwie=1), "Paprika und Zwiebel würfeln."), ("Tomate", dict(tom=2, zwie=1), "Tomaten und Zwiebel würfeln."), ("Spinat", dict(spin=100, zwie=1), "Die Zwiebel würfeln.")]):
             if (ti + vi) % 2:
                 continue
-            i = join(ing(kiche=170, kokos=100, reis=60, curry=2, knob=1, zitrone=1), ing(**vd), ing(**td), ing(T="Salz und Pfeffer"))
+            i = join(ing(kiche=170, kokos=100, reis=60, curry=2, knob=1, zitrone=1, oel=0.5), ing(**vd), ing(**td), ing(T="Salz und Pfeffer"))
+            huhn = tn == "Hähnchen"
+            anbraten = "Zwiebel, Gemüse, Knoblauch und Curry in einem Topf 4 Minuten anbraten" + (", bis der Spinat zusammengefallen ist." if "spin" in vd else ".")
             add(f"Kichererbsen-Curry mit {nl(vn, 'Reis', tn)}", "M", 30, "pa", i,
-                [CARB["reis"][3], vs + " Knoblauch fein hacken. " + ts, "Zwiebel, Gemüse, Knoblauch und Curry in einem Topf 4 Minuten anbraten (Spinat zusammenfallen lassen).", "Kichererbsen und Kokosmilch zugeben und 10 Minuten köcheln. Mit Zitronensaft, Salz und Pfeffer abschmecken.", f"Mit Reis und {tn} servieren."])
+                [CARB["reis"][3], vs + " Knoblauch fein hacken. " + ts]
+                + (["Das Hähnchen im Topf in heißem Öl 6 bis 8 Minuten rundum braten, bis es durch und innen nicht mehr rosa ist, und herausnehmen."] if huhn else [])
+                + [anbraten, ("Kichererbsen, Kokosmilch und das Hähnchen" if huhn else "Kichererbsen und Kokosmilch") + " zugeben und 10 Minuten köcheln. Mit Zitronensaft, Salz und Pfeffer abschmecken.",
+                   "Mit dem Reis servieren." if huhn else f"Mit Reis und {tn} servieren."])
     # (3) Bohnen-Quesadilla
     for ci, (cn, cd) in enumerate([("Mozzarella", dict(moz=50)), ("Gouda", dict(gouda=35))]):
         for vi, (vn, vd, vs) in enumerate([("Paprika", dict(pap=1, zwie=0.5, tom=1), "Paprika, Zwiebel und Tomate klein schneiden."), ("Tomate", dict(tom=2, zwie=0.5, pap=0.5), "Tomaten, Zwiebel und Paprika klein schneiden."), ("Rucola", dict(pap=1, tom=1, ruc=30), "Paprika und Tomate klein schneiden, den Rucola zupfen.")]):
@@ -159,8 +166,8 @@ def huelsen():
                     continue
                 i = join(ing(wrap=1, bohne=120, oel=0.5), ing(**cd), ing(**vd), ing(**dd), ing(T="Salz und Pfeffer"))
                 add(f"Bohnen-Quesadilla mit {nl(cn, vn, dn + '-Dip')}", "M", 20, "a", i,
-                    [vs + " Die Bohnen abtropfen und mit einer Gabel grob zerdrücken.", "Bohnen, Gemüse (Rucola erst später) und Käse auf der Hälfte jedes Wraps verteilen, würzen und die Wraps zuklappen.",
-                     "In einer Pfanne mit etwas Öl von jeder Seite 3 bis 4 Minuten braten, bis der Käse geschmolzen und der Wrap goldbraun ist.", "Mit dem Dip aus " + ("Joghurt und Paprikapulver" if di == 0 else "Quark und Kreuzkümmel") + " servieren (Rucola dazugeben)."])
+                    [vs + " Die Bohnen abtropfen und mit einer Gabel grob zerdrücken.", "Bohnen, " + ("Gemüse (ohne den Rucola)" if "ruc" in vd else "Gemüse") + " und Käse auf der Hälfte jedes Wraps verteilen, würzen und die Wraps zuklappen.",
+                     "In einer Pfanne mit etwas Öl von jeder Seite 3 bis 4 Minuten braten, bis der Käse geschmolzen und der Wrap goldbraun ist.", "Mit dem Dip aus " + ("Joghurt und Paprikapulver" if di == 0 else "Quark und Kreuzkümmel") + " servieren" + (" und den Rucola dazugeben." if "ruc" in vd else ".")])
     # (4) Kichererbsen-Pfanne mit Ei
     for si, (sn, sd, sw) in enumerate([("Kreuzkümmel", dict(kreuz=1.5, paprikap=0.5), "Kreuzkümmel"), ("Paprikapulver", dict(paprikap=2), "Paprikapulver"), ("Curry", dict(curry=2), "Curry")]):
         for vi, (vn, vd, vs) in enumerate([("Paprika", dict(pap=2, zwie=1), "Paprika und Zwiebel würfeln."), ("Tomate", dict(tom=3, zwie=1, pap=0.5), "Tomaten, Zwiebel und Paprika würfeln.")]):
@@ -172,4 +179,4 @@ def huelsen():
         for vi, (vn, vd, vs) in enumerate([("Paprika und Tomate", dict(pap=2, tom=2, zwie=1), "Paprika, Tomaten und Zwiebel würfeln."), ("Paprika und Rucola", dict(pap=2, ruc=30, zwie=1, stueck=100), "Paprika und Zwiebel würfeln, den Rucola zupfen.")]):
             i = join(ing(linse=60, reis=30, bruehe=300, oel=1, paprikap=1.5, kreuz=0.5), ing(**vd), ing(**cd), ing(T="Salz und Pfeffer"))
             add(f"Linsen-Gemüse-Pfanne mit {nl(vn, cn)}", "M", 30, "pa", i,
-                [vs, "Das Gemüse mit den Gewürzen im Öl 4 Minuten anbraten. Linsen, Reis und Brühe zugeben.", "Zugedeckt 15 Minuten köcheln, bis Linsen und Reis weich sind, bei Bedarf Wasser nachgießen.", f"Mit {cn} bestreuen und zugedeckt schmelzen lassen (Rucola erst zum Servieren dazugeben)."])
+                [vs, "Das Gemüse mit den Gewürzen im Öl 4 Minuten anbraten. Linsen, Reis und Brühe zugeben.", "Zugedeckt 15 Minuten köcheln, bis Linsen und Reis weich sind, bei Bedarf Wasser nachgießen.", f"Mit {cn} bestreuen und zugedeckt schmelzen lassen" + (", den Rucola erst zum Servieren dazugeben." if "ruc" in vd else ".")])
