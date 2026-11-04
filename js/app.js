@@ -415,7 +415,7 @@ document.addEventListener("toggle", (ev) => { if (ev.target && ev.target.id === 
 const RPAGE = 48;
 let rShow = RPAGE, rSig = "";
 function rcardHTML(r) {
-  return '<button class="rcard" data-recipe="' + r.id + '"><h4>' + (FAV.includes(r.id) ? '<span class="favmark" aria-label="Lieblingsrezept">♥</span> ' : "") + r.title + '</h4>' +
+  return '<button class="rcard" data-recipe="' + r.id + '"><span class="rname">' + (FAV.includes(r.id) ? '<span class="favmark" aria-label="Lieblingsrezept">♥</span> ' : "") + r.title + '</span>' +
     '<div class="tags"><span class="tag">' + r.meal + '</span>' + (r.diet !== "omni" ? '<span class="tag g">' + (r.diet === "vegan" ? "Vegan" : "Vegetarisch") + "</span>" : "") + r.tags.slice(0, 2).map((t) => '<span class="tag">' + t + "</span>").join("") + "</div>" +
     '<div class="rnum"><span class="pro">' + r.protein + '<small>g Eiweiß</small></span><span class="rsub">' + r.kcal + " kcal, " + r.time + " Min, ca. " + eur(r.cost) + "</span></div></button>";
 }

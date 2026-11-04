@@ -196,7 +196,7 @@ html[data-big] .fline .fsort { position: static; width: 100%; max-width: none; m
 .rcard { text-align: left; background: var(--surface); border: 0; border-radius: var(--r-md); padding: 18px; display: flex; flex-direction: column; gap: 14px; cursor: pointer; font: inherit; color: inherit; box-shadow: var(--shadow); }
 .rcard:hover { box-shadow: var(--shadow), 0 0 0 2px var(--accent); }
 .rcard { content-visibility: auto; contain-intrinsic-size: auto 150px; }
-.rcard h4 { font-size: 1.125rem; line-height: 1.25; overflow-wrap: anywhere; hyphens: auto; }
+.rcard .rname { display: block; font-family: var(--display); font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; font-size: 1.125rem; line-height: 1.25; overflow-wrap: anywhere; hyphens: auto; }
 .rnum { display: flex; flex-direction: column; gap: 2px; margin-top: auto; }
 .pro { font-family: var(--display); font-size: 2.5rem; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: var(--good); font-variant-numeric: tabular-nums; }
 .pro small { font-family: var(--body); font-size: 0.875rem; font-weight: 550; letter-spacing: 0; margin-left: 5px; color: var(--muted); }
@@ -450,7 +450,7 @@ html[data-big] .rings { grid-template-columns: minmax(0, 1fr); justify-items: ce
 body[data-coach="0"] .side { display: none; }
 @media (min-width: 980px) { body[data-coach="0"] .layout { grid-template-columns: minmax(0, 1fr); } .side { top: 16px; } }
 .hero { gap: 24px; padding: 28px; }
-.rcard h4 { min-height: 2.5em; }
+.rcard .rname { min-height: 2.5em; }
 .rcard .tags { flex-wrap: nowrap; overflow: hidden; min-height: 26px; }
 .rcard .tag { flex: none; white-space: nowrap; }
 @media (max-width: 979px) {
@@ -517,7 +517,7 @@ body[data-coach="0"] .side { display: none; }
   .tdhead .row .primary { grid-column: 1 / -1; }
   .tab { font-size: 0.875rem; padding: 0 10px; }
   .rcard { padding: 14px 16px; gap: 8px; }
-  .rcard h4 { min-height: 0; font-size: 1.0625rem; }
+  .rcard .rname { min-height: 0; font-size: 1.0625rem; }
   .rnum { flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
   .pro { font-size: 1.75rem; }
   .pro small { font-size: 0.8125rem; }
