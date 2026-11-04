@@ -9,10 +9,10 @@ sys.path.insert(0, HERE)
 # Einheit: g oder ml = Menge direkt, Stk/EL/TL = Anzahl mit Gramm je Einheit
 DB = {
  "haehn": ("Hähnchenbrust", None, "g", 1, 106, 22, "Geflügel", "fleisch"),
- "pute": ("Putenbrust", None, "g", 1, 105, 23, "Geflügel", "fleisch"),
+ "pute": ("Putenbrust", None, "g", 1, 110, 23, "Geflügel", "fleisch"),
  "ghack": ("Hackfleisch (gemischt)", None, "g", 1, 250, 17, "Rindfleisch,Schwein", "fleisch"),
- "phack": ("Putenhack", None, "g", 1, 130, 20, "Geflügel", "fleisch"),
- "rhack": ("Rinderhack (mager)", None, "g", 1, 175, 20, "Rindfleisch", "fleisch"),
+ "phack": ("Putenhack", None, "g", 1, 160, 17.5, "Geflügel", "fleisch"),
+ "rhack": ("Rinderhack light", None, "g", 1, 160, 20, "Rindfleisch", "fleisch"),
  "schink": ("Kochschinken", None, "g", 1, 105, 20, "Schwein,verarbeitet", "fleisch"),
  "paufs": ("Putenbrust-Aufschnitt", None, "g", 1, 100, 19, "Geflügel,verarbeitet", "fleisch"),
  "ei": ("Ei", "Eier", "Stk", 51, 143, 12.6, "Ei", "ei"),
@@ -23,8 +23,8 @@ DB = {
  "moz": ("Mozzarella", None, "g", 1, 250, 18, "Käse,Milch", "milch"),
  "gouda": ("Gouda", None, "g", 1, 350, 25, "Käse,Milch", "milch"),
  "parm": ("Parmesan", None, "g", 1, 400, 35, "Käse,Milch", "milch"),
- "speisequark": ("Speisequark 20 %", None, "g", 1, 105, 11.5, "Milch", "milch"),
- "jogGr": ("Griechischer Joghurt (10 %)", None, "g", 1, 133, 5.5, "Milch", "milch"),
+ "speisequark": ("Speisequark 20 %", None, "g", 1, 100, 11, "Milch", "milch"),
+ "jogGr": ("Griechischer Joghurt (10 %)", None, "g", 1, 123, 4.2, "Milch", "milch"),
  "butter": ("Butter (ungesalzen)", None, "g", 1, 741, 0.7, "Milch", "fett"),
  "haehnst": ("Hähnchen-Mini-Steaks", None, "g", 1, 110, 22, "Geflügel", "fleisch"),
  "lyoner": ("Delikatess-Lyoner", None, "g", 1, 260, 12, "Schwein,verarbeitet", "fleisch"),
@@ -57,7 +57,7 @@ DB = {
  "kiche": ("Kichererbsen (Dose, abgetropft)", None, "g", 1, 125, 7, "Hülsenfrüchte", "hülse"),
  "bohne": ("Kidneybohnen (Dose, abgetropft)", None, "g", 1, 105, 7, "Hülsenfrüchte", "hülse"),
  "linse": ("rote Linsen (trocken)", None, "g", 1, 350, 25, "Hülsenfrüchte", "hülse"),
- "kokos": ("leichte Kokosmilch", None, "ml", 1, 75, 0.8, "", "sonst"),
+ "kokos": ("leichte Kokosmilch", None, "ml", 1, 130, 0.7, "", "sonst"),
  "bruehe": ("Gemüsebrühe", None, "ml", 1, 5, 0.3, "", "sonst"),
  "zitrone": ("Zitronensaft", None, "EL", 15, 25, 0.4, "", "sonst"),
  "senf": ("Senf", None, "TL", 5, 100, 6, "", "sonst"),
@@ -453,7 +453,7 @@ r("Nudel-Hack-Auflauf mit Tomate und Mozzarella", "M", 45, "p", "ghack:90;nudel:
 r("Hack-Kichererbsen-Eintopf mit Tomate", "M", 30, "p", "ghack:80;kiche:120;stueck:250;zwie:1;pap:1;tmark:1;knob:1;~Paprikapulver, Kreuzkümmel, Salz und Pfeffer",
   "Hack mit Zwiebel und Knoblauch krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Paprika in Würfeln und Tomatenmark zugeben und 2 Minuten mitbraten.|Tomaten, Kichererbsen und Gewürze zugeben und 15 Minuten köcheln lassen.",
   "Eintöpfe wie dieser schmecken am nächsten Tag noch besser und lassen sich gut einfrieren.")
-r("Hähnchen-Curry mit Kokosmilch und Reis", "M", 30, "", "haehn:130;kokos:150;reis:60;pap:1;zwie:1;curry:2;knob:1;oel:1;stueck:100",
+r("Hähnchen-Curry mit Kokosmilch und Reis", "M", 30, "", "haehn:130;kokos:120;reis:60;pap:1;zwie:1;curry:2;knob:1;oel:1;stueck:100",
   "Reis nach Packungsanleitung kochen.|Hähnchen in Würfeln im Öl rundherum anbraten, bis es innen ganz durch ist. Zwiebel, Paprika und Knoblauch zugeben und 3 Minuten mitbraten.|Curry kurz mitrösten, Tomaten und Kokosmilch zugießen und 10 Minuten köcheln lassen.|Mit dem Reis servieren.")
 r("Mexikanische Bohnen-Eier-Pfanne mit Brot", "M", 20, "g", "bohne:120;ei:2;stueck:150;zwie:1;pap:1;oel:1;brot:1;~Paprikapulver, Salz und Pfeffer",
   "Zwiebel und Paprika klein schneiden und im Öl 4 Minuten anbraten.|Tomaten, Bohnen und Gewürze zugeben und 6 Minuten köcheln lassen.|Zwei Mulden formen, die Eier hineinschlagen und mit Deckel 6 bis 8 Minuten garen, bis Eiweiß und Eigelb fest sind.|Mit dem Brot essen.")
@@ -605,7 +605,7 @@ r("Würziges Hähnchen mit Kreuzkümmel, Reis und Gurken-Tomaten-Salat", "M", 30
 
 
 # ======================= NEU (Runde 4): Pute =======================
-r("Puten-Curry mit Kokosmilch und Reis", "M", 30, "p", "pute:150;kokos:150;curry:1;kurkuma:1;pap:1;zwie:1;stueck:100;reis:60;oel:1;~Salz",
+r("Puten-Curry mit Kokosmilch und Reis", "M", 30, "p", "pute:150;kokos:110;curry:1;kurkuma:1;pap:1;zwie:1;stueck:100;reis:60;oel:1;~Salz",
   "Reis nach Packungsanleitung kochen.|Zwiebel und Paprika klein schneiden und im Öl 4 Minuten anbraten. Curry und Kurkuma kurz mitrösten.|Putenbrust in Würfeln zugeben und rundum anbraten.|Kokosmilch und stückige Tomaten zugeben und 10 Minuten köcheln, bis das Fleisch durch ist. Mit Salz abschmecken.")
 r("Putengeschnetzeltes in Paprika-Rahm mit Nudeln", "M", 25, "", "pute:150;pap:2;zwie:1;speisequark:60;bruehe:100;nudel:70;paprikap:1;oel:1;~Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Pute in Streifen im Öl rundum anbraten, bis sie durch ist. Paprika und Zwiebel in Streifen zugeben und 5 Minuten braten.|Brühe angießen und kurz einkochen, dann die Pfanne vom Herd nehmen. Quark und Paprikapulver unterrühren.|Mit Salz und Pfeffer abschmecken und die Nudeln untermischen.")
@@ -716,7 +716,7 @@ r("Linsen-Bowl mit Paprika, Gurke und Joghurt", "M", 25, "pa", "linse:70;gurke:1
   "Hält sich gekühlt 2 Tage und ist kalt eine gute Brotdosen-Mahlzeit.")
 r("Gefüllte Paprika mit Quark und Ei", "M", 35, "", "pap:2;quark:100;ei:2;gouda:20;zwie:0.5;brot:1;~Schnittlauch, Salz und Pfeffer",
   "Ofen auf 200 °C vorheizen. Paprika halbieren und entkernen.|Quark mit Eiern, fein gehackter Zwiebel, Salz und Pfeffer verrühren und in die Paprikahälften füllen.|Mit Gouda bestreuen und 25 Minuten backen, bis die Füllung fest ist.|Mit dem Brot servieren.")
-r("Kichererbsen-Pfanne mit Paprika und Joghurt", "M", 25, "g", "kiche:150;pap:2;zwie:1;jogGr:60;kurkuma:1;kreuz:1;knob:1;oel:1;brot:1;~Salz und Pfeffer",
+r("Kichererbsen-Pfanne mit Paprika und Joghurt", "M", 25, "g", "kiche:170;pap:2;zwie:1;jogGr:60;kurkuma:1;kreuz:1;knob:1;oel:1;brot:1;~Salz und Pfeffer",
   "Zwiebel, Paprika und Knoblauch im Öl 5 Minuten anbraten.|Kurkuma und Kreuzkümmel kurz mitrösten, Kichererbsen zugeben und 6 Minuten braten.|Mit Salz und Pfeffer abschmecken und mit Joghurt und Brot servieren.")
 r("Tex-Mex-Rührei mit Bohnen, Paprika und Brot", "M", 15, "g", "ei:3;bohne:60;pap:1;tom:1;gouda:15;brot:1;oel:1;paprikap:1;~Salz und Pfeffer",
   "Paprika in Stücken im Öl 4 Minuten anbraten, Bohnen und Paprikapulver zugeben.|Eier verquirlen, würzen und dazugeben, bei mittlerer Hitze stocken lassen, bis das Ei ganz fest ist.|Mit Tomatenwürfeln und Gouda bestreuen und mit dem Brot essen.")
@@ -753,7 +753,7 @@ r("Gemischter Salat mit Rührei und Schinken", "M", 15, "g", "ei:3;schink:60;eis
 
 
 # ======================= NEU (Runde 4): Frühstück =======================
-r("Griechischer Joghurt mit Erdbeeren, Mandeln und Honig", "F", 3, "kg", "jogGr:200;erdb:100;mandel:10;honig:1",
+r("Griechischer Joghurt mit Erdbeeren, Mandeln und Honig", "F", 3, "kg", "jogGr:200;erdb:100;mandel:25;honig:1",
   "Erdbeeren in Stücke schneiden oder auftauen lassen.|Joghurt in eine Schale geben und Erdbeeren und gehackte Mandeln daraufgeben.|Mit Honig beträufeln.")
 r("Griechischer Joghurt mit Banane und Haferflocken", "F", 3, "k", "jogGr:200;banane:1;hafer:30;~Zimt",
   "Banane in Scheiben schneiden.|Joghurt in eine Schale geben, Haferflocken und Banane darauf verteilen.|Mit Zimt bestäuben.")
@@ -797,7 +797,7 @@ r("Haferbrei mit Skyr und Erdbeeren", "F", 10, "g", "hafer:40;milch:200;skyr:150
   "Haferflocken mit der Milch unter Rühren 4 Minuten bei mittlerer Hitze kochen.|Etwas abkühlen lassen, Skyr unterrühren (nicht mehr kochen).|Erdbeeren in Stücken daraufgeben und mit Zimt bestäuben.")
 
 # ======================= NEU (Runde 4): Snacks =======================
-r("Griechischer Joghurt mit Honig und Mandeln", "S", 2, "k", "jogGr:150;honig:1;mandel:10",
+r("Griechischer Joghurt mit Honig und Mandeln", "S", 2, "k", "jogGr:150;honig:1;mandel:15",
   "Joghurt in eine Schale geben.|Mandeln grob hacken und daraufstreuen.|Mit Honig beträufeln.")
 r("Quark mit Banane und Kakao", "S", 3, "kgl", "quark:200;banane:0.5;kakao:1",
   "Banane mit einer Gabel zerdrücken.|Quark und Kakao unterrühren, bis eine Creme entsteht.")
@@ -864,6 +864,7 @@ gen_fs.run()
 for _rec in gen_core.OUT:
     r(*_rec)
 if gen_core.SKIPPED: print('Übersprungen (Titel schon vorhanden):', gen_core.SKIPPED)
+if gen_core.LOWPROT: print('Weggefallen (zu wenig Eiweiß):', gen_core.LOWPROT)
 
 # ======================= Berechnung =======================
 def slug(t):

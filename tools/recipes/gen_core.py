@@ -55,6 +55,8 @@ FIT = {"oel": (0.5, 0.5), "reis": (10, 40), "nudel": (10, 50), "couscous": (10, 
        "parm": (5, 10), "rhack": (10, 90), "phack": (10, 100), "ghack": (10, 85), "linse": (10, 50), "kiche": (10, 120), "bohne": (10, 100), "kokos": (25, 75),
        "hafer": (5, 15), "jogGr": (10, 40), "honig": (0.5, 0.5), "mandel": (5, 5), "butter": (2, 2), "lyoner": (10, 30), "broetchen": (1, 1), "ei": (0.5, 1)}
 LIMIT = {"M": 640, "F": 600, "S": 360}
+MINPROT = {"M": 23, "F": 13, "S": 9}   # wie die Prüfung in build.py: wer darunter liegt, wird gar nicht erst erzeugt
+LOWPROT = []          # Titel, die wegen zu wenig Eiweiß weggefallen sind
 LIGHT = {"M": 460, "F": 320, "S": 190}
 
 
@@ -75,6 +77,15 @@ def _unparse(parts):
 def _kcal(k, a):
     name, pl, unit, per, kc, pr, fl, grp = DB[k]
     return a * per * kc / 100.0
+
+
+def _protein(parts):
+    total = 0.0
+    for k, a in parts:
+        if k:
+            name, pl, unit, per, kc, pr, fl, grp = DB[k]
+            total += a * per * pr / 100.0
+    return total
 
 
 def fit(ingredients, meal):
@@ -101,6 +112,8 @@ def add(title, meal, time, tags, ingredients, steps, tip=None):
     USED.add(slug(title))
     if DB:
         ingredients, kc = fit(ingredients, meal)
+        if round(_protein(_parse(ingredients))) < MINPROT[meal]:
+            LOWPROT.append(title); USED.discard(slug(title)); return False
         if kc <= LIGHT[meal] and "l" not in tags:
             tags += "l"
     OUT.append((title, meal, int(time), tags, ingredients, "|".join(steps) if isinstance(steps, (list, tuple)) else steps, tip))

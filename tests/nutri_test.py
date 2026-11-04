@@ -14,18 +14,18 @@ def ck(n, c, info=""):
     if not c: fails.append(n)
 
 
-# Schlüssel: (kcal von, bis, Eiweiß von, bis) je 100 g bzw. 100 ml, Quelle: BLS 3.02 und USDA FoodData Central, grob gerundet
+# Schlüssel: (kcal von, bis, Eiweiß von, bis) je 100 g bzw. 100 ml. Quellen: BLS 3.02, USDA FoodData Central und deutsche Handelsetiketten (Lidl, REWE, Aldi), grob gerundet
 REF = {
-    "haehn": (95, 125, 21, 24), "pute": (95, 125, 21, 25), "ghack": (220, 290, 15, 19), "phack": (110, 160, 18, 22), "rhack": (150, 200, 18, 22),
+    "haehn": (95, 125, 21, 24), "pute": (100, 120, 21, 25), "ghack": (220, 290, 15, 19), "phack": (140, 170, 16.5, 20), "rhack": (125, 165, 19, 22),
     "schink": (95, 125, 18, 22), "paufs": (85, 115, 17, 22), "ei": (130, 160, 12, 13.5), "skyr": (55, 70, 10, 12), "quark": (60, 75, 11, 14),
     "jog35": (60, 80, 3.3, 4.5), "milch": (44, 50, 3.2, 3.6), "moz": (230, 270, 17, 20), "gouda": (320, 400, 22, 27), "parm": (380, 440, 32, 38),
-    "speisequark": (95, 125, 10, 13), "jogGr": (110, 150, 4.5, 7), "butter": (720, 760, 0.5, 1), "haehnst": (100, 125, 20, 23), "lyoner": (240, 290, 10, 14),
+    "speisequark": (95, 110, 10, 12), "jogGr": (115, 135, 3.5, 5.5), "butter": (720, 760, 0.5, 1), "haehnst": (100, 125, 20, 23), "lyoner": (240, 290, 10, 14),
     "hafer": (360, 380, 12, 14), "chia": (470, 500, 15, 20), "mandel": (570, 610, 19, 22), "brot": (200, 250, 6, 9), "wrap": (270, 320, 8, 10),
     "broetchen": (220, 270, 8, 10), "nudel": (340, 360, 11.5, 14), "reis": (345, 365, 6.5, 8), "couscous": (350, 375, 11.5, 14), "honig": (295, 320, 0, 0.6),
     "oel": (880, 900, 0, 0.1), "soja": (50, 80, 5, 9), "tmark": (70, 110, 4, 5.5), "stueck": (20, 32, 0.9, 1.5), "tom": (15, 22, 0.8, 1.1),
     "gurke": (10, 16, 0.5, 0.8), "pap": (20, 40, 0.8, 1.3), "zwie": (28, 42, 1.0, 1.4), "karo": (30, 42, 0.8, 1.0), "eisb": (11, 16, 0.7, 1.1),
     "spin": (18, 27, 2.5, 3.2), "ruc": (20, 30, 2.3, 2.8), "sgurke": (10, 20, 0.3, 0.9), "knob": (130, 160, 5.5, 7), "banane": (85, 95, 1.0, 1.3),
-    "erdb": (30, 40, 0.6, 0.9), "kiche": (115, 135, 6.5, 8), "bohne": (95, 125, 6, 8.5), "linse": (330, 360, 23, 26), "kokos": (60, 90, 0.4, 1.0),
+    "erdb": (30, 40, 0.6, 0.9), "kiche": (115, 135, 6.5, 8), "bohne": (95, 125, 6, 8.5), "linse": (330, 360, 23, 26), "kokos": (120, 140, 0.4, 1.0),
     "bruehe": (0, 10, 0, 0.6), "zitrone": (20, 35, 0.3, 0.5), "senf": (60, 120, 4, 8), "kakao": (330, 400, 17, 25), "schnitzel": (100, 125, 20, 23),
     "curry": (290, 350, 10, 15), "garam": (300, 360, 10, 16), "paprikap": (280, 330, 12, 15), "kurkuma": (300, 330, 7, 10), "kreuz": (360, 400, 17, 19)}
 # Gramm je Einheit (Stück, EL, TL): nur Werte, die realistisch sind
