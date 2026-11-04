@@ -11,7 +11,7 @@ Live: https://justiiiiiin.github.io/Training/
 - `js/`: klassische Skripte, die sich den globalen Bereich teilen. `sync.js` und `boot.js` stehen am Ende von `index.html`. `boot.js` lädt nach dem ersten Abgleich der Reihe nach `data.js` (Übungen, Rezepte, Preise, Tipps), `app.js` (Zustand, Oberfläche, Logik), `v3.js` (3D-Ansicht) und `start.js` (Start, setzt `window.__fcReady`), jeweils mit `?v=<Versionslabel>`.
 - Der Sync-Block (`js/sync.js`, `window.FC`): Speicher über localStorage, optional Supabase (Tabelle `kv`). Schema und Row-Level-Security der Tabelle stehen in `docs/supabase.sql`.
 - `sw.js`: Service Worker (Netz zuerst, Offline-Rückfall, Cache `fc-offline-v3`). Neue Dateien gehören in seine Liste `FILES`. `manifest.webmanifest` und die Icons gehören zur Installation auf dem Home-Bildschirm.
-- Daten in `js/data.js`: `RECIPES` (300 Rezepte), `DAYS`, `PRICE` (Lidl-Richtwerte) werden aus `tools/recipes/` eingesetzt. Übungen: `EX`, `EXALT`, `EXFUT`, `GEAR`. 3D-Animationen: `V3A`.
+- Daten in `js/data.js`: `RECIPES` (1000 Rezepte: 300 von Hand in `build.py`, 700 aus den Generatoren `gen_*.py`), `DAYS`, `PRICE` (Lidl-Richtwerte) werden aus `tools/recipes/` eingesetzt. Mengen sind Rohgewichte (Fleisch roh, Reis, Nudeln, Couscous und Linsen trocken), die App weist im Rezept und im Rechner darauf hin. Übungen: `EX`, `EXALT`, `EXFUT`, `GEAR`. 3D-Animationen: `V3A`.
 - Wichtige Stellen: `sanitizeState()` (prüft alle gespeicherten Daten), `showTab()`/`GROUPS`/`TABN` (Navigation), `renderEx`, `renderAusblick`, `prepCalc`/`prepGen` (Vorkochen), `shopCalc` (Einkaufsliste), `buyEstimate` (Ausgaben), `cParse` (Kalorien-Rechner mit `CEXTRA`, `CDISH`).
 - Gespeichert wird alles in localStorage-Schlüsseln `fc_*` (zum Beispiel `fc_settings`, `fc_diary`, `fc_goals`). Ändere nie ihre Bedeutung, ohne `sanitizeState` mitzuziehen.
 
@@ -32,14 +32,18 @@ cat js/data.js js/app.js js/v3.js js/start.js > /tmp/all.js && node --check /tmp
 ```
 
 Rezepte ändern: `tools/recipes/build.py` bearbeiten, dann `python3 tools/recipes/build.py` (prüft Kalorien, Eiweiß, Vielfalt, schreibt die JSON-Dateien) und `python3 tools/recipes/inject.py` (setzt sie in `js/data.js` ein).
+Die 700 erzeugten Rezepte kommen aus `gen_main.py` bis `gen_main4.py` (Mittag/Abend) und `gen_fs.py` (Frühstück, Snacks) auf Basis von `gen_core.py` (Zutaten zusammenfügen, Kalorien automatisch anpassen, doppelte Titel überspringen). Sie sind Varianten aus Zutat, Soße und Beilage mit eigenen Schritten, keine kopierten Texte. Kalorien, Eiweiß, Kosten und Gemüse rechnet `build.py` immer aus den Zutaten. Mit `FC_TARGET=0` entfällt die Prüfung auf genau 1000 Rezepte, wenn du an den Generatoren arbeitest.
 
 ## Tests
 
 Alle Tests laufen mit Playwright (Chromium) gegen `index.html`, ohne Server, außer `pwa_test.py` (lokaler Server). Pfade kommen aus `tests/fcenv.py`. Mit `FC_URL` oder `FC_APP_DIR` lässt sich eine andere Version prüfen. `audit2.py` füttert alle Speicherschlüssel mit kaputten Werten und geht die Tabs durch (dauert länger). `ui_test.py` prüft die Oberfläche: Kontrast nach WCAG AA, Tap-Ziele ab 24 px und seitlichen Überlauf, hell und dunkel. `robust_test.py`, `merge_test.py` und `swcache_test.py` decken kaputte Daten, Sync-Konflikte und den Offline-Speicher ab. `train_layout_test.py` prüft die Trainingskarte auf dem Handy (Jetzt/Danach, Erledigt-Zeile, Symbol-Knöpfe, Fertig ohne Scrollen), `anim_geometry_test.py` die Körpergeometrie von Pike-Liegestütze und Rucksack-Rudern.
+`nutri_test.py` rechnet alle 1000 Rezepte aus der Zutatentabelle neu, prüft die Zutatenwerte gegen übliche Tabellenbereiche (BLS, USDA) und die Rohgewicht-Hinweise im Rezept und im Rechner.
 `update_test.py` und `swupdate_test.py` (Update-Banner und Service Worker) fehlen hier, weil sie handgebaute Fixtures brauchen.
 Bekannte Eigenheit: `Overnight Oats (dein Rezept)` hat 845 kcal und wird von `build.py` absichtlich als Ausnahme gemeldet.
 
 ## Fallstricke
+
+- Rezeptliste (`renderRecipes`): zeigt 48 Rezepte, der Knopf „Mehr anzeigen“ (`data-rmore`) hängt weitere an. Suchtext (`rHay`) und ID-Index (`byId`, `recipesWith`) werden zwischengespeichert, der Index baut sich neu, wenn sich die Rezeptzahl ändert. Rezept-Titel müssen eindeutig sein, `build.py` bricht sonst ab. Beim Vorkochen bewertet `prepPick` die Reste nur für die 40 besten Kandidaten, sonst wird das Würfeln bei vielen Rezepten langsam.
 
 - Der Code läuft von oben nach unten, Datei für Datei. Top-level-`const` und `let` müssen vor ihrer ersten Benutzung stehen, auch indirekt über Funktionen, die beim Start laufen (`sanitizeState` läuft mitten in `app.js`). Funktionen aus einer späteren Datei gibt es beim Laden einer früheren noch nicht. Doppelte Namen fallen mit dem zusammengefügten `node --check` auf.
 - Im Rechner (`cParse`) prüft `CDISH` (Gerichte) vor `CFOODS` (Zutaten), und ein einzelnes Wort in `CDISH` trifft auch als Teil eines längeren Wortes. Nimm dort nur eindeutige oder mehrwortige Schlüssel.

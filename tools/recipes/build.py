@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Rezeptsammlung: berechnet Kalorien und Eiweiß aus einer Zutatentabelle und prüft Vielfalt und Gesundheit."""
-import json, re, sys, itertools, collections, unicodedata
+import json, re, sys, os, itertools, collections, unicodedata
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 
 # key: (Name, Mehrzahl, Einheit, Gramm je Einheit, kcal/100g, Eiweiß/100g, Merkmale, Gruppe)
 # Einheit: g oder ml = Menge direkt, Stk/EL/TL = Anzahl mit Gramm je Einheit
@@ -35,7 +38,7 @@ DB = {
  "reis": ("Reis (Rohgewicht)", None, "g", 1, 350, 7, "", "stärke"),
  "couscous": ("Couscous (Rohgewicht)", None, "g", 1, 360, 12.5, "", "stärke"),
  "honig": ("Honig", None, "TL", 7, 300, 0.3, "Honig", "sonst"),
- "oel": ("Rapsöl", None, "TL", 4, 880, 0, "", "fett"),
+ "oel": ("Rapsöl", None, "TL", 4.5, 884, 0, "", "fett"),
  "soja": ("Sojasauce", None, "EL", 15, 60, 6, "", "sonst"),
  "tmark": ("Tomatenmark", None, "EL", 15, 85, 4.5, "", "sonst"),
  "stueck": ("stückige Tomaten (Dose)", None, "g", 1, 24, 1.2, "", "gemüse"),
@@ -139,7 +142,7 @@ TAG = {"k": "Ohne Kochen", "p": "Meal-Prep", "g": "Günstig", "a": "Für die Arb
 SHOWN_CONTAINS = ["Hülsenfrüchte", "Rindfleisch", "Schwein", "Geflügel", "Ei", "Nüsse"]
 
 R = []
-TARGET = 300
+TARGET = int(os.environ.get("FC_TARGET", "1000"))  # 300 von Hand geschrieben + 700 aus den Bausteinen in gen_*.py
 def r(title, meal, time, tags, ing, steps, tip=None):
     R.append(dict(title=title, meal=MEAL[meal], time=time, tags=tags, ing=ing, steps=[s.strip() for s in steps.split("|")], tip=tip))
 
@@ -851,6 +854,17 @@ r("Hähnchen-Blech mit Paprika, Tomate und Zwiebel", "M", 35, "", "haehn:160;pap
 r("Schnitzel-Tomaten-Auflauf mit Couscous und Mozzarella", "M", 40, "", "schnitzel:150;tom:3;pap:1;couscous:40;moz:40;zwie:0.5;knob:1;~Oregano, Salz und Pfeffer",
   "Ofen auf 200 °C vorheizen. Couscous mit heißem Wasser übergießen und 5 Minuten quellen lassen.|Schnitzel in Streifen schneiden, Tomaten, Paprika und Zwiebel in Stücke. Alles mit Couscous, Knoblauch und Gewürzen in eine Form geben.|Mit Mozzarella belegen und 25 Minuten backen, bis das Fleisch durch und der Käse goldbraun ist.")
 
+# ======================= Erzeugte Rezepte (700) =======================
+import gen_core, gen_main
+gen_core.DB = DB
+gen_core.USED.update(gen_core.slug(x['title']) for x in R)  # nichts doppelt zu den handgeschriebenen
+gen_main.run()
+import gen_fs
+gen_fs.run()
+for _rec in gen_core.OUT:
+    r(*_rec)
+if gen_core.SKIPPED: print('Übersprungen (Titel schon vorhanden):', gen_core.SKIPPED)
+
 # ======================= Berechnung =======================
 def slug(t):
     t = unicodedata.normalize("NFKD", t.lower().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss"))
@@ -902,8 +916,8 @@ for o in out:
 # ======================= Prüfung =======================
 problems = []
 ids = [o["id"] for o in out]
-assert len(set(ids)) == len(ids), "doppelte IDs"
-assert len(out) == TARGET, len(out)
+assert len(set(ids)) == len(ids), ("doppelte IDs", [i for i, c in collections.Counter(ids).items() if c > 1][:10])
+assert not TARGET or len(out) == TARGET, (len(out), TARGET)
 BANNED = ["gyros", "fisch", "thunfisch", "lachs", "tofu", "kartoffel", "hüttenkäse", "pilz", "brokkoli", "zucchini", "radieschen"]
 for o in out:
     text = (o["title"] + " " + " ".join(i[2] for i in o["ing"]) + " " + " ".join(o["steps"])).lower()
@@ -917,6 +931,7 @@ for o in out:
     pmin = {"Frühstück": 13, "Mittag/Abend": 23, "Snack": 9}[o["meal"]]
     if o["protein"] < pmin: problems.append(f"Eiweiß unter {pmin} g: {o['title']} = {o['protein']}")
     if o["meal"] == "Mittag/Abend" and o["veg"] < 100: problems.append(f"Gemüse unter 100 g: {o['title']} = {o['veg']}")
+    if o["protein"] * 4 > o["kcal"] + 10: problems.append(f"Eiweiß-kcal größer als Gesamt-kcal: {o['title']}")
 
 stat = collections.Counter(o["meal"] for o in out)
 src = collections.Counter()
@@ -961,9 +976,9 @@ if "--report" in sys.argv or True:
 
 pub = [{k: v for k, v in o.items() if not k.startswith("_") and v is not None} for o in out]
 PJ = {k: dict(pack=v[0], price=v[1], sec=v[2], label=v[3], loose=v[4], staple=v[5], per=DB[k][3], u=DB[k][2], n=DB[k][0], pl=DB[k][1], p=DB[k][5], kcal=DB[k][4]) for k, v in PRICE.items()}
-json.dump(PJ, open("/home/claude/recipes/prices.json", "w", encoding="utf-8"), ensure_ascii=False)
-json.dump(pub, open("/home/claude/recipes/recipes.json", "w", encoding="utf-8"), ensure_ascii=False, indent=None)
-json.dump(out, open("/home/claude/recipes/recipes_full.json", "w", encoding="utf-8"), ensure_ascii=False)
+json.dump(PJ, open(os.path.join(HERE, "prices.json"), "w", encoding="utf-8"), ensure_ascii=False)
+json.dump(pub, open(os.path.join(HERE, "recipes.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=None)
+json.dump(out, open(os.path.join(HERE, "recipes_full.json"), "w", encoding="utf-8"), ensure_ascii=False)
 print("geschrieben:", len(pub))
 
 # ======================= Beispieltage =======================
@@ -978,5 +993,5 @@ for name, idl in DAYS_DEF:
     for i in idl: assert i in byid, i
     days.append(dict(name=name, items=[dict(id=i, title=byid[i]["title"], meal=byid[i]["meal"], kcal=byid[i]["kcal"], protein=byid[i]["protein"]) for i in idl],
                      kcal=sum(byid[i]["kcal"] for i in idl), protein=sum(byid[i]["protein"] for i in idl)))
-json.dump(days, open("/home/claude/recipes/days.json", "w", encoding="utf-8"), ensure_ascii=False)
+json.dump(days, open(os.path.join(HERE, "days.json"), "w", encoding="utf-8"), ensure_ascii=False)
 for d in days: print("Tag:", d["name"], d["kcal"], "kcal", d["protein"], "g Eiweiß")

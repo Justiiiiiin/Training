@@ -358,6 +358,9 @@ function toggleExc(code) { EXC = EXC.includes(code) ? EXC.filter((x) => x !== co
 const EXC_ALL = ["Hülsenfrüchte", "Rindfleisch", "Schwein", "Geflügel", "Ei", "Nüsse"];
 const FDEF = JSON.stringify(F);
 const FKEYS = ["meal", "diet", "time", "minProt", "prep", "nocook", "cheap", "work", "light", "fav"];
+/* Suchtext je Rezept (Titel und Zutaten, klein geschrieben), nur einmal gebaut statt bei jedem Tastendruck für alle Rezepte */
+const RHAY = new WeakMap();
+function rHay(r) { let t = RHAY.get(r); if (t === undefined) { t = (r.title + " " + r.ing.map((i) => i[2]).join(" ")).toLowerCase(); RHAY.set(r, t); } return t; }
 function filtered() {
   const q = F.q.trim().toLowerCase();
   const list = RECIPES.filter((r) =>
@@ -372,7 +375,7 @@ function filtered() {
     (!F.light || r.tags.includes("Leicht")) &&
     !isExc(r) &&
     (!F.fav || FAV.includes(r.id)) &&
-    (!q || (r.title + " " + r.ing.map((i) => i[2]).join(" ") + " " + r.tags.join(" ")).toLowerCase().includes(q)));
+    (!q || rHay(r).includes(q) || r.tags.some((t) => t.toLowerCase().includes(q))));
   const by = { protein: (a, b) => b.protein - a.protein, kcal: (a, b) => a.kcal - b.kcal, time: (a, b) => a.time - b.time, dens: (a, b) => b.protein / b.kcal - a.protein / a.kcal, cost: (a, b) => a.cost - b.cost, ppe: (a, b) => b.protein / b.cost - a.protein / a.cost, title: (a, b) => a.title.localeCompare(b.title, "de") };
   return list.sort(by[F.sort]);
 }
@@ -380,8 +383,9 @@ function filterActive() { const base = JSON.parse(FDEF); return FKEYS.some((k) =
 function resetFilters() { const s = F.sort; Object.assign(F, JSON.parse(FDEF)); F.sort = s; renderRecipes(); }
 let FOPEN = false;
 let IOPEN = false;
+let INGKEYS = null;
 function ingexHTML() {
-  const keys = [...new Set(RECIPES.flatMap((r) => r.ing.map((i) => i[4]).filter(Boolean)))].filter((k) => PRICE[k]).sort((a, b) => zname(a).localeCompare(zname(b), "de"));
+  const keys = INGKEYS || (INGKEYS = [...new Set(RECIPES.flatMap((r) => r.ing.map((i) => i[4]).filter(Boolean)))].filter((k) => PRICE[k]).sort((a, b) => zname(a).localeCompare(zname(b), "de")));
   const nz = EXC.filter((x) => x.startsWith("z:")).length, hid = EXC.filter((x) => x.startsWith("r:"));
   return '<details class="more ingex" id="ingex"' + (IOPEN ? " open" : "") + "><summary>Zutaten, die ich nicht mag" + (nz ? '<span class="badge">' + nz + "</span>" : "") + "</summary>" +
     '<p class="small muted">Rezepte mit diesen Zutaten verschwinden aus Liste, Glücksrad und Tagesvorschlag.</p><div class="fgroup">' +
@@ -406,17 +410,37 @@ function renderFilters() {
     "</details>";
 }
 document.addEventListener("toggle", (ev) => { if (ev.target && ev.target.id === "pricebox") PRICEOPEN = ev.target.open; if (ev.target && ev.target.id === "fmore") FOPEN = ev.target.open; if (ev.target && ev.target.id === "ingex") IOPEN = ev.target.open; }, true);
-function renderRecipes() {
+/* Die Liste zeigt zuerst 48 Rezepte und lädt per Knopf mehr nach. So bleibt sie auch mit 1000 Rezepten schnell. */
+const RPAGE = 48;
+let rShow = RPAGE, rSig = "";
+function rcardHTML(r) {
+  return '<button class="rcard" data-recipe="' + r.id + '"><h4>' + (FAV.includes(r.id) ? '<span class="favmark" aria-label="Lieblingsrezept">♥</span> ' : "") + r.title + '</h4>' +
+    '<div class="tags"><span class="tag">' + r.meal + '</span>' + (r.diet !== "omni" ? '<span class="tag g">' + (r.diet === "vegan" ? "Vegan" : "Vegetarisch") + "</span>" : "") + r.tags.slice(0, 2).map((t) => '<span class="tag">' + t + "</span>").join("") + "</div>" +
+    '<div class="rnum"><span class="pro">' + r.protein + '<small>g Eiweiß</small></span><span class="rsub">' + r.kcal + " kcal, " + r.time + " Min, ca. " + eur(r.cost) + "</span></div></button>";
+}
+function renderRecipes(more) {
   const list = filtered();
+  const sig = JSON.stringify(F) + "|" + EXC.join(","), same = sig === rSig;
+  if (!same) { rSig = sig; rShow = RPAGE; }
+  const before = rShow;
+  if (more) rShow += RPAGE * 2;
+  const moreBtn = (rest) => (rest > 0 ? '<div class="rmore"><button class="btn" data-rmore="1">Mehr anzeigen (' + rest + " weitere)</button></div>" : "");
+  /* Mehr anzeigen: nur die neuen Karten anhängen, die Liste und die Filter bleiben unberührt */
+  if (more && same && $("#rgrid").querySelector(".rmore")) {
+    const grid = $("#rgrid"), old = grid.querySelector(".rmore"); old.remove();
+    grid.insertAdjacentHTML("beforeend", list.slice(before, rShow).map(rcardHTML).join("") + moreBtn(list.length - Math.min(rShow, list.length)));
+    const c = grid.querySelectorAll(".rcard")[before]; if (c) c.focus({ preventScroll: true });
+    return;
+  }
   $("#rcount").textContent = list.length + " von " + RECIPES.length + " Rezepten" + excLabel();
   $("#rsort").value = F.sort;
-  $("#rgrid").innerHTML = list.length ? list.map((r) =>
-    '<button class="rcard" data-recipe="' + r.id + '"><h4>' + (FAV.includes(r.id) ? '<span class="favmark" aria-label="Lieblingsrezept">♥</span> ' : "") + r.title + '</h4>' +
-    '<div class="tags"><span class="tag">' + r.meal + '</span>' + (r.diet !== "omni" ? '<span class="tag g">' + (r.diet === "vegan" ? "Vegan" : "Vegetarisch") + "</span>" : "") + r.tags.slice(0, 2).map((t) => '<span class="tag">' + t + "</span>").join("") + "</div>" +
-    '<div class="rnum"><span class="pro">' + r.protein + '<small>g Eiweiß</small></span><span class="rsub">' + r.kcal + " kcal, " + r.time + " Min, ca. " + eur(r.cost) + "</span></div></button>").join("")
+  const shown = list.slice(0, rShow), rest = list.length - shown.length;
+  $("#rgrid").innerHTML = list.length ? shown.map(rcardHTML).join("") + moreBtn(rest)
     : '<div class="card empty"><h3>Keine Treffer</h3><p class="muted">Lockere die Filter etwas.</p><div class="row" style="justify-content:center"><button class="btn" data-freset="1">Filter zurücksetzen</button></div></div>';
   renderFilters();
+  if (more) { const c = $("#rgrid").querySelectorAll(".rcard")[before]; if (c) c.focus({ preventScroll: true }); }
 }
+const RAWKEYS = ["haehn", "pute", "phack", "rhack", "ghack", "schnitzel", "haehnst", "reis", "nudel", "couscous", "linse"];
 let openId = null, portions = 1;
 const UNIT_SPOKEN = { g: "Gramm", ml: "Milliliter", EL: "Esslöffel", TL: "Teelöffel" };
 function ingText(i, spoken) {
@@ -478,6 +502,7 @@ function drawRecipe() {
     '<div class="tags">' + (r.diet !== "omni" ? '<span class="tag g">' + (r.diet === "vegan" ? "Vegan" : "Vegetarisch") + "</span>" : "") + r.tags.map((t) => '<span class="tag">' + t + "</span>").join("") + (r.veg >= 50 ? '<span class="tag g">Gemüse ca. ' + r.veg + " g</span>" : "") + "</div>" +
     '<div class="row"><span class="small muted">Portionen</span><span class="stepper"><button class="btn icon" data-por="-1" aria-label="Weniger Portionen">−</button><b>' + portions + '</b><button class="btn icon" data-por="1" aria-label="Mehr Portionen">+</button></span></div>' +
     "<h4>Zutaten</h4><ul>" + r.ing.map((i) => "<li>" + ingText(i, false) + "</li>").join("") + "</ul>" +
+    (r.ing.some((i) => RAWKEYS.includes(i[4])) ? '<p class="small muted">Fleisch ist roh gewogen, Reis, Nudeln, Couscous und Linsen trocken. Beim Garen ändert sich das Gewicht, die Nährwerte gelten für die Menge in der Liste.</p>' : "") +
     "<h4>Zubereitung</h4><ol>" + r.steps.map((s) => "<li>" + s + "</li>").join("") + "</ol>" +
     (r.ing.some((i) => i[4] === "erdb") ? '<p class="note"><b>Tiefkühl-Erdbeeren:</b> Erhitze sie vor dem Essen mindestens 2 Minuten auf über 90 °C und lass sie abkühlen. Das empfiehlt das BfR wegen möglicher Viren. Frische Erdbeeren gründlich waschen.</p>' : "") + (r.tip ? '<p class="note">' + r.tip + "</p>" : "") + (r.note ? '<p class="note">' + r.note + "</p>" : "") +
     '<p class="small muted">Nährwerte sind gerundete Richtwerte aus üblichen Tabellen. Marken weichen ab.</p>' +
@@ -869,7 +894,7 @@ const GROUPS = [
   { id: "fortschritt", title: "Fortschritt", tabs: ["fortschritt"] }
 ];
 const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", ausblick: "Ausblick", rezepte: "Rezepte", rad: "Rad", vorkochen: "Vorkochen", einkauf: "Einkauf", ernaehrung: "Ernährung", fortschritt: "Fortschritt" };
-const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", ausblick: "Pläne, Ausrüstung und Kauflinks", rezepte: "300 Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", vorkochen: "Sonntag kochen, die Woche essen", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf" };
+const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", ausblick: "Pläne, Ausrüstung und Kauflinks", rezepte: RECIPES.length + " Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", vorkochen: "Sonntag kochen, die Woche essen", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf" };
 const LAST = {};
 let CUR = "heute";
 const greeting = () => { const h = new Date().getHours(); return h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend"; };
@@ -926,7 +951,9 @@ let RPL = store.get("fc_radplans", {});
 const rad = { seg: [], theta: 0, hi: -1, busy: false, skip: false, shown: new Set() };
 const TAU = Math.PI * 2;
 const DAYN = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
-const byId = (id) => RECIPES.find((r) => r.id === id);
+/* Index nach ID, wird neu gebaut, wenn sich die Zahl der Rezepte ändert */
+let RBYID = null, RBYIDN = -1;
+const byId = (id) => { if (!RBYID || RBYIDN !== RECIPES.length) { RBYID = new Map(RECIPES.map((r) => [r.id, r])); RBYIDN = RECIPES.length; } return RBYID.get(id); };
 const hasSpin = (r) => r.ing.some((i) => /spinat/i.test(i[2]));
 const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const pickRnd = (a) => a[Math.floor(Math.random() * a.length)];
@@ -1192,8 +1219,10 @@ function shopCalc(entries) {
   return { lines, used: new Set(entries.map((e) => e.id)), total: lines.filter((l) => !l.staple).reduce((a, l) => a + l.cost, 0) };
 }
 const stFor = (k) => STORE.find((x) => x.keys.includes(k));
+let RBYING = null, RBYINGN = -1;
+const recipesWith = (k) => { if (!RBYING || RBYINGN !== RECIPES.length) { RBYINGN = RECIPES.length; RBYING = {}; RECIPES.forEach((r) => new Set(r.ing.map((i) => i[4])).forEach((key) => { if (key) (RBYING[key] = RBYING[key] || []).push(r); })); } return RBYING[k] || []; };
 function restIdeas(k, left, used) {
-  return RECIPES.filter((r) => !used.has(r.id) && !isExc(r) && !(RAD.noSpinat && hasSpin(r)) &&
+  return recipesWith(k).filter((r) => !used.has(r.id) && !isExc(r) && !(RAD.noSpinat && hasSpin(r)) &&
     r.ing.some((i) => i[4] === k && i[0] != null && i[0] * PRICE[k].per <= left + 1e-6)).sort((a, b) => a.cost - b.cost).slice(0, 2);
 }
 function restHTML(l, used) {
@@ -1595,9 +1624,12 @@ function prepPick(kind, avoid, ctx) {
   if (!pool.length) pool = prepPool(kind);
   if (!pool.length) return "";
   const eco = PREP.eco !== false && ctx && (kind !== "main" || ctx.mains.length + 1 >= PREP.n) && (kind !== "b" || PREP.brk) && (kind !== "s" || PREP.snk);
-  return pool.map((r) => {
-    const w = eco ? restWaste(prepCalcWith(kind === "main" ? ctx.mains.concat(r.id) : ctx.mains, kind === "b" ? r.id : ctx.b, kind === "s" ? r.id : ctx.s)) : 0;
-    return { r, s: -(FAV.includes(r.id) ? 3 : 0) - r.protein / 12 + r.cost * 0.8 + r.time / 45 + w * 1.5 + Math.random() * 1.6 };
+  /* Erst grob bewerten (Eiweiß, Preis, Zeit, Lieblinge, Zufall), die aufwendige Reste-Rechnung nur für die besten 40. So bleibt das Würfeln auch bei vielen Rezepten schnell. */
+  const base = pool.map((r) => ({ r, s: -(FAV.includes(r.id) ? 3 : 0) - r.protein / 12 + r.cost * 0.8 + r.time / 45 + Math.random() * 1.6 })).sort((a, b) => a.s - b.s);
+  if (!eco) return base[0].r.id;
+  return base.slice(0, 40).map((o) => {
+    const w = restWaste(prepCalcWith(kind === "main" ? ctx.mains.concat(o.r.id) : ctx.mains, kind === "b" ? o.r.id : ctx.b, kind === "s" ? o.r.id : ctx.s));
+    return { r: o.r, s: o.s + w * 1.5 };
   }).sort((a, b) => a.s - b.s)[0].r.id;
 }
 function prepGen(which) {
@@ -2277,6 +2309,7 @@ function cParse(text) {
     if (f.id === "ei" && (!unit || unit === "stk")) { const sz = eggSize(t); if (sz) { g = (n == null ? 1 : n) * EGGW[sz]; note = "Größe " + sz.toUpperCase(); } else note = "als Größe M gerechnet"; }
     if (cooked && f.raw) { g *= 0.37; note = "gekocht gerechnet"; }
     else if ((cooked || fried) && ["haehn", "pute", "phack", "rhack", "ghack", "schnitzel"].includes(f.id)) { g *= 1.3; note = "gegart gerechnet, Fleisch verliert beim Garen Wasser"; }
+    else if (["haehn", "pute", "phack", "rhack", "ghack", "schnitzel", "haehnst"].includes(f.id)) note = "als rohes Fleisch gerechnet";
     g = Math.min(20000, Math.round(g));
     return { raw, kind: "food", name: f.name, g, qty: g + " g", k: g * f.kcal / 100, p: g * f.p / 100, c: g * f.eur / 100, note, def: n == null };
   });
@@ -2768,6 +2801,7 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.rspin) return radRoll(t.dataset.rspin);
   if (t.dataset.recipe) return openRecipe(t.dataset.recipe, false, t);
   if (t.dataset.por) { portions = Math.max(1, Math.min(4, portions + parseInt(t.dataset.por, 10))); return drawRecipe(); }
+  if (t.dataset.rmore) return renderRecipes(true);
   if (t.dataset.f) { const g = t.dataset.f, v = g === "time" ? parseInt(t.dataset.v, 10) : t.dataset.v; F[g] = F[g] === v ? (g === "time" ? 0 : "") : v; return renderRecipes(); }
   if (t.dataset.ft) { F[t.dataset.ft] = !F[t.dataset.ft]; return renderRecipes(); }
   if (t.dataset.exc) { EXC = EXC.includes(t.dataset.exc) ? EXC.filter((x) => x !== t.dataset.exc) : EXC.concat(t.dataset.exc); store.set("fc_exc", EXC); return renderRecipes(); }

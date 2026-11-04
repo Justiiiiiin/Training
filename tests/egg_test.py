@@ -24,7 +24,7 @@ with sync_playwright() as p:
     rr=pg.evaluate("RECIPES.find(x=>x.id==='ruehrei-mit-paprika-und-brot')"); print("  Ruehrei mit Paprika und Brot:",rr["kcal"],"kcal",rr["protein"],"g")
     ck("Rezeptwerte aus neuer Eitabelle (Ei M)", 500<=rr["kcal"]<=545 and 27<=rr["protein"]<=30, (rr["kcal"],rr["protein"]))
     ck("Ei in der Preisliste: 51 g (M) je Ei, 2,99 fuer 10", pg.evaluate("PRICE.ei.per")==51 and pg.evaluate("PRICE.ei.pack")==510 and abs(pg.evaluate("RECIPES.find(x=>x.id==='hartgekochte-eier').cost")-0.6)<0.01)
-    ck("300 Rezepte, Kosten wie Bauplan", pg.evaluate("RECIPES.length")==300)
+    ck("1000 Rezepte, Kosten wie Bauplan", pg.evaluate("RECIPES.length")==1000)
     print("Fehler:",errs); ck("keine Fehler", not errs)
     b.close()
 print("FAILS",fails)

@@ -26,7 +26,7 @@ try:
         ck("Offline: Seite laedt aus dem Cache", pg.evaluate("document.getElementById('appver').textContent")==ver, ver)
         ck("Offline: App rendert (Heute)", "Heute" in pg.inner_text("#pagetitle") or "Guten" in pg.inner_text("#pagetitle"), pg.inner_text("#pagetitle"))
         pg.evaluate("showTab('rezepte')"); pg.wait_for_timeout(300)
-        ck("Offline: 300 Rezepte", "300" in pg.inner_text("#rcount"), pg.inner_text("#rcount"))
+        ck("Offline: 1000 Rezepte", "1000" in pg.inner_text("#rcount"), pg.inner_text("#rcount"))
         c.set_offline(False)
         pg.reload(); pg.wait_for_timeout(1000)
         ck("Wieder online: laedt", pg.evaluate("!!document.getElementById('appver')"))

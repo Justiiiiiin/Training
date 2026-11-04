@@ -12,7 +12,7 @@ with sync_playwright() as p:
     pg.goto(URL); pg.wait_for_timeout(700)
     cur=pg.evaluate("RECIPES.map(r=>[r.id,r.cost,r.tags])")
     bad=[(i,c0,B[i]["cost"]) for i,c0,t in cur if abs(c0-B[i]["cost"])>0.011]
-    ck("Ohne eigene Preise: Kosten wie im Bauplan (300)", not bad and len(cur)==300, bad[:3])
+    ck("Ohne eigene Preise: Kosten wie im Bauplan (1000)", not bad and len(cur)==1000, bad[:3])
     badt=[i for i,c0,t in cur if ("Günstig" in t)!=("Günstig" in B[i]["tags"])]
     ck("Guenstig-Markierung wie im Bauplan", not badt, badt[:3])
     pg.evaluate("showTab('einkauf')"); pg.wait_for_timeout(300)
@@ -54,7 +54,7 @@ with sync_playwright() as p:
     pg.evaluate("store.set('fc_settings',Object.assign({},settings,{prices:{haehn:'x',reis:-1,gibtsnicht:5,ei:1.5,wrap:null}}))"); pg.reload(); pg.wait_for_timeout(700)
     ck("Kaputte Preise bereinigt (nur ei bleibt)", pg.evaluate("Object.keys(settings.prices)")==["ei"], pg.evaluate("Object.keys(settings.prices)"))
     pg.evaluate("store.set('fc_settings',Object.assign({},settings,{prices:'kaputt'}))"); pg.reload(); pg.wait_for_timeout(700)
-    ck("prices als Text: App startet", pg.evaluate("typeof settings.prices")=="object" and pg.evaluate("RECIPES.length")==300)
+    ck("prices als Text: App startet", pg.evaluate("typeof settings.prices")=="object" and pg.evaluate("RECIPES.length")==1000)
     ck("kein Ueberlauf", pg.evaluate("document.documentElement.scrollWidth<=window.innerWidth"))
     pg.evaluate("showTab('einkauf'); document.getElementById('pricebox').open=true; document.getElementById('pricebox').scrollIntoView()"); pg.wait_for_timeout(300); pg.screenshot(path=__import__("fcenv").SHOTS + "/v316_prices.png")
     print("Fehler:",errs); ck("keine Fehler", not errs)
