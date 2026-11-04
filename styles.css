@@ -960,3 +960,21 @@ html[data-big] #stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #panel-rad .radbtns { grid-column: 2; grid-row: 3; }
   #panel-rad #radres { grid-column: 1 / -1; grid-row: 4; }
 }
+
+/* Handy quer (Training mit aufgestelltem Handy): Karte in zwei Spalten, links Titel und Figur, rechts Schritte und Knöpfe, damit alles ohne Scrollen sichtbar bleibt */
+@media (orientation: landscape) and (max-height: 520px) and (max-width: 979px) {
+  .coach { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); column-gap: 20px; row-gap: 8px; align-items: start; padding: 14px 20px; }
+  .coach .coachhead { grid-column: 1; grid-row: 1; }
+  .coach .coachfig { grid-column: 1; grid-row: 2; }
+  .coach .actions { grid-column: 2; }
+  .coach .caption { grid-column: 1 / -1; grid-row: 3; }
+  .coach .steps { display: none; }
+  .coach .actions { grid-row: 1 / span 2; align-self: center; }
+  .coach .mini .btn, .coach .mini .btn.icon { min-height: 44px; }
+  .coach .repchips { flex-direction: row; align-items: center; gap: 10px; }
+  .coach .repchips > span { flex: none; white-space: normal; max-width: 7.5em; line-height: 1.25; }
+  .coach .repchips .row { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 6px; padding: 2px 0; }
+  .coach .repchips .row::-webkit-scrollbar { display: none; }
+  .coach .repchips .fchip { flex: none; min-height: 44px; min-width: 44px; }
+  .app { padding-top: 12px; gap: 10px; }
+}

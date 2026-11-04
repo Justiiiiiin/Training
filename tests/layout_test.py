@@ -189,6 +189,20 @@ with sync_playwright() as p:
         ck("große Schrift, kein Überlauf: " + tab, noscroll(p2))
     c2.close()
 
+    # Handy quer: Fertig, Pause und Stopp ohne Scrollen erreichbar
+    c4 = b.new_context(viewport={"width": 844, "height": 390}, has_touch=True, is_mobile=True)
+    p4 = c4.new_page(); p4.on("pageerror", lambda e: errs.append(str(e)))
+    p4.goto(URL); ready(p4)
+    p4.evaluate("showTab('uebungen')"); p4.wait_for_timeout(300)
+    p4.evaluate("document.querySelector('[data-act=start]').click()"); p4.wait_for_timeout(800)
+    p4.evaluate("document.querySelector('[data-act=next]').click()"); p4.wait_for_timeout(1200)
+    lim = p4.evaluate("document.querySelector('.gnav').getBoundingClientRect().top")
+    fb = p4.evaluate("(()=>{const r=document.querySelector('#actions .btn.lg').getBoundingClientRect();const m=[...document.querySelectorAll('#actions .mini .btn')].map(x=>x.getBoundingClientRect().bottom);return {fertig:r.bottom, mini:Math.max(...m)}})()")
+    ck("Q1 quer: Fertig über der unteren Leiste", fb["fertig"] <= lim, [fb, lim])
+    ck("Q1 quer: kleine Knöpfe über der unteren Leiste", fb["mini"] <= lim + 1, [fb, lim])
+    ck("Q1 quer: kein seitlicher Überlauf", noscroll(p4))
+    c4.close()
+
     # Desktop: Glücksrad komplett sichtbar, Einstellungen links, Rad rechts
     c3 = b.new_context(viewport={"width": 1280, "height": 800})
     p3 = c3.new_page(); p3.on("pageerror", lambda e: errs.append(str(e)))
