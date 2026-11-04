@@ -315,8 +315,9 @@ details.src li a { padding: 3px 0; } /* größere Tippfläche (mindestens 24 px)
 }
 @media (max-width: 979px) {
   /* Im Ruhezustand nur Titel und Startknopf, damit der Inhalt nicht erst nach einem Bildschirm Scrollen beginnt */
-  .coach[data-idle="1"] .ringwrap, .coach[data-idle="1"] .steps { display: none; }
+  .coach[data-idle="1"] .ringwrap, .coach[data-idle="1"] .steps, .coach[data-idle="1"] #phase { display: none; }
   .coach[data-idle="1"] { padding: 20px; gap: 14px; }
+  .coach[data-idle="1"] .actions { gap: 8px; }
 }
 @media (max-width: 640px) {
   .app { padding: 16px 14px 48px; gap: 18px; }
@@ -864,7 +865,7 @@ html:not([data-ready]) .layout, html:not([data-ready]) .gnav { display: none !im
 #calc.stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 #calc .stat { padding: 14px; }
 #calc .stat .big { font-size: 1.625rem; }
-#calc .stat > span:last-child { font-size: 0.8125rem; line-height: 1.35; }
+#calc .stat > span:last-child { display: block; font-size: 0.8125rem; line-height: 1.35; }
 html[data-big] #calc.stats { grid-template-columns: minmax(0, 1fr); }
 @media (max-width: 340px) { #calc.stats { grid-template-columns: minmax(0, 1fr); } }
 
@@ -875,3 +876,34 @@ html[data-big] #calc.stats { grid-template-columns: minmax(0, 1fr); }
 .linkrow { display: flex; flex-wrap: wrap; gap: 4px 16px; }
 .linkbtn { min-height: 24px; padding: 4px 0; border: 0; background: none; color: var(--accent); font: inherit; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 @media (pointer: coarse) { .linkbtn { min-height: 44px; padding: 0 4px; } }
+
+/* Glücksrad: Einstellungen eingeklappt mit Kurzfassung, damit das Rad ohne Scrollen sichtbar ist */
+.radmore > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; cursor: pointer; list-style: none; }
+.radmore > summary::-webkit-details-marker { display: none; }
+.radmore > summary::after { content: ""; flex: none; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform 0.25s var(--ease); }
+.radmore[open] > summary::after { transform: rotate(225deg); }
+.rsum { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rsum b { font-weight: 650; }
+.rsum span { color: var(--muted); font-size: 0.875rem; line-height: 1.35; }
+.radbody { display: flex; flex-direction: column; gap: 16px; padding-top: 12px; }
+.radbody p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .radmore > summary::after { transition: none; } }
+
+/* Protokolltabelle ohne seitliches Scrollen auf dem Handy */
+@media (max-width: 640px) { .tablewrap th, .tablewrap td { padding: 10px 6px; } .tablewrap th { font-size: 0.8125rem; } .tablewrap .x { min-width: 36px; min-height: 36px; } }
+.tipbox > summary { min-height: 36px; }
+details.src > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); }
+details.src > summary::-webkit-details-marker { display: none; }
+details.src > summary::after { content: ""; flex: none; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform 0.25s var(--ease); }
+details.src[open] > summary { color: var(--ink); }
+details.src[open] > summary::after { transform: rotate(225deg); }
+@media (prefers-reduced-motion: reduce) { details.src > summary::after { transition: none; } }
+
+/* Fortschritt: die vier Kennzahlen in einer Reihe, damit Eintragen und Kurven höher stehen */
+#stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+#stats .stat { padding: 12px 10px; border-radius: var(--r-md); }
+#stats .stat .big { font-size: 1.5rem; margin-bottom: 4px; }
+#stats .stat > span:last-child { display: block; font-size: 0.75rem; line-height: 1.3; overflow-wrap: anywhere; hyphens: auto; }
+#stats .statact { min-height: 0; }
+@media (max-width: 359px) { #stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+html[data-big] #stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }

@@ -20,7 +20,7 @@
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.44 · 04.11. 17:00</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.45 · 04.11. 18:14</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -74,7 +74,7 @@
 
     <section class="panel" id="panel-rad" role="tabpanel" hidden>
       <div class="card raddeck">
-        <div><h3>Was essen wir?</h3><p class="muted">Das Rad wählt aus deinen Rezepten. Die „Ohne“-Filter aus dem Rezepte-Bereich gelten auch hier.</p></div>
+        <div><h3>Was essen wir?</h3><p class="muted">Das Rad wählt aus deinen Rezepten.</p></div>
         <div class="seg" role="group" aria-label="Was soll das Rad auswählen?">
           <button class="segb" data-rmode="meal" aria-pressed="false">Mahlzeit</button>
           <button class="segb" data-rmode="day" aria-pressed="true">Tag</button>
@@ -97,10 +97,6 @@
 
     <section class="panel" id="panel-fortschritt" role="tabpanel" hidden>
       <div class="stats" id="stats"></div>
-      <div class="card" id="eathist"></div>
-      <div class="card" id="volcard"></div>
-      <div class="card" id="badgecard"></div>
-      <div class="charts" id="charts"></div>
       <div class="card">
         <h3>Heute eintragen</h3>
         <form class="form" id="logform">
@@ -110,9 +106,13 @@
           <label class="field">Plank (s)<input type="number" id="f-plank" step="1" min="0" max="600" inputmode="numeric"></label>
           <button class="btn primary" type="submit">Speichern</button>
         </form>
-        <p class="muted small">Taille: Maßband auf Höhe des Bauchnabels, locker anlegen, nach dem Ausatmen ablesen. Immer zur gleichen Tageszeit messen.</p>
+        <details class="more tipbox"><summary>So misst du richtig</summary><p class="muted small">Taille: Maßband auf Höhe des Bauchnabels, locker anlegen, nach dem Ausatmen ablesen. Immer zur gleichen Tageszeit messen. Gewicht am besten morgens nach dem Toilettengang.</p></details>
         <p class="note" id="waistnote"></p>
       </div>
+      <div class="charts" id="charts"></div>
+      <div class="card" id="eathist"></div>
+      <div class="card" id="volcard"></div>
+      <div class="card" id="badgecard"></div>
       <div class="card tablewrap" id="logtable"></div>
     </section>
 

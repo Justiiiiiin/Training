@@ -410,7 +410,7 @@ function renderFilters() {
     (filterActive() ? '<div class="fgroup"><button class="fchip" data-freset="1">Filter zurücksetzen</button></div>' : "") +
     '</details><select id="rsort" class="fsort" aria-label="Sortieren">' + SORTS.map((o) => '<option value="' + o[0] + '"' + (F.sort === o[0] ? " selected" : "") + ">" + o[1] + "</option>").join("") + "</select></div>";
 }
-document.addEventListener("toggle", (ev) => { if (ev.target && ev.target.id === "pricebox") PRICEOPEN = ev.target.open; if (ev.target && ev.target.id === "fmore") FOPEN = ev.target.open; if (ev.target && ev.target.id === "ingex") IOPEN = ev.target.open; }, true);
+document.addEventListener("toggle", (ev) => { if (ev.target && ev.target.id === "pricebox") PRICEOPEN = ev.target.open; if (ev.target && ev.target.id === "fmore") FOPEN = ev.target.open; if (ev.target && ev.target.id === "radmore") ROPEN = ev.target.open; if (ev.target && ev.target.id === "ingex") IOPEN = ev.target.open; }, true);
 /* Die Liste zeigt zuerst 48 Rezepte und lädt per Knopf mehr nach. So bleibt sie auch mit 1000 Rezepten schnell. */
 const RPAGE = 48;
 let rShow = RPAGE, rSig = "";
@@ -907,7 +907,7 @@ function renderProgress() {
   const rows = log.slice().reverse().map((e) =>
     "<tr><td>" + e.date.slice(8) + "." + e.date.slice(5, 7) + ".</td><td>" + (e.weight != null ? nf(e.weight) : "–") + "</td><td>" + (e.waist != null ? nf(e.waist) : "–") +
     "</td><td>" + (e.pushups != null ? e.pushups : "–") + "</td><td>" + (e.plank != null ? e.plank : "–") + '</td><td><button class="x" data-del="' + e.date + '" aria-label="Eintrag löschen">×</button></td></tr>').join("");
-  $("#logtable").innerHTML = "<table><thead><tr><th>Datum</th><th>kg</th><th>Taille cm</th><th>Liegestütze</th><th>Plank s</th><th></th></tr></thead><tbody>" + rows + "</tbody></table>";
+  $("#logtable").innerHTML = "<table><thead><tr><th>Datum</th><th>kg</th><th>Taille</th><th>Liegestütze</th><th>Plank</th><th></th></tr></thead><tbody>" + rows + "</tbody></table>";
 }
 
 /* ======================= Tabs ======================= */
@@ -1199,6 +1199,7 @@ function radRender() {
       }).join("") + "</ul>" + (RAD.mode === "meal" ? "" : "") + "</section>";
   }).join("") + radShopHTML(P);
 }
+let ROPEN = false;
 function renderRadOpts() {
   const tog = (k, label) => '<button class="fchip" data-ropt="' + k + '" aria-pressed="' + (RAD[k] ? "true" : "false") + '">' + label + "</button>";
   $$("[data-rmode]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.rmode === RAD.mode ? "true" : "false"));
@@ -1209,7 +1210,8 @@ function renderRadOpts() {
   if (RAD.mode === "week") h += tog("reste", "Reste verwerten");
   h += tog("noSpinat", "Ohne Spinat") + tog("cheap", "Günstig") + tog("work", RAD.mode === "meal" ? "Für die Arbeit" : "Mittag zum Mitnehmen");
   const seg = (label, items, attr, cur) => '<div class="segwrap"><span class="small muted">' + label + '</span><div class="seg">' + items.map((x) => '<button class="segb" data-' + attr + '="' + x[0] + '" aria-pressed="' + (cur === x[0]) + '">' + x[1] + "</button>").join("") + "</div></div>";
-  h = '<div class="chips">' + h + '</div><div class="radsegs">' + (RAD.mode !== "meal" ? seg("Preis pro Tag", [[0, "Egal"], [6, "bis 6 €"], [5, "bis 5 €"]], "rmax", RAD.maxDay) : "") + seg("Für", [[1, "1 Person"], [2, "2 Personen"]], "rpeople", RAD.people) + "</div>";
+  const sum = [RAD.mode === "meal" ? RAD.meal : RAD.mode === "day" ? (RAD.bfDay ? "Mit Frühstück" : "Ohne Frühstück") : RAD.bfWeek ? "Frühstück täglich" : "", RAD.mode === "week" && RAD.reste ? "Reste verwerten" : "", RAD.noSpinat ? "Ohne Spinat" : "", RAD.cheap ? "Günstig" : "", RAD.work ? (RAD.mode === "meal" ? "Für die Arbeit" : "Mittag zum Mitnehmen") : "", RAD.mode !== "meal" && RAD.maxDay ? "bis " + RAD.maxDay + " € am Tag" : "", RAD.people + (RAD.people === 1 ? " Person" : " Personen")].filter(Boolean).join(", ");
+  h = '<details class="radmore" id="radmore"' + (ROPEN ? " open" : "") + '><summary><span class="rsum"><b>Einstellungen</b><span>' + sum + '</span></span></summary><div class="radbody"><div class="chips">' + h + '</div><div class="radsegs">' + (RAD.mode !== "meal" ? seg("Preis pro Tag", [[0, "Egal"], [6, "bis 6 €"], [5, "bis 5 €"]], "rmax", RAD.maxDay) : "") + seg("Für", [[1, "1 Person"], [2, "2 Personen"]], "rpeople", RAD.people) + '</div><p class="small muted">Die „Ohne“-Filter aus dem Bereich Rezepte gelten auch hier.</p></div></details>';
   $("#radopts").innerHTML = h;
   $("#spin").textContent = "Drehen";
   $("#spin").setAttribute("aria-label", { meal: "Mahlzeit drehen", day: "Tag drehen", week: "Woche drehen" }[RAD.mode]);
@@ -2809,10 +2811,11 @@ function renderCharts() {
   const cpts = log.filter((x) => x.waist != null).map((x) => ({ ms: new Date(x.date + "T12:00:00").getTime(), y: x.waist }));
   const recent = WK.slice(-5).reverse().map((w) => '<li><b>' + esc(dateDE(w.date)) + '</b><span class="muted small">' + esc(w.min) + " Min, " + exOf(w).map((e) => { const ev = evalEx(e, w.sets); return ev ? e.name + " " + ev.vals.join("/") : ""; }).filter(Boolean).join(", ") + "</span></li>").join("");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(REVW)) REVW = weekStartISO(todayISO());
-  el.innerHTML = reviewHTML(REVW, true) + coachEvalHTML() +
+  el.innerHTML =
     '<div class="card"><div class="rday-h"><h3>Gewicht</h3><span class="rtot">' + wtxt + "</span></div>" + chartSVG(wpts, "dein Gewicht", true) +
     '<p class="small muted">Die Linie zeigt deinen Trend und glättet Schwankungen durch Wasser und Essen. Wiege dich morgens nach dem Toilettengang und achte auf den Trend, nicht auf einzelne Tage. Ein gutes Tempo sind etwa 0,5 bis 1 % deines Gewichts pro Woche.</p></div>' +
     '<div class="card"><h3>Taille</h3>' + chartSVG(cpts, "deine Taille", false) + "</div>" +
+    reviewHTML(REVW, true) + coachEvalHTML() +
     '<div class="card"><h3>Training der letzten 12 Wochen</h3>' + heatHTML() + '<p class="small muted">Jedes Feld ist ein Tag. Ziel sind drei Einheiten pro Woche.</p></div>' +
     perfHTML() + (recent ? '<div class="card"><h3>Letzte Einheiten</h3><ul class="eatlist">' + recent + "</ul></div>" : "");
 }

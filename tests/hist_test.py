@@ -13,6 +13,7 @@ with sync_playwright() as p:
     ck("det am Eintrag", pg.evaluate("dayGet().items.slice(-1)[0].det.length")>=2, pg.evaluate("JSON.stringify(dayGet().items.slice(-1)[0].det)"))
     pg.evaluate("document.getElementById('dlg-eat').close()")
     pg.evaluate("showTab('fortschritt')"); pg.wait_for_timeout(300)
+    pg.evaluate("document.getElementById('eathist').scrollIntoView()"); pg.wait_for_timeout(300)  # content-visibility: Zeilen außerhalb des Bildschirms werden erst beim Hinscrollen gezeichnet
     t=pg.inner_text("#eathist"); print(t[:300].replace("\n"," | "))
     ck("Tagebuch zeigt Tage", "Essens-Tagebuch" in t and "30.10." in t)
     ck("Details sichtbar nach Aufklappen", pg.evaluate("(()=>{ const d=[...document.querySelectorAll('.hday')].find(x=>x.innerText.includes('30.10.')); d.open=true; return d.innerText.includes('150 g Reis'); })()"))

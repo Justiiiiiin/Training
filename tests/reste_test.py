@@ -75,6 +75,7 @@ with sync_playwright() as p:
 
     # 8) Chip „Reste verwerten“ ist da und schaltet um
     pg.evaluate("() => { RAD.mode = 'week'; showTab('rad', true); renderRadOpts(); }")
+    pg.evaluate("document.getElementById('radmore').open=true"); pg.wait_for_timeout(100)
     ck("Chip Reste verwerten vorhanden", pg.is_visible("[data-ropt=reste]"))
     on0 = pg.evaluate("RAD.reste"); pg.click("[data-ropt=reste]"); on1 = pg.evaluate("RAD.reste")
     ck("Chip schaltet um", on0 is True and on1 is False, (on0, on1))

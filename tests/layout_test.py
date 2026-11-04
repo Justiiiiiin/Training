@@ -135,6 +135,26 @@ with sync_playwright() as p:
     ck("L9 Zahnrad öffnet die Einstellungen", pg.evaluate("document.getElementById('dlg-settings').open"))
     pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
 
+    # v3.45: Glücksrad zuerst sichtbar, Trainingskarte im Ruhezustand schlank, Fortschritt neu geordnet
+    pg.evaluate("showTab('rad')"); pg.wait_for_timeout(350)
+    sp = box(pg, "#spin")
+    ck("R1 Drehen liegt ohne Scrollen im Bild", sp is not None and sp["y"] + sp["h"] < 844 - 70, sp)
+    ck("R1 Einstellungen eingeklappt mit Kurzfassung", pg.evaluate("!document.getElementById('radmore').open") and "Personen" in pg.inner_text("#radmore > summary"), pg.inner_text("#radmore > summary").replace("\n", " "))
+    pg.click("#radmore > summary"); pg.wait_for_timeout(200)
+    ck("R1 Aufklappen zeigt die Schalter", pg.is_visible("[data-ropt=noSpinat]") and pg.is_visible("[data-rpeople='1']"))
+    pg.click("[data-rpeople='1']"); pg.wait_for_timeout(200)
+    ck("R1 Auswahl bleibt offen und Kurzfassung folgt", pg.evaluate("document.getElementById('radmore').open") and "1 Person" in pg.inner_text("#radmore > summary"))
+    pg.click("[data-rpeople='2']")
+    pg.evaluate("showTab('uebungen')"); pg.wait_for_timeout(300)
+    ck("R2 Ruhezustand: kein Bereit-Chip, Karte unter 250 px", not pg.is_visible("#phase") and box(pg, ".coach")["h"] < 250, box(pg, ".coach"))
+    pg.evaluate("showTab('fortschritt')"); pg.wait_for_timeout(300)
+    sx = pg.evaluate("[...document.querySelectorAll('#stats .stat')].map(e=>Math.round(e.getBoundingClientRect().y))")
+    ck("R3 vier Kennzahlen in einer Reihe", len(sx) == 4 and len(set(sx)) == 1, sx)
+    ck("R3 Eintragen steht vor den Kurven", pg.evaluate("document.getElementById('logform').getBoundingClientRect().y < document.getElementById('charts').getBoundingClientRect().y"))
+    pg.evaluate("log.length=0; for(let i=0;i<4;i++) log.push({date:'2026-10-0'+(i+1),weight:80-i,waist:90-i,pushups:10+i,plank:30+i}); renderProgress()"); pg.wait_for_timeout(300)
+    ck("R3 Tabelle ohne seitliches Scrollen", pg.evaluate("(()=>{const w=document.getElementById('logtable');return w.scrollWidth<=w.clientWidth+1})()"))
+    pg.evaluate("log.length=0")
+
     # Überlauf auf 320 px und bei großer Schrift
     c2 = b.new_context(viewport={"width": 320, "height": 640}, has_touch=True, is_mobile=True)
     p2 = c2.new_page(); p2.on("pageerror", lambda e: errs.append(str(e)))
