@@ -395,7 +395,7 @@ function ingexHTML() {
 const SORTS = [["protein", "Meiste Eiweiß"], ["kcal", "Wenig Kalorien"], ["time", "Kurze Zeit"], ["dens", "Eiweiß je Kalorie"], ["cost", "Günstig zuerst"], ["ppe", "Eiweiß je Euro"], ["title", "Name"]];
 function renderFilters() {
   const chip = (g, v, label, on) => '<button class="fchip" data-f="' + g + '" data-v="' + v + '" aria-pressed="' + (on ? "true" : "false") + '">' + label + "</button>";
-  const tog = (k, label) => '<button class="fchip" data-ft="' + k + '" aria-pressed="' + (F[k] ? "true" : "false") + '">' + label + "</button>";
+  const tog = (k, label) => '<button class="fchip ftog" data-ft="' + k + '" aria-pressed="' + (F[k] ? "true" : "false") + '">' + label + "</button>";
   const base = JSON.parse(FDEF);
   const nAct = FKEYS.filter((k) => k !== "meal" && F[k] !== base[k]).length + EXC.length;
   $("#filters").innerHTML =
@@ -1203,7 +1203,7 @@ function radRender() {
 }
 let ROPEN = false;
 function renderRadOpts() {
-  const tog = (k, label) => '<button class="fchip" data-ropt="' + k + '" aria-pressed="' + (RAD[k] ? "true" : "false") + '">' + label + "</button>";
+  const tog = (k, label) => '<button class="fchip ftog" data-ropt="' + k + '" aria-pressed="' + (RAD[k] ? "true" : "false") + '">' + label + "</button>";
   $$("[data-rmode]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.rmode === RAD.mode ? "true" : "false"));
   let h = "";
   if (RAD.mode === "meal") h += ["Frühstück", "Mittag/Abend", "Snack", "Egal"].map((m) => '<button class="fchip" data-rmeal="' + m + '" aria-pressed="' + (RAD.meal === m ? "true" : "false") + '">' + m + "</button>").join("");
@@ -1834,7 +1834,7 @@ function prepHTML() {
   prepEnsure();
   const c = prepCalc(), P = PREP.people, wk = PREP.week;
   const seg = (field, vals) => vals.map((v) => '<button class="btn" type="button" data-prepopt="' + field + '" data-v="' + v + '" aria-pressed="' + (PREP[field] === v) + '">' + v + "</button>").join("");
-  const tog = (field, lab) => '<button class="btn" type="button" data-prepopt="' + field + '" aria-pressed="' + !!PREP[field] + '">' + lab + "</button>";
+  const tog = (field, lab) => '<button class="btn ftog" type="button" data-prepopt="' + field + '" aria-pressed="' + !!PREP[field] + '">' + lab + "</button>";
   const cur = weekStartISO(todayISO()), off = Math.round((new Date(wk + "T12:00:00") - new Date(cur + "T12:00:00")) / 604800000), wkName = off === 0 ? "Diese Woche" : off === 1 ? "Nächste Woche" : "In " + off + " Wochen";
   const picker = '<div class="weekpick" role="group" aria-label="Woche wählen"><button class="btn icon" type="button" data-prepweek="-1" aria-label="Vorherige Woche"' + (off <= 0 ? " disabled" : "") + ">‹</button><div><b>" + wkName + '</b><span class="small muted">' + dateDE(wk) + " bis " + dateDE(shiftDay(wk, 6)) + '</span></div><button class="btn icon" type="button" data-prepweek="1" aria-label="Nächste Woche"' + (off >= 4 ? " disabled" : "") + ">›</button></div>";
   const tagOf = (it, d) => (d >= it.keep.fridge ? (it.keep.freeze ? "Tiefkühler" : "frisch machen") : "");
@@ -1852,7 +1852,7 @@ function prepHTML() {
   return '<div class="card" data-nofold><h3>Vorkochplan</h3>' + picker +
     '<div class="prepopts"><div class="row"><span class="small muted">Personen</span><span class="stepper"><button class="btn icon" type="button" data-prepopt="people" data-d="-1" aria-label="Weniger Personen">−</button><b>' + P + '</b><button class="btn icon" type="button" data-prepopt="people" data-d="1" aria-label="Mehr Personen">+</button></span></div>' +
     '<div class="row pseg"><span class="small muted">Tage</span>' + seg("days", [3, 4, 5, 6]) + '</div><div class="row pseg"><span class="small muted">Gerichte</span>' + seg("n", [1, 2, 3]) + '</div><div class="row pseg">' + tog("brk", "Frühstück") + tog("snk", "Snack") + tog("eco", "Reste sparsam einplanen") + "</div></div>" +
-    '<p class="prepsum"><b>ca. ' + eur(c.calc.total) + "</b> · " + eur(c.calc.total / P) + " pro Person · " + c.mins + ' Min am Sonntag</p><div class="row"><button class="btn primary" type="button" data-prepcart="1">In die Einkaufsliste</button><button class="btn" type="button" data-prepgen="all" aria-label="Neu würfeln">' + ic("repeat") + "<span>Neu würfeln</span></button></div></div>" +
+    '<p class="prepsum"><b>ca. ' + eur(c.calc.total) + "</b> · " + eur(c.calc.total / P) + " pro Person · " + '<span class="nw">' + c.mins + ' Min am Sonntag</span></p><div class="row"><button class="btn primary" type="button" data-prepcart="1">In die Einkaufsliste</button><button class="btn" type="button" data-prepgen="all" aria-label="Neu würfeln">' + ic("repeat") + "<span>Neu würfeln</span></button></div></div>" +
     '<div class="card" data-nofold><h3>Deine Woche</h3><ul class="prepweek">' + week + "</ul></div>" + prepRestHTML(c) +
     '<div class="grid2">' + items + "</div>" +
     '<details class="card acc" id="prepsteps" data-nofold' + (new Date().getDay() === 0 ? " open" : "") + '><summary><span class="acct">Sonntag: Reihenfolge zum Kochen</span></summary><div class="accbody"><ol class="prepsteps">' + steps + "</ol></div></details>" +

@@ -925,3 +925,8 @@ html[data-big] #stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .dlgacts .btn.wide { justify-self: stretch; }
 .dlgacts .linkbtn { color: var(--muted); font-weight: 600; font-size: 0.9375rem; }
 @media (max-width: 359px) { .dlgacts { grid-template-columns: 1fr; } }
+
+/* Schalter (an/aus) zeigen den Zustand auch ohne Farbe: Haken, wenn an */
+.ftog[aria-pressed="true"]::before { content: "\2713"; font-weight: 700; margin-right: 6px; }
+.btn.ftog[aria-pressed="true"]::before { margin-right: 0; }
+.nw { white-space: nowrap; }
