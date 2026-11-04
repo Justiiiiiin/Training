@@ -440,7 +440,7 @@ function renderRecipes(more) {
   renderFilters();
   if (more) { const c = $("#rgrid").querySelectorAll(".rcard")[before]; if (c) c.focus({ preventScroll: true }); }
 }
-const RAWKEYS = ["haehn", "pute", "phack", "rhack", "ghack", "schnitzel", "haehnst", "reis", "nudel", "couscous", "linse"];
+const RAWKEYS = ["haehn", "pute", "phack", "rhack", "ghack", "schnitzel", "haehnst", "reis", "nudel", "linse"];
 let openId = null, portions = 1;
 const UNIT_SPOKEN = { g: "Gramm", ml: "Milliliter", EL: "Esslöffel", TL: "Teelöffel" };
 function ingText(i, spoken) {
@@ -502,7 +502,7 @@ function drawRecipe() {
     '<div class="tags">' + (r.diet !== "omni" ? '<span class="tag g">' + (r.diet === "vegan" ? "Vegan" : "Vegetarisch") + "</span>" : "") + r.tags.map((t) => '<span class="tag">' + t + "</span>").join("") + (r.veg >= 50 ? '<span class="tag g">Gemüse ca. ' + r.veg + " g</span>" : "") + "</div>" +
     '<div class="row"><span class="small muted">Portionen</span><span class="stepper"><button class="btn icon" data-por="-1" aria-label="Weniger Portionen">−</button><b>' + portions + '</b><button class="btn icon" data-por="1" aria-label="Mehr Portionen">+</button></span></div>' +
     "<h4>Zutaten</h4><ul>" + r.ing.map((i) => "<li>" + ingText(i, false) + "</li>").join("") + "</ul>" +
-    (r.ing.some((i) => RAWKEYS.includes(i[4])) ? '<p class="small muted">Fleisch ist roh gewogen, Reis, Nudeln, Couscous und Linsen trocken. Beim Garen ändert sich das Gewicht, die Nährwerte gelten für die Menge in der Liste.</p>' : "") +
+    (r.ing.some((i) => RAWKEYS.includes(i[4])) ? '<p class="small muted">Fleisch ist roh gewogen, Reis, Nudeln und Linsen trocken. Beim Garen ändert sich das Gewicht, die Nährwerte gelten für die Menge in der Liste.</p>' : "") +
     "<h4>Zubereitung</h4><ol>" + r.steps.map((s) => "<li>" + s + "</li>").join("") + "</ol>" +
     (r.ing.some((i) => i[4] === "erdb") ? '<p class="note"><b>Tiefkühl-Erdbeeren:</b> Erhitze sie vor dem Essen mindestens 2 Minuten auf über 90 °C und lass sie abkühlen. Das empfiehlt das BfR wegen möglicher Viren. Frische Erdbeeren gründlich waschen.</p>' : "") + (r.tip ? '<p class="note">' + r.tip + "</p>" : "") + (r.note ? '<p class="note">' + r.note + "</p>" : "") +
     '<p class="small muted">Nährwerte sind gerundete Richtwerte aus üblichen Tabellen. Marken weichen ab.</p>' +
@@ -1766,13 +1766,13 @@ const CSYN = {
   haehn: "haehnchenbrust haehnchen haenchen hahnchen huhn huehnchen chicken haehnchenfilet", pute: "putenbrust pute putenfleisch putenschnitzel putenfilet", phack: "putenhack putenhackfleisch", rhack: "rinderhack rinderhackfleisch rindergehacktes",
   ghack: "hackfleisch hack gehacktes", schink: "schinken kochschinken", paufs: "aufschnitt putenaufschnitt", ei: "ei eier eiern spiegelei ruehrei", skyr: "skyr", quark: "quark magerquark", jog35: "joghurt naturjoghurt", milch: "milch",
   moz: "mozzarella", gouda: "gouda kaese schnittkaese", parm: "parmesan|parmigiano|parmigiano reggiano|reggiano", hafer: "haferflocken hafer porridge", chia: "chia|chiasamen|chia samen|chiasaat", mandel: "mandeln mandel", brot: "brot vollkornbrot brotscheibe graubrot mischbrot", wrap: "wrap wraps tortilla",
-  broetchen: "broetchen semmel vollkornbroetchen", nudel: "nudeln pasta spaghetti penne fusilli makkaroni tagliatelle vollkornnudeln", reis: "reis", couscous: "couscous", honig: "honig", oel: "oel olivenoel rapsoel sonnenblumenoel",
-  soja: "sojasauce", tmark: "tomatenmark", stueck: "stueckige tomaten|passierte tomaten|dosentomaten", tom: "tomate tomaten", gurke: "gurke gurken salatgurke", pap: "paprika", zwie: "zwiebel zwiebeln", karo: "karotte karotten moehre moehren",
+  broetchen: "broetchen semmel vollkornbroetchen", nudel: "nudeln pasta spaghetti penne fusilli makkaroni tagliatelle vollkornnudeln", reis: "reis", honig: "honig", oel: "oel olivenoel rapsoel sonnenblumenoel",
+  tmark: "tomatenmark", stueck: "stueckige tomaten|passierte tomaten|dosentomaten", tom: "tomate tomaten", gurke: "gurke gurken salatgurke", pap: "paprika", zwie: "zwiebel zwiebeln", karo: "karotte karotten moehre moehren",
   eisb: "eisbergsalat salat eisberg", spin: "spinat", ruc: "rucola", sgurke: "saure gurke|saure gurken|gewuerzgurke|gewuerzgurken", knob: "knoblauch", banane: "banane bananen", erdb: "erdbeeren erdbeere", kiche: "kichererbsen",
   bohne: "kidneybohnen bohnen", linse: "linsen", kokos: "kokosmilch", bruehe: "gemuesebruehe bruehe", zitrone: "zitronensaft zitrone", senf: "senf", kakao: "kakao", schnitzel: "schweineschnitzel schnitzel schweinefleisch", curry: "currypulver curry",
   speisequark: "speisequark", jogGr: "griechischer joghurt|griechisches joghurt|joghurt griechisch|sahnejoghurt", butter: "butter markenbutter suessrahmbutter streichbutter", haehnst: "mini steaks|ministeaks|minutensteaks|minisnitzel", lyoner: "lyoner delikatess lyoner"
 };
-const CDEF = { speisequark: 150, jogGr: 150, butter: 10, haehnst: 150, lyoner: 30, gouda: 30, moz: 60, parm: 15, schink: 40, paufs: 40, quark: 150, skyr: 150, jog35: 150, hafer: 50, mandel: 20, chia: 15, reis: 80, nudel: 100, couscous: 70, milch: 200, eisb: 80, gurke: 100, spin: 80, ruc: 30, erdb: 150, kiche: 120, bohne: 120, linse: 60, kokos: 100, bruehe: 200, stueck: 200 };
+const CDEF = { speisequark: 150, jogGr: 150, butter: 10, haehnst: 150, lyoner: 30, gouda: 30, moz: 60, parm: 15, schink: 40, paufs: 40, quark: 150, skyr: 150, jog35: 150, hafer: 50, mandel: 20, chia: 15, reis: 80, nudel: 100, milch: 200, eisb: 80, gurke: 100, spin: 80, ruc: 30, erdb: 150, kiche: 120, bohne: 120, linse: 60, kokos: 100, bruehe: 200, stueck: 200 };
 /* weitere Lebensmittel: [Schlüssel (| getrennt), Name, kcal/100 g, Eiweiß/100 g, Gramm je Stück, Standardmenge in g, ca. € pro 100 g] */
 const CEXTRA = [
   ["eigelb|eidotter", "Eigelb", 322, 15.9, 17, 17, 0.3], ["eiweiss|eiklar", "Eiweiß (vom Ei)", 52, 10.9, 33, 33, 0.1],
@@ -2339,7 +2339,7 @@ function calcHTML() {
       '<div class="row"><label class="field sm">Aufgeteilt auf Personen<input type="number" id="calc-srv" min="1" max="8" value="' + CALC.srv + '" inputmode="numeric"></label><label class="field">Name im Tagebuch<input type="text" id="calc-name" maxlength="60" value="' + esc(CALC.name) + '"></label></div>' +
       (per > 1 ? '<p class="small">Für dich: ' + Math.round(T.k / per) + " kcal, " + (Math.round(T.p / per * 10) / 10).toLocaleString("de-DE") + " g Eiweiß</p>" : "") +
       '<div class="row"><button class="btn primary" type="button" data-calcadd="1">Heute eintragen</button></div>' +
-      '<details class="mydsave"><summary>Als Gericht speichern, um später nur Gramm einzugeben</summary><div class="row"><label class="field">Name<input type="text" id="myd-name" maxlength="60" value="' + esc(CALC.name) + '"></label><label class="field sm">Fertig gewogen (g)<input type="number" id="myd-w" min="50" max="20000" inputmode="numeric" placeholder="leer = Schätzung"></label></div><p class="small muted">Wiege das fertige Gericht, wenn du kannst. Ohne Angabe schätze ich das Gewicht nach dem Kochen, das ist ungenauer.</p><div class="row"><button class="btn" type="button" data-mydsave="1">Gericht speichern</button></div></details><p class="small muted">Richtwerte. Reis, Nudeln, Couscous und Linsen gelten als Rohgewicht, außer du schreibst „gekocht“.</p>';
+      '<details class="mydsave"><summary>Als Gericht speichern, um später nur Gramm einzugeben</summary><div class="row"><label class="field">Name<input type="text" id="myd-name" maxlength="60" value="' + esc(CALC.name) + '"></label><label class="field sm">Fertig gewogen (g)<input type="number" id="myd-w" min="50" max="20000" inputmode="numeric" placeholder="leer = Schätzung"></label></div><p class="small muted">Wiege das fertige Gericht, wenn du kannst. Ohne Angabe schätze ich das Gewicht nach dem Kochen, das ist ungenauer.</p><div class="row"><button class="btn" type="button" data-mydsave="1">Gericht speichern</button></div></details><p class="small muted">Richtwerte. Reis, Nudeln und Linsen gelten als Rohgewicht, außer du schreibst „gekocht“.</p>';
   }
   return '<h4 id="calc-sec">Selbst berechnen</h4><p class="small muted">Schreib Zutaten mit Menge oder ein Gericht, zum Beispiel „200 g Hähnchen, 150 g Reis, 1 Paprika“ oder „Döner“.</p>' +
     '<label class="field">Name des Gerichts (optional)<input type="text" id="calc-name0" maxlength="60" value="' + esc(CALC.name) + '" placeholder="z. B. Spaghetti Bolognese"></label><label class="field">Zutaten mit Mengen<textarea id="calc-in" rows="3" maxlength="400" placeholder="200 g Hähnchen, 150 g Reis, 1 Paprika">' + esc(CALC.text) + "</textarea></label>" +
