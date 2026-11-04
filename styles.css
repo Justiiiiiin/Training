@@ -939,3 +939,14 @@ html[data-big] #stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   html:not([data-big]) body[data-group="training"] .tabs, html:not([data-big]) body[data-group="fortschritt"] .tabs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; overflow: hidden; gap: 0; padding: 3px; }
   html:not([data-big]) body[data-group="training"] .tab, html:not([data-big]) body[data-group="fortschritt"] .tab { min-width: 0; padding: 0 4px; justify-content: center; text-align: center; overflow: hidden; }
 }
+
+/* Einstellungen: Abschnitte mit Trennlinie und ruhigeren Überschriften */
+#dlg-settings #instbox, #dlg-settings #icsbox, #dlg-settings .dlg > h3 { border-top: 1px solid var(--line); margin-top: 26px; padding-top: 20px; }
+#dlg-settings #instbox > h3, #dlg-settings #icsbox > h3, #dlg-settings .dlg > h3 { font-size: 1.1875rem; margin-bottom: 10px; }
+#dlg-settings .dlg > h3 { display: block; }
+#dlg-settings .dlg > .dlg-head h3 { border: 0; margin: 0; padding: 0; font-size: 1.375rem; }
+
+/* Dunkelmodus: Die gewählte Auswahl (Früh, Spät, Frei, Mahlzeit, Tag, Woche) ist heller als die Leiste, nicht dunkler */
+@media (prefers-color-scheme: dark) {
+  .segb[aria-pressed="true"] { background: var(--track); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 1px 0 rgba(0, 0, 0, 0.25); }
+}

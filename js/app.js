@@ -239,7 +239,7 @@ function renderTimer() {
   if (tm.id) {
     frac = Math.max(0, Math.min(1, tm.left / (tm.total * 1000)));
     big = fmt(tm.left);
-    unit = { warmup: "Aufwärmen", rest: "Pause", hold: "Halten", prep: "Gleich" }[p] || "Timer";
+    unit = { warmup: "bis zum Start", rest: "Pause", hold: "Halten", prep: "Gleich" }[p] || "Timer";
   } else if (p === "work") { frac = 1; big = e.short; unit = "Wiederholungen"; }
   else if (p === "done") { frac = 1; big = "Fertig"; unit = "gut gemacht"; }
   const bar = $("#ringbar");
