@@ -39,7 +39,9 @@ async function netFirst(req) {
       fetch(req.url, { cache: "no-cache", credentials: "same-origin" }),
       new Promise((_, no) => setTimeout(() => no(new Error("timeout")), wait))
     ]);
-    if (r && r.ok) c.put(key, r.clone());
+    if (r && r.ok) { c.put(key, r.clone()); return r; }
+    /* Serverfehler (5xx) oder Begrenzung (429) des Hosters: lieber die zuletzt geladene Fassung als eine Fehlerseite */
+    if (r && (r.status >= 500 || r.status === 429)) { const hit = await c.match(key); if (hit) return hit; }
     return r;
   } catch (err) {
     if (err && err.message === "timeout") slowUntil = Date.now() + 45000;

@@ -24,13 +24,6 @@ function fcStartFailed(msg) {
 /* Lädt den Hauptcode in fester Reihenfolge (async = false). ?v= mit dem Versionslabel umgeht veraltete Browser-Caches nach einem Update. */
 var FC_FILES = ["js/data.js", "js/app.js", "js/v3.js", "js/start.js"];
 function fcVer() { return encodeURIComponent(((document.getElementById("appver") || {}).textContent || "").trim()); }
-/* Mit Sync wartet der Start bis zu 7 s auf das Netz. Die Skripte laden währenddessen schon vor (gleiche Adresse wie unten), statt erst danach zu beginnen. */
-if (FC.mode !== "local") {
-  FC_FILES.forEach(function (f) {
-    var v = fcVer(), l = document.createElement("link"); l.rel = "preload"; l.as = "script"; l.href = f + (v ? "?v=" + v : "");
-    document.head.appendChild(l);
-  });
-}
 function fcLoad(files, done) {
   var v = fcVer(), left = files.length, failed = "";
   files.forEach(function (f) {
@@ -40,13 +33,26 @@ function fcLoad(files, done) {
     document.body.appendChild(el);
   });
 }
+/* Fehlt beim Start eine Datei (kurzer Netzaussetzer, leere Antwort), lädt die App einmal von selbst neu, statt gleich den Fehlerhinweis zu zeigen. Die Sperre von 60 s verhindert eine Schleife. */
+function fcAutoRetry() {
+  try {
+    var k = "fc__retry", last = parseInt(sessionStorage.getItem(k) || "0", 10) || 0;
+    if (Date.now() - last < 60000) return false;
+    sessionStorage.setItem(k, String(Date.now()));
+    location.reload();
+    return true;
+  } catch (e) { return false; }
+}
 FC.boot(function () {
   var first = "";
   var onErr = function (e) { if (!first && e && e.message) first = String(e.message); };
   window.addEventListener("error", onErr);
   fcLoad(FC_FILES, function (failed) {
     window.removeEventListener("error", onErr);
+    if (window.__fcReady) { try { sessionStorage.removeItem("fc__retry"); } catch (e) {} FC.paint(); return; }
+    /* Fehlt ein Name (zum Beispiel bindV3), fehlt meist eine Datei: einmal neu laden. Die Meldung nennt die fehlende Datei zuerst. */
+    if ((failed || /not defined|Can't find variable|ReferenceError/.test(first)) && fcAutoRetry()) return;
     FC.paint();
-    if (!window.__fcReady) fcStartFailed(first || failed || "unbekannt");
+    fcStartFailed(failed || first || "unbekannt");
   });
 });
