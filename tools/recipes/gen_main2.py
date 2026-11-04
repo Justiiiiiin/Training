@@ -143,22 +143,20 @@ def auflaeufe():
                 ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. Nudeln 3 Minuten kürzer als auf der Packung angegeben kochen.", sp, fleisch,
                  ("Schinken" if m == "schink" else "Fleisch") + ", Gemüse, stückige Tomaten, Nudeln und Gewürze in einer Auflaufform mischen. Mit dem Käse belegen.",
                  "20 bis 25 Minuten backen, bis der Käse goldbraun ist. " + ruc.strip()])
-    # (b) Couscous-Auflauf
+    # (b) Reis-Auflauf
     for mi, m in enumerate(["haehn", "pute", "phack", "rhack", "schnitzel"]):
         for si, (sn, sd, sp) in enumerate([("Paprika", dict(pap=2, zwie=1, tom=1), "Paprika, Zwiebel und Tomate in Stücke schneiden."), ("Tomate", dict(tom=3, zwie=1, pap=0.5), "Tomaten, Zwiebel und Paprika in Stücke schneiden.")]):
             if (mi + si) % 2:
                 continue
             pre, g, art = MEAT[m]
-            i = join(ing(**{m: g - 20, "couscous": 50, "oel": meat_oel(m), "moz": 50, "knob": 1}), ing(**sd), ing(T="Oregano, Salz und Pfeffer"))
-            add(f"Couscous-Auflauf mit {NAME[m]} und {sn} unter Mozzarella", "M", 40, "p", i,
-                ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. Couscous mit der gleichen Menge heißem Wasser übergießen und 5 Minuten quellen lassen.", sp + " Knoblauch fein hacken.", meat_step(m),
-                 "Fleisch, Gemüse, Couscous, Knoblauch und Gewürze in einer Auflaufform mischen und mit Mozzarella belegen.", "20 bis 25 Minuten backen, bis der Käse goldbraun ist."])
+            i = join(ing(**{m: g - 20, "reis": 50, "oel": meat_oel(m), "moz": 50, "knob": 1}), ing(**sd), ing(T="Oregano, Salz und Pfeffer"))
+            add(f"Reis-Auflauf mit {NAME[m]} und {sn} unter Mozzarella", "M", 40, "p", i,
+                ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. Reis nach Packungsanleitung kochen.", sp + " Knoblauch fein hacken.", meat_step(m),
+                 "Fleisch, Gemüse, Reis, Knoblauch und Gewürze in einer Auflaufform mischen und mit Mozzarella belegen.", "20 bis 25 Minuten backen, bis der Käse goldbraun ist."])
     # (c) gefüllte Paprika und Tomaten
     for mi, m in enumerate(["rhack", "phack", "ghack"]):
-        for ci, c in enumerate(["reis", "couscous"]):
+        for ci, c in enumerate(["reis"]):
             for chi, (cn, cheese) in enumerate([("Mozzarella", dict(moz=40)), ("Gouda", dict(gouda=30))]):
-                if (mi + ci + chi) % 2:
-                    continue
                 pre, g, art = MEAT[m]
                 cw = CARB[c][0]
                 i = join(ing(**{m: g, c: 50, "pap": 2, "zwie": 1, "stueck": 150, "tmark": 1, "oel": 0.5}), ing(**cheese), ing(T="Paprikapulver, Salz und Pfeffer"))
@@ -168,10 +166,10 @@ def auflaeufe():
                      "Mit dem Käse belegen und 25 bis 30 Minuten backen, bis die Paprika weich sind."])
     for mi, m in enumerate(["rhack", "phack", "ghack"]):
         pre, g, art = MEAT[m]
-        i = join(ing(**{m: g, "couscous": 50, "tom": 4, "zwie": 1, "knob": 1, "moz": 40, "oel": 0.5}), ing(T="Oregano, Salz und Pfeffer"))
-        add(f"Gefüllte Tomaten mit {pre} und Couscous", "M", 45, "", i,
-            [CARB["couscous"][3], "Ofen auf 200 °C Ober- und Unterhitze vorheizen. Von den Tomaten einen Deckel abschneiden und die Tomaten mit einem Löffel aushöhlen. Das Innere klein schneiden.", meat_step(m),
-             "Zwiebel und Knoblauch fein würfeln, mit dem Tomateninneren zum Hack geben, 3 Minuten braten und mit Couscous, Oregano, Salz und Pfeffer mischen.", "Die Tomaten füllen, Mozzarella daraufgeben und 20 bis 25 Minuten backen."])
+        i = join(ing(**{m: g, "reis": 50, "tom": 4, "zwie": 1, "knob": 1, "moz": 40, "oel": 0.5}), ing(T="Oregano, Salz und Pfeffer"))
+        add(f"Gefüllte Tomaten mit {pre} und Reis", "M", 45, "", i,
+            [CARB["reis"][3], "Ofen auf 200 °C Ober- und Unterhitze vorheizen. Von den Tomaten einen Deckel abschneiden und die Tomaten mit einem Löffel aushöhlen. Das Innere klein schneiden.", meat_step(m),
+             "Zwiebel und Knoblauch fein würfeln, mit dem Tomateninneren zum Hack geben, 3 Minuten braten und mit dem Reis, Oregano, Salz und Pfeffer mischen.", "Die Tomaten füllen, Mozzarella daraufgeben und 20 bis 25 Minuten backen."])
     # (d) Auflauf ohne Beilage: Fleisch, Tomate, Mozzarella
     for mi, m in enumerate(["haehn", "pute", "schnitzel", "phack", "haehnst"]):
         for vi, (vn, vd, vs) in enumerate([("Tomaten", dict(tom=4, zwie=1), "Tomaten in Scheiben, Zwiebel in Ringe schneiden."), ("Paprika-Tomaten", dict(pap=1, tom=2, zwie=1), "Paprika in Streifen, Tomaten in Scheiben und die Zwiebel in Ringe schneiden.")]):
@@ -186,7 +184,7 @@ def auflaeufe():
     for mi, m in enumerate(["rhack", "phack", "ghack"]):
         for vi, (vn, vd, vs) in enumerate([("Paprika-Tomaten", dict(pap=2, tom=2, zwie=1, knob=1), "Paprika, Tomaten und Zwiebel würfeln, Knoblauch hacken."), ("Paprika", dict(pap=2, zwie=1, stueck=200, knob=1), "Paprika und Zwiebel würfeln, Knoblauch hacken.")]):
             pre, g, art = MEAT[m]
-            i = join(ing(**{m: g, "couscous": 40, "gouda": 40, "tmark": 1, "oel": 0.5}), ing(**vd), ing(T="Paprikapulver, Salz und Pfeffer"))
+            i = join(ing(**{m: g, "nudel": 50, "gouda": 40, "tmark": 1, "oel": 0.5}), ing(**vd), ing(T="Paprikapulver, Salz und Pfeffer"))
             add(f"{pre}-Gemüse-Auflauf mit {vn} und Gouda-Haube", "M", 45, "p", i,
-                [CARB["couscous"][3], "Ofen auf 200 °C Ober- und Unterhitze vorheizen. " + vs, meat_step(m),
-                 "Gemüse und Tomatenmark zum Hack geben, 5 Minuten braten, mit dem Couscous mischen und würzen. In eine Form füllen.", "Den Gouda reiben, darüberstreuen und 20 Minuten backen."])
+                ["Nudeln 3 Minuten kürzer als auf der Packung angegeben kochen.", "Ofen auf 200 °C Ober- und Unterhitze vorheizen. " + vs, meat_step(m),
+                 "Gemüse und Tomatenmark zum Hack geben, 5 Minuten braten, mit den Nudeln mischen und würzen. In eine Form füllen.", "Den Gouda reiben, darüberstreuen und 20 Minuten backen."])

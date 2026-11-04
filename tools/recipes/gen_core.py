@@ -2,7 +2,7 @@
 """Bausteine für die erzeugten Rezepte: Fleisch, Beilagen und häufige Arbeitsschritte.
 
 Jede Rezeptfamilie (gen_main.py, gen_fs.py) setzt daraus Zutaten, Schritte und Titel zusammen.
-Alle Mengen gelten für eine Portion und sind Rohgewicht (Fleisch, Reis, Nudeln, Couscous)."""
+Alle Mengen gelten für eine Portion und sind Rohgewicht (Fleisch, Reis, Nudeln)."""
 
 import re, unicodedata
 
@@ -51,7 +51,7 @@ def slug(t):
 
 DB = {}               # setzt build.py (Zutatentabelle), damit die Mengen geprüft und angepasst werden können
 # Zutat: (Schritt, Mindestmenge). Wird eine Mahlzeit zu energiereich, werden diese Mengen schrittweise gekürzt.
-FIT = {"oel": (0.5, 0.5), "reis": (10, 40), "nudel": (10, 50), "couscous": (10, 40), "brot": (1, 1), "wrap": (1, 1), "moz": (10, 20), "gouda": (10, 20),
+FIT = {"oel": (0.5, 0.5), "reis": (10, 40), "nudel": (10, 50), "brot": (1, 1), "wrap": (1, 1), "moz": (10, 20), "gouda": (10, 20),
        "parm": (5, 10), "rhack": (10, 90), "phack": (10, 100), "ghack": (10, 85), "linse": (10, 50), "kiche": (10, 120), "bohne": (10, 100), "kokos": (25, 75),
        "hafer": (5, 15), "jogGr": (10, 40), "honig": (0.5, 0.5), "mandel": (5, 5), "butter": (2, 2), "lyoner": (10, 30), "broetchen": (1, 1), "ei": (0.5, 1)}
 LIMIT = {"M": 640, "F": 600, "S": 360}
@@ -59,7 +59,7 @@ MINPROT = {"M": 23, "F": 13, "S": 9}   # wie die Prüfung in build.py: wer darun
 LOWPROT = []          # Titel, die wegen zu wenig Eiweiß weggefallen sind
 BADTASTE = []         # Titel, die wegen unpassender Kombination weggefallen sind
 KAESE_MILD = {"moz", "gouda"}
-WUERZ_STARK = {"kokos", "soja", "curry", "garam", "kurkuma"}
+WUERZ_STARK = {"kokos", "curry", "garam", "kurkuma"}
 LIGHT = {"M": 460, "F": 320, "S": 190}
 
 
@@ -110,7 +110,7 @@ def fit(ingredients, meal):
 
 
 def unpassend(keys):
-    """Kombinationen, die selten gut schmecken: milder Käse zu Curry, Kokos oder Soja, Parmesan zu Curry, Kokos, Soja oder Honig."""
+    """Kombinationen, die selten gut schmecken: milder Käse zu Curry oder Kokos, Parmesan zu Curry, Kokos oder Honig."""
     if keys & KAESE_MILD and keys & WUERZ_STARK:
         return True
     return "parm" in keys and bool(keys & (WUERZ_STARK | {"honig"}))
@@ -165,7 +165,6 @@ def meat_oel(k):
 CARB = {
     "reis": ("Reis", 70, 15, "Reis nach Packungsanleitung kochen."),
     "nudel": ("Nudeln", 80, 12, "Nudeln nach Packungsanleitung in Salzwasser bissfest kochen."),
-    "couscous": ("Couscous", 70, 6, "Couscous mit der gleichen Menge heißem Wasser übergießen, 5 Minuten quellen lassen und mit einer Gabel lockern."),
 }
 
 

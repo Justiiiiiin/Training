@@ -40,14 +40,14 @@ def suppen():
                  "Kichererbsen, stückige Tomaten und Brühe zugeben und 15 Minuten köcheln lassen. Mit Salz und Pfeffer abschmecken.", "Dazu eine Scheibe Vollkornbrot essen."])
     # (c) Chili (hier darf die Karotte rein)
     for mi, m in enumerate(["rhack", "phack", "ghack", "haehn"]):
-        for ci, c in enumerate(["reis", "couscous", "brot"]):
+        for ci, c in enumerate(["reis", "brot"]):
             for ki, karo in enumerate([False, True]):
                 if (mi + ci + ki) % 2:
                     continue
                 pre, g, art = MEAT[m]
-                cw = {"reis": "Reis", "couscous": "Couscous", "brot": "Vollkornbrot"}[c]
-                cg = {"reis": 60, "couscous": 60, "brot": 2}[c]
-                cstep = {"reis": CARB["reis"][3], "couscous": CARB["couscous"][3], "brot": "Das Brot dazu bereitstellen."}[c]
+                cw = {"reis": "Reis", "brot": "Vollkornbrot"}[c]
+                cg = {"reis": 60, "brot": 2}[c]
+                cstep = {"reis": CARB["reis"][3], "brot": "Das Brot dazu bereitstellen."}[c]
                 i = join(ing(**{m: g - 20, c: cg, "bohne": 120, "pap": 1, "zwie": 1, "stueck": 200, "tmark": 1, "paprikap": 1.5, "kreuz": 0.5, "oel": meat_oel(m)}), ing(karo=1) if karo else "", ing(T="Chiliflocken, Salz und Pfeffer"))
                 add(f"{pre}-Chili mit {'Karotte, ' if karo else ''}Kidneybohnen und {cw}", "M", 40, "pa", i,
                     [cstep, "Paprika und Zwiebel würfeln" + (", die Karotte raspeln" if karo else "") + ", die Bohnen abtropfen.", meat_step(m),
@@ -87,9 +87,9 @@ def ofen():
              ("Kreuzkümmel-Paprika", dict(kreuz=1, paprikap=1), "Mit Öl, Kreuzkümmel, Paprikapulver, Salz und Pfeffer mischen."),
              ("Curry-Kurkuma", dict(curry=1.5, kurkuma=0.5), "Mit Öl, Curry, Kurkuma, Salz und Pfeffer mischen."),
              ("Senf-Honig", dict(senf=1, honig=1), "Mit Öl, Senf, Honig, Salz und Pfeffer mischen."),
-             ("Soja-Honig", dict(soja=1, honig=1), "Mit Öl, Sojasauce, Honig und Pfeffer mischen."),
+             ("Knoblauch-Zitrone", dict(knob=1, zitrone=1), "Mit Öl, Knoblauch, Zitronensaft, Salz und Pfeffer mischen."),
              ("Garam-Masala", dict(garam=1.5), "Mit Öl, Garam Masala, Salz und Pfeffer mischen.")]
-    SIDE = [("Couscous", dict(couscous=60), "Den Couscous mit der gleichen Menge heißem Wasser übergießen, 5 Minuten quellen lassen und lockern. Zum Blech servieren."),
+    SIDE = [("Nudeln", dict(nudel=60), "Die Nudeln nach Packungsanleitung kochen und zum Blech servieren."),
             ("Reis", dict(reis=60), "Den Reis nach Packungsanleitung kochen und zum Blech servieren."),
             ("Vollkornbrot", dict(brot=2), "Das Brot zum Blech servieren.")]
     for mi, m in enumerate(["haehn", "pute", "schnitzel", "haehnst"]):
@@ -107,7 +107,7 @@ def ofen():
     # Mini-Hackbraten aus dem Muffinblech
     for mi, m in enumerate(["rhack", "phack", "ghack"]):
         for vi, (vn, vd) in enumerate([("Paprika und Tomate", dict(pap=2, tom=2, zwie=0.5)), ("Paprika und Rucola", dict(pap=2, ruc=30, zwie=0.5))]):
-            for ci, c in enumerate(["couscous", "reis"]):
+            for ci, c in enumerate(["nudel", "reis"]):
                 if (mi + vi + ci) % 2:
                     continue
                 pre, g, art = MEAT[m]
@@ -121,10 +121,8 @@ def ofen():
 def haeckse():
     # (a) Bällchen in Tomatensoße
     for mi, m in enumerate(["rhack", "phack", "ghack"]):
-        for ci, c in enumerate(["nudel", "reis", "couscous"]):
+        for ci, c in enumerate(["nudel", "reis"]):
             for si, (sn, sd, sp) in enumerate([("Paprika-Tomatensoße", dict(pap=1, zwie=1, stueck=200, knob=1), "Paprika und Zwiebel würfeln, Knoblauch hacken."), ("Tomaten-Basilikum-Soße", dict(tom=2, zwie=1, stueck=150, knob=1), "Tomaten und Zwiebel würfeln, Knoblauch hacken.")]):
-                if (mi + ci + si) % 2:
-                    continue
                 pre, g, art = MEAT[m]
                 i = join(ing(**{m: g, c: CARB[c][1], "hafer": 10, "senf": 0.5, "oel": 1, "moz": 20}), ing(**sd), ing(T="Oregano, Salz und Pfeffer"))
                 add(f"{pre}-Bällchen in {sn} mit {CARB[c][0]}", "M", 35, "pa", i,
@@ -137,11 +135,11 @@ def haeckse():
                 continue
             vd, vs = V[(mi + di) % len(V)]
             pre, g, art = MEAT[m]
-            s = ["brot", "couscous"][(mi + di) % 2]
+            s = ["brot", "reis"][(mi + di) % 2]
             i = join(ing(**{m: g, "hafer": 15, "ei": 0.5, "zwie": 0.5, "senf": 1, "oel": 1, s: 2 if s == "brot" else 50}), ing(**vd), ing(**dd), ing(T="Salz und Pfeffer"))
             add(f"{pre}-Frikadellen mit {dn}-Dip und Salat", "M", 30, "pa", i,
-                [vs, ("Couscous mit der gleichen Menge heißem Wasser übergießen und quellen lassen." if s == "couscous" else "Das Brot bereitstellen."),
-                 "Hack mit Haferflocken, Ei, der fein gewürfelten Zwiebel, Senf, Salz und Pfeffer verkneten und zu flachen Frikadellen formen.", "Im Öl bei mittlerer Hitze 5 bis 6 Minuten pro Seite braten, bis sie innen nicht mehr rosa sind.", ds, "Frikadellen mit Salat, Dip und " + ("Couscous" if s == "couscous" else "Brot") + " servieren."])
+                [vs, (CARB["reis"][3] if s == "reis" else "Das Brot bereitstellen."),
+                 "Hack mit Haferflocken, Ei, der fein gewürfelten Zwiebel, Senf, Salz und Pfeffer verkneten und zu flachen Frikadellen formen.", "Im Öl bei mittlerer Hitze 5 bis 6 Minuten pro Seite braten, bis sie innen nicht mehr rosa sind.", ds, "Frikadellen mit Salat, Dip und " + ("Reis" if s == "reis" else "Brot") + " servieren."])
     # (c) Burger-Bowl und Burger
     for mi, m in enumerate(["rhack", "phack", "ghack"]):
         for bi, (bn, bd) in enumerate([("ohne Brötchen", dict(eisb=60, gurke=50)), ("im Vollkornbrötchen", dict(broetchen=1, eisb=40, gurke=50))]):
@@ -153,20 +151,21 @@ def haeckse():
                  "Die Patties im Öl 4 bis 5 Minuten pro Seite braten, bis sie durch sind (innen nicht mehr rosa). Zum Schluss mit Gouda belegen und kurz schmelzen lassen.", end])
     # (d) Köfte-Spieße
     for mi, m in enumerate(["rhack", "phack", "ghack"]):
-        for ci, c in enumerate(["couscous", "reis"]):
+        for ci, c in enumerate(["reis", "brot"]):
             pre, g, art = MEAT[m]
-            i = join(ing(**{m: g, c: 60, "zwie": 0.5, "kreuz": 1, "paprikap": 1, "jog35": 80, "gurke": 100, "tom": 2, "oel": 1}), ing(T="Petersilie, Salz und Pfeffer"))
-            add(f"{pre}-Köfte mit {CARB[c][0]}, Gurken-Tomaten-Salat und Joghurt", "M", 30, "p", i,
-                [CARB[c][3], "Hack mit der fein gewürfelten Zwiebel, Kreuzkümmel, Paprikapulver, Salz und Pfeffer gut verkneten und zu länglichen Röllchen formen.",
-                 "Die Röllchen im Öl rundum 8 bis 10 Minuten braten, bis sie innen nicht mehr rosa sind.", "Gurke und Tomaten würfeln und mit Salz, Pfeffer und Petersilie mischen. Joghurt glatt rühren.", f"Köfte mit {CARB[c][0]}, Salat und Joghurt servieren."])
+            cw = "Vollkornbrot" if c == "brot" else CARB[c][0]
+            i = join(ing(**{m: g, c: 2 if c == "brot" else 60, "zwie": 0.5, "kreuz": 1, "paprikap": 1, "jog35": 80, "gurke": 100, "tom": 2, "oel": 1}), ing(T="Petersilie, Salz und Pfeffer"))
+            add(f"{pre}-Köfte mit {cw}, Gurken-Tomaten-Salat und Joghurt", "M", 30, "p", i,
+                ["Das Brot bereitstellen." if c == "brot" else CARB[c][3], "Hack mit der fein gewürfelten Zwiebel, Kreuzkümmel, Paprikapulver, Salz und Pfeffer gut verkneten und zu länglichen Röllchen formen.",
+                 "Die Röllchen im Öl rundum 8 bis 10 Minuten braten, bis sie innen nicht mehr rosa sind.", "Gurke und Tomaten würfeln und mit Salz, Pfeffer und Petersilie mischen. Joghurt glatt rühren.", f"Köfte mit {cw}, Salat und Joghurt servieren."])
     # (e) Hähnchen mit Haferkruste (gebacken)
     for di, (dn, dd, ds) in enumerate(D):
-        for ci, c in enumerate(["couscous", "brot"]):
+        for ci, c in enumerate(["reis", "brot"]):
             if (di + ci) % 2:
                 continue
             vd, vs = V[di % len(V)]
-            i = join(ing(haehn=150, hafer=25, ei=1, paprikap=1, oel=1), ing(**vd), ing(**dd), ing(couscous=60) if c == "couscous" else ing(brot=2), ing(T="Salz und Pfeffer"))
+            i = join(ing(haehn=150, hafer=25, ei=1, paprikap=1, oel=1), ing(**vd), ing(**dd), ing(reis=60) if c == "reis" else ing(brot=2), ing(T="Salz und Pfeffer"))
             add(f"Hähnchen mit Haferkruste, {dn}-Dip und Salat", "M", 35, "", i,
-                ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. " + (CARB["couscous"][3] if c == "couscous" else ""), vs,
+                ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. " + (CARB["reis"][3] if c == "reis" else ""), vs,
                  "Hähnchen in Streifen schneiden und salzen. Ei verquirlen, Haferflocken mit Paprikapulver und Pfeffer mischen. Die Streifen erst im Ei, dann in den Haferflocken wenden und fest andrücken.",
-                 "Auf einem geölten Blech 15 bis 18 Minuten backen, einmal wenden, bis das Fleisch durch und die Kruste goldbraun ist.", ds, "Mit Salat, Dip und " + ("Couscous" if c == "couscous" else "Brot") + " servieren."])
+                 "Auf einem geölten Blech 15 bis 18 Minuten backen, einmal wenden, bis das Fleisch durch und die Kruste goldbraun ist.", ds, "Mit Salat, Dip und " + ("Reis" if c == "reis" else "Brot") + " servieren."])

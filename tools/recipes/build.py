@@ -36,10 +36,8 @@ DB = {
  "broetchen": ("Vollkornbrötchen", "Vollkornbrötchen", "Stk", 60, 240, 9, "", "stärke"),
  "nudel": ("Vollkornnudeln (Rohgewicht)", None, "g", 1, 350, 12.5, "", "stärke"),
  "reis": ("Reis (Rohgewicht)", None, "g", 1, 350, 7, "", "stärke"),
- "couscous": ("Couscous (Rohgewicht)", None, "g", 1, 360, 12.5, "", "stärke"),
  "honig": ("Honig", None, "TL", 7, 300, 0.3, "Honig", "sonst"),
  "oel": ("Rapsöl", None, "TL", 4.5, 884, 0, "", "fett"),
- "soja": ("Sojasauce", None, "EL", 15, 60, 6, "", "sonst"),
  "tmark": ("Tomatenmark", None, "EL", 15, 85, 4.5, "", "sonst"),
  "stueck": ("stückige Tomaten (Dose)", None, "g", 1, 24, 1.2, "", "gemüse"),
  "tom": ("Tomate", "Tomaten", "Stk", 100, 18, 0.9, "", "gemüse"),
@@ -103,10 +101,8 @@ PRICE = {
  "broetchen": (60, 0.25, "Brot & Backwaren", "Stück", 0, 0),
  "nudel": (500, 1.15, "Nudeln, Reis & Trockenes", "Packung 500 g", 0, 0),
  "reis": (1000, 1.89, "Nudeln, Reis & Trockenes", "Beutel 1 kg", 0, 0),
- "couscous": (500, 1.29, "Nudeln, Reis & Trockenes", "Packung 500 g", 0, 0),
  "honig": (500, 3.19, "Vorrat", "Glas 500 g", 0, 1),
  "oel": (920, 1.99, "Vorrat", "Flasche 1 l", 0, 1),
- "soja": (150, 1.29, "Vorrat", "Flasche 150 ml", 0, 1),
  "tmark": (200, 0.79, "Vorrat", "Tube 200 g", 0, 1),
  "stueck": (400, 0.79, "Nudeln, Reis & Trockenes", "Dose 400 g", 0, 0),
  "tom": (1000, 3.29, "Obst & Gemüse", "lose", 1, 0),
@@ -248,13 +244,13 @@ r("Eier-Gurken-Salat", "S", 12, "ga", "ei:2;gurke:150;jog35:50;zitrone:1;~Salz, 
 
 # ======================= MITTAG UND ABEND (56) =======================
 # --- Hähnchen (14)
-r("Hähnchen-Reis-Pfanne", "M", 20, "p", "haehn:150;reis:70;pap:1;zwie:1;oel:1;soja:1",
-  "Reis nach Packungsanleitung kochen.|Hähnchen in Streifen im Öl rundherum anbraten, bis es innen ganz durch ist und nichts Rosa mehr zu sehen ist.|Paprika und Zwiebel in Stücken dazugeben und einige Minuten mitbraten.|Reis unterrühren und mit Sojasauce abschmecken.",
+r("Hähnchen-Reis-Pfanne", "M", 20, "p", "haehn:150;reis:70;pap:1;zwie:1;oel:1;~Salz, Pfeffer und Paprikapulver",
+  "Reis nach Packungsanleitung kochen.|Hähnchen in Streifen im Öl rundherum anbraten, bis es innen ganz durch ist und nichts Rosa mehr zu sehen ist.|Paprika und Zwiebel in Stücken dazugeben und einige Minuten mitbraten.|Reis unterrühren und mit Salz, Pfeffer und Paprikapulver abschmecken.",
   "Geflügel muss im Kern mindestens 70 °C erreichen.")
 r("Hähnchen-Wrap", "M", 15, "a", "haehn:120;oel:1;jog35:40;wrap:1;eisb:40;gurke:60;tom:1;~Salz und Pfeffer",
   "Hähnchen in Streifen im Öl rundherum anbraten, bis es innen ganz durch ist.|Wrap mit dem Joghurt bestreichen und mit Salat, Gurke und Tomate belegen.|Das Hähnchen daraufgeben und einrollen.")
-r("Ofenhähnchen mit Paprika und Couscous", "M", 35, "p", "haehn:150;pap:2;zwie:1;tom:2;oel:1;couscous:60;~Paprikapulver, Salz und Pfeffer",
-  "Ofen auf 200 °C Ober- und Unterhitze vorheizen.|Paprika, Zwiebel und Tomaten in Stücke schneiden und mit Öl und Gewürzen auf einem Blech mischen.|Hähnchen würzen und dazulegen. 25 bis 30 Minuten backen, einmal wenden, bis es innen durch ist.|Couscous mit der gleichen Menge heißem Wasser übergießen, zugedeckt 5 Minuten quellen lassen und auflockern.")
+r("Ofenhähnchen mit Paprika und Reis", "M", 35, "p", "haehn:150;pap:2;zwie:1;tom:2;oel:1;reis:60;~Paprikapulver, Salz und Pfeffer",
+  "Ofen auf 200 °C Ober- und Unterhitze vorheizen.|Paprika, Zwiebel und Tomaten in Stücke schneiden und mit Öl und Gewürzen auf einem Blech mischen.|Hähnchen würzen und dazulegen. 25 bis 30 Minuten backen, einmal wenden, bis es innen durch ist.|In der Zwischenzeit den Reis nach Packungsanleitung kochen und dazu servieren.")
 r("Hähnchen-Nudelpfanne in Tomatensauce", "M", 25, "p", "haehn:130;nudel:70;stueck:200;zwie:1;knob:1;oel:1;parm:10;~Oregano, Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Hähnchen würfeln und im Öl rundherum anbraten, bis es innen durch ist. Zwiebel und Knoblauch kurz mitbraten.|Tomaten zugeben und 8 Minuten köcheln lassen, würzen.|Nudeln untermischen und mit Parmesan bestreuen.")
 r("Hähnchen-Rucola-Nudeln mit Parmesan", "M", 20, "", "haehn:130;nudel:70;ruc:50;parm:20;tom:2;oel:1;~Salz und Pfeffer",
@@ -274,8 +270,8 @@ r("Hähnchen-Sandwich mit Joghurt-Senf", "M", 15, "a", "brot:2;haehn:100;eisb:40
   "Hähnchen im Öl rundherum anbraten, bis es innen ganz durch ist, und in Scheiben schneiden.|Joghurt mit Senf verrühren und aufs Brot streichen.|Mit Salat, Tomate, Saurer Gurke und Hähnchen belegen.")
 r("Ofen-Nuggets mit Gurken-Dip", "M", 30, "", "haehn:150;hafer:30;ei:1;parm:10;oel:1;quark:80;gurke:100;pap:1;zitrone:1;~Salz und Pfeffer",
   "Ofen auf 200 °C Ober- und Unterhitze vorheizen.|Hähnchen in Stücke schneiden. Haferflocken mit Parmesan, Salz und Pfeffer mischen, Ei verquirlen.|Die Stücke erst im Ei, dann in der Haferflocken-Mischung wenden und mit dem Öl beträufeln.|15 bis 20 Minuten backen, bis sie innen durch und goldbraun sind.|Quark mit klein geschnittener Gurke und Zitronensaft verrühren und mit Paprikastreifen dazu servieren.")
-r("Hähnchen-Paprika-Pfanne mit Tzatziki", "M", 25, "", "haehn:150;zwie:1;oel:1;pap:1;couscous:50;jog35:100;gurke:100;knob:1;~Salz, Pfeffer und Paprikapulver",
-  "Couscous mit der gleichen Menge heißem Wasser übergießen und zugedeckt quellen lassen.|Hähnchen in dünnen Streifen mit Zwiebel und Paprika im Öl scharf anbraten, bis es innen ganz durch ist.|Joghurt mit geriebener Gurke, Knoblauch, Salz und Pfeffer zum Tzatziki verrühren.|Alles zusammen anrichten.",
+r("Hähnchen-Paprika-Pfanne mit Tzatziki", "M", 25, "", "haehn:150;zwie:1;oel:1;pap:1;reis:50;jog35:100;gurke:100;knob:1;~Salz, Pfeffer und Paprikapulver",
+  "Reis nach Packungsanleitung kochen.|Hähnchen in dünnen Streifen mit Zwiebel und Paprika im Öl scharf anbraten, bis es innen ganz durch ist.|Joghurt mit geriebener Gurke, Knoblauch, Salz und Pfeffer zum Tzatziki verrühren.|Alles zusammen anrichten.",
   "Magere Hähnchenbrust statt fettigem Gyros-Fleisch: kaum Fett, aber gleiches Würzgefühl.")
 r("Tomaten-Hähnchen-Suppe", "M", 25, "pa", "stueck:300;haehn:120;zwie:1;knob:1;bruehe:300;reis:30;oel:1;parm:10;~Salz und Pfeffer",
   "Zwiebel und Knoblauch klein schneiden und im Öl anbraten.|Tomaten, Brühe und Reis zugeben und 10 Minuten köcheln lassen.|Hähnchen in kleinen Würfeln dazugeben und weitere 8 bis 10 Minuten garen, bis es innen durch ist.|Mit Parmesan, Salz und Pfeffer abschmecken.")
@@ -283,16 +279,16 @@ r("Tomaten-Hähnchen-Suppe", "M", 25, "pa", "stueck:300;haehn:120;zwie:1;knob:1;
 # --- Pute (6)
 r("Puten-Paprika-Geschnetzeltes mit Reis", "M", 25, "p", "pute:150;pap:2;zwie:1;jog35:60;reis:60;oel:1;~Paprikapulver, Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Pute in Streifen im Öl rundherum anbraten, bis sie innen durch ist.|Paprika und Zwiebel dazugeben und 5 Minuten mitbraten.|Joghurt unterrühren (nicht mehr kochen) und würzen. Mit dem Reis servieren.")
-r("Putenhack-Paprika-Pfanne mit Couscous", "M", 25, "p", "phack:120;pap:2;zwie:1;stueck:100;couscous:60;oel:1;~Paprikapulver, Salz und Pfeffer",
-  "Couscous mit der gleichen Menge heißem Wasser übergießen und zugedeckt quellen lassen.|Zwiebel im Öl anbraten, Hack dazugeben und krümelig durchbraten, bis nichts Rosa mehr zu sehen ist.|Paprika in Stücken und Tomaten zugeben und 8 Minuten garen, würzen.|Mit dem Couscous servieren.")
+r("Putenhack-Paprika-Pfanne mit Reis", "M", 25, "p", "phack:120;pap:2;zwie:1;stueck:100;reis:60;oel:1;~Paprikapulver, Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Zwiebel im Öl anbraten, Hack dazugeben und krümelig durchbraten, bis nichts Rosa mehr zu sehen ist.|Paprika in Stücken und Tomaten zugeben und 8 Minuten garen, würzen.|Mit dem Reis servieren.")
 r("Puten-Wrap mit Eisbergsalat", "M", 15, "a", "wrap:1;pute:100;eisb:50;tom:1;sgurke:1;jog35:40;senf:1;oel:1;~Salz und Pfeffer",
   "Pute in Streifen im Öl rundherum anbraten, bis sie innen ganz durch ist.|Joghurt mit Senf verrühren und auf den Wrap streichen.|Mit Salat, Tomate, klein geschnittener Saurer Gurke und der Pute belegen und einrollen.")
 r("Putenburger mit Salat", "M", 25, "", "phack:130;broetchen:1;eisb:40;tom:1;sgurke:2;zwie:0.5;oel:1;senf:1;~Salz und Pfeffer",
   "Hack mit Salz, Pfeffer und Senf verkneten und zu einem flachen Patty formen.|Im Öl von jeder Seite 5 bis 6 Minuten braten, bis es durch ist und nichts Rosa mehr zu sehen ist.|Brötchen aufschneiden und kurz anrösten.|Mit Salat, Tomate, Zwiebelringen, Saurer Gurke und dem Patty belegen.")
-r("Puten-Reispfanne mit Tomate und Ei", "M", 20, "", "pute:120;reis:60;tom:2;ei:1;zwie:1;soja:1;oel:1;~Pfeffer",
-  "Reis nach Packungsanleitung kochen.|Pute in Streifen im Öl anbraten, bis sie innen ganz durch ist. Zwiebel und Tomaten in Stücken kurz mitbraten.|Das Ei am Rand der Pfanne verrühren und fest werden lassen.|Reis und Sojasauce untermischen.")
-r("Putenbrust mit Tomaten-Rucola-Couscous", "M", 20, "a", "pute:150;couscous:60;tom:2;ruc:40;gurke:100;zitrone:1;oel:1;~Salz und Pfeffer",
-  "Couscous mit der gleichen Menge heißem Wasser übergießen und zugedeckt 5 Minuten quellen lassen.|Pute würzen und im Öl von beiden Seiten braten, bis sie innen ganz durch ist, dann in Scheiben schneiden.|Tomaten und Gurke würfeln und mit Rucola, Zitronensaft und dem Couscous mischen.|Die Pute darauflegen.")
+r("Puten-Reispfanne mit Tomate und Ei", "M", 20, "", "pute:120;reis:60;tom:2;ei:1;zwie:1;oel:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Pute in Streifen im Öl anbraten, bis sie innen ganz durch ist. Zwiebel und Tomaten in Stücken kurz mitbraten.|Das Ei am Rand der Pfanne verrühren und fest werden lassen.|Den Reis untermischen und mit Salz und Pfeffer abschmecken.")
+r("Putenbrust mit Tomaten-Rucola-Reissalat", "M", 20, "a", "pute:150;reis:60;tom:2;ruc:40;gurke:100;zitrone:1;oel:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen und abkühlen lassen.|Pute würzen und im Öl von beiden Seiten braten, bis sie innen ganz durch ist, dann in Scheiben schneiden.|Tomaten und Gurke würfeln und mit Rucola, Zitronensaft und dem Reis mischen.|Die Pute darauflegen.")
 
 # --- Rind (7)
 r("Spaghetti Bolognese mit Vollkornnudeln", "M", 30, "p", "rhack:120;nudel:60;stueck:200;karo:1;zwie:1;tmark:1;knob:1;oel:1;parm:10;~Oregano, Salz und Pfeffer",
@@ -314,8 +310,8 @@ r("Hack-Spinat-Nudeln mit Mozzarella", "M", 25, "", "rhack:100;nudel:60;spin:100
 # --- Vegetarisch mit Ei und Käse (12)
 r("Shakshuka mit Brot", "M", 20, "g", "ei:3;stueck:250;pap:1;zwie:1;knob:1;oel:1;brot:1;~Paprikapulver, Salz und Pfeffer",
   "Zwiebel, Knoblauch und Paprika klein schneiden und im Öl 5 Minuten anbraten.|Tomaten und Gewürze zugeben und 8 Minuten köcheln lassen.|Drei Mulden formen, Eier hineingleiten lassen, Deckel drauf.|5 bis 8 Minuten garen, bis Eiweiß und Eigelb fest sind. Mit dem Brot essen.")
-r("Gebratener Reis mit Ei und Paprika", "M", 20, "g", "reis:60;ei:3;pap:1.5;zwie:1;soja:1;oel:1;~Pfeffer",
-  "Reis nach Packungsanleitung kochen (gern vom Vortag, gut abgekühlt).|Zwiebel und Paprika im Öl 4 Minuten anbraten.|Reis dazugeben, Eier darüberschlagen und rühren, bis sie ganz fest sind.|Mit Sojasauce und Pfeffer würzen.")
+r("Gebratener Reis mit Ei und Paprika", "M", 20, "g", "reis:60;ei:3;pap:1.5;zwie:1;oel:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen (gern vom Vortag, gut abgekühlt).|Zwiebel und Paprika im Öl 4 Minuten anbraten.|Reis dazugeben, Eier darüberschlagen und rühren, bis sie ganz fest sind.|Mit Salz und Pfeffer würzen.")
 r("Pizza-Wraps mit Tomate und Mozzarella", "M", 15, "g", "wrap:2;stueck:80;moz:80;pap:1;tom:1;~Oregano",
   "Ofen auf 220 °C Ober- und Unterhitze vorheizen.|Wraps auf ein Blech legen, mit der Tomatensauce bestreichen und mit Paprika, Tomate und Mozzarella belegen.|Mit Oregano bestreuen und 8 bis 10 Minuten knusprig backen.")
 r("Nudelauflauf mit Tomate, Paprika und Mozzarella", "M", 40, "p", "nudel:70;stueck:200;pap:1;moz:70;parm:10;zwie:1;~Oregano, Salz und Pfeffer",
@@ -358,8 +354,8 @@ r("Nudelsalat mit Gurke, Tomate und Mozzarella", "M", 20, "pa", "nudel:70;gurke:
   "Nudeln nach Packungsanleitung kochen und abkühlen lassen.|Joghurt mit Zitronensaft, Senf, Salz und Pfeffer verrühren.|Gurke und Tomaten würfeln, Zwiebel fein schneiden und mit Mozzarella und den Nudeln mischen.|Dressing unterheben und eine Stunde durchziehen lassen.")
 r("Hähnchen-Nudelsalat mit Paprika", "M", 25, "pa", "nudel:60;haehn:120;pap:1;gurke:100;sgurke:2;jog35:60;senf:1;oel:1;~Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen und abkühlen lassen.|Hähnchen in Würfeln im Öl anbraten, bis es innen ganz durch ist, und abkühlen lassen.|Joghurt mit Senf, Salz und Pfeffer verrühren.|Alles mit Paprika, Gurke und klein geschnittener Saurer Gurke mischen.")
-r("Hack-Paprika-Reispfanne", "M", 25, "g", "ghack:100;reis:60;pap:2;zwie:1;tmark:1;soja:1;knob:1;~Paprikapulver und Pfeffer",
-  "Reis nach Packungsanleitung kochen.|Zwiebel und Knoblauch klein schneiden, mit dem Hack in einer Pfanne krümelig durchbraten, bis nichts Rosa mehr zu sehen ist.|Paprika in Würfeln und Tomatenmark zugeben und 6 Minuten braten.|Reis und Sojasauce untermischen und würzen.",
+r("Hack-Paprika-Reispfanne", "M", 25, "g", "ghack:100;reis:60;pap:2;zwie:1;tmark:1;knob:1;~Paprikapulver, Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Zwiebel und Knoblauch klein schneiden, mit dem Hack in einer Pfanne krümelig durchbraten, bis nichts Rosa mehr zu sehen ist.|Paprika in Würfeln und Tomatenmark zugeben und 6 Minuten braten.|Den Reis untermischen und würzen.",
   "Eine günstige Pfanne, die sich gut für zwei Portionen kochen lässt.")
 r("Eisbergsalat-Bowl mit Putenaufschnitt und Ei", "M", 20, "a", "eisb:150;paufs:60;ei:2;tom:1;gurke:100;jog35:70;senf:1;brot:1;~Salz und Pfeffer",
   "Eier mindestens 8 Minuten hart kochen, abschrecken und pellen.|Joghurt mit Senf, Salz und Pfeffer zum Dressing verrühren.|Salat, Tomate, Gurke und Aufschnitt in einer Schale anrichten, Eier in Vierteln darauflegen.|Dressing darübergeben und das Brot dazu essen.")
@@ -441,8 +437,8 @@ r("Hähnchen-Brötchen mit Quark-Senf-Creme", "M", 15, "a", "haehn:100;oel:0.5;b
 r("Burrito-Wrap mit Hack und Bohnen", "M", 25, "pa", "ghack:80;bohne:80;wrap:1;tmark:1;zwie:1;pap:1;~Paprikapulver, Salz und Pfeffer",
   "Zwiebel und Paprika klein schneiden und mit dem Hack krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Bohnen und Tomatenmark zugeben, würzen und 5 Minuten köcheln lassen.|Die Füllung auf den Wrap geben, einrollen und in Folie wickeln.",
   "Schmeckt warm und kalt. Gewickelt hält er im Kühlschrank 2 Tage.")
-r("Asia-Nudelpfanne mit Hähnchen und Paprika", "M", 20, "", "haehn:130;nudel:70;pap:1;zwie:1;knob:1;soja:2;honig:1;oel:1",
-  "Nudeln nach Packungsanleitung kochen.|Hähnchen in Streifen im Öl rundherum anbraten, bis es innen durch ist. Paprika und Zwiebel in Streifen sowie klein geschnittenen Knoblauch zugeben und 4 Minuten mitbraten.|Sojasauce und Honig verrühren, mit den Nudeln in die Pfanne geben und alles gut vermengen.")
+r("Honig-Senf-Nudelpfanne mit Hähnchen und Paprika", "M", 20, "", "haehn:130;nudel:70;pap:1;zwie:1;knob:1;senf:1;honig:1;oel:1;~Salz und Pfeffer",
+  "Nudeln nach Packungsanleitung kochen und 3 EL Nudelwasser aufheben.|Hähnchen in Streifen im Öl rundherum anbraten, bis es innen durch ist. Paprika und Zwiebel in Streifen sowie klein geschnittenen Knoblauch zugeben und 4 Minuten mitbraten.|Senf, Honig und das Nudelwasser verrühren, mit den Nudeln in die Pfanne geben, alles gut vermengen und mit Salz und Pfeffer abschmecken.")
 r("Putenhack-Reis-Bowl mit Gurke und Joghurt", "M", 20, "p", "phack:130;reis:60;gurke:100;jog35:50;pap:1;oel:1;curry:1;~Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Putenhack mit Curry im Öl krümelig durchbraten, bis nichts Rosa mehr zu sehen ist. Paprika in Würfeln kurz mitbraten.|Gurke würfeln. Reis, Hack und Gurke in eine Schüssel geben und mit Joghurt toppen.")
 r("Hack-Quesadilla mit Paprika und Gouda", "M", 20, "a", "wrap:1;ghack:80;pap:1;gouda:30;zwie:0.5;tmark:1;~Paprikapulver, Salz und Pfeffer",
@@ -470,10 +466,10 @@ r("Joghurt-Hähnchen aus dem Ofen mit Reis und Gurkensalat", "M", 35, "", "haehn
   "Hähnchen mit Joghurt, Curry, Salz und Pfeffer mindestens 15 Minuten marinieren. Ofen auf 200 °C Ober- und Unterhitze vorheizen.|Reis nach Packungsanleitung kochen.|Hähnchen auf ein geöltes Blech legen und 20 bis 25 Minuten backen, bis es innen ganz durch ist.|Gurke und Tomate würfeln, mit Zitronensaft und Salz anmachen.")
 r("Hack-Paprika-Pfanne mit Rührei", "M", 20, "g", "ghack:100;ei:2;pap:2;zwie:1;~Paprikapulver, Salz und Pfeffer",
   "Hack mit Zwiebel krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Paprika in Streifen zugeben und 5 Minuten mitbraten, würzen.|Die Eier darüber verquirlen und unter Rühren stocken lassen, bis sie fest sind.")
-r("Kichererbsen-Reispfanne mit Ei", "M", 20, "g", "kiche:120;reis:60;ei:2;pap:1;zwie:1;tom:1;soja:1;oel:1;~Pfeffer",
-  "Reis nach Packungsanleitung kochen.|Zwiebel und Paprika klein schneiden und im Öl 4 Minuten anbraten. Kichererbsen zugeben und 3 Minuten mitbraten.|Die Eier am Rand verrühren und fest werden lassen, dann alles mit Reis und Sojasauce vermengen.|Tomate in Stücken zum Schluss unterheben.")
-r("Putenhack-Bällchen mit Joghurt-Sauce und Couscous", "M", 25, "", "phack:130;ei:0.5;hafer:15;couscous:60;jog35:60;gurke:80;tom:1;zwie:0.5;oel:1;~Salz und Pfeffer",
-  "Putenhack mit Ei, Haferflocken, klein geschnittener Zwiebel und Gewürzen verkneten und zu kleinen Bällchen formen.|Im Öl bei mittlerer Hitze rundherum 8 bis 10 Minuten braten, bis sie innen ganz durch sind.|Couscous mit der gleichen Menge heißem Wasser übergießen und 5 Minuten quellen lassen.|Gurke und Tomate würfeln, mit dem Joghurt vermischen und dazu servieren.")
+r("Kichererbsen-Reispfanne mit Ei", "M", 20, "g", "kiche:120;reis:60;ei:2;pap:1;zwie:1;tom:1;oel:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Zwiebel und Paprika klein schneiden und im Öl 4 Minuten anbraten. Kichererbsen zugeben und 3 Minuten mitbraten.|Die Eier am Rand verrühren und fest werden lassen, dann alles mit dem Reis vermengen und mit Salz und Pfeffer würzen.|Tomate in Stücken zum Schluss unterheben.")
+r("Putenhack-Bällchen mit Joghurt-Sauce und Reis", "M", 25, "", "phack:130;ei:0.5;hafer:15;reis:60;jog35:60;gurke:80;tom:1;zwie:0.5;oel:1;~Salz und Pfeffer",
+  "Putenhack mit Ei, Haferflocken, klein geschnittener Zwiebel und Gewürzen verkneten und zu kleinen Bällchen formen.|Im Öl bei mittlerer Hitze rundherum 8 bis 10 Minuten braten, bis sie innen ganz durch sind.|Reis nach Packungsanleitung kochen.|Gurke und Tomate würfeln, mit dem Joghurt vermischen und dazu servieren.")
 r("Hähnchen-Caesar-Salat mit Joghurt-Dressing", "M", 20, "a", "haehn:120;ei:1;eisb:150;parm:15;brot:1;jog35:40;zitrone:1;senf:1;oel:0.5;~Salz und Pfeffer",
   "Ei 8 Minuten hart kochen, pellen und vierteln.|Hähnchen in Streifen im Öl rundherum anbraten, bis es innen ganz durch ist. Brot würfeln und in der Pfanne rösten.|Joghurt mit Zitronensaft, Senf, Salz und Pfeffer zum Dressing verrühren.|Salat mit Hähnchen, Ei, Brotwürfeln und Parmesan mischen und das Dressing darübergeben.")
 r("Tomaten-Hähnchen-Reis-Auflauf", "M", 40, "p", "haehn:130;reis:60;stueck:200;pap:1;zwie:1;moz:40;oel:1;~Oregano, Salz und Pfeffer",
@@ -484,8 +480,8 @@ r("Eier-Nudeln mit Tomate, Rucola und Parmesan", "M", 20, "g", "nudel:70;ei:2;to
 r("Hackbraten-Muffins mit Salat", "M", 35, "pa", "ghack:120;ei:1;hafer:25;zwie:0.5;senf:1;tmark:1;eisb:100;tom:1;gurke:60;~Salz und Pfeffer",
   "Ofen auf 190 °C Ober- und Unterhitze vorheizen.|Hack mit Ei, Haferflocken, klein geschnittener Zwiebel, Senf, Tomatenmark und Gewürzen verkneten und in zwei große Muffinmulden drücken.|20 bis 25 Minuten backen, bis sie innen ganz durch sind und nichts Rosa mehr zu sehen ist.|Mit Salat, Tomate und Gurke essen.",
   "Kalt wie warm gut, am nächsten Tag in der Box zur Arbeit.")
-r("Honig-Senf-Hähnchen mit Paprika und Couscous", "M", 30, "", "haehn:130;senf:1;honig:1;pap:2;zwie:1;couscous:60;oel:1;~Salz und Pfeffer",
-  "Senf mit Honig verrühren und das gewürzte Hähnchen damit bestreichen. Ofen auf 200 °C Ober- und Unterhitze vorheizen.|Paprika und Zwiebel in Stücken mit dem Öl auf einem Blech mischen, das Hähnchen dazulegen und 20 bis 25 Minuten backen, bis es innen ganz durch ist.|Couscous mit der gleichen Menge heißem Wasser übergießen, 5 Minuten quellen lassen und lockern.")
+r("Honig-Senf-Hähnchen mit Paprika und Reis", "M", 30, "", "haehn:130;senf:1;honig:1;pap:2;zwie:1;reis:60;oel:1;~Salz und Pfeffer",
+  "Senf mit Honig verrühren und das gewürzte Hähnchen damit bestreichen. Ofen auf 200 °C Ober- und Unterhitze vorheizen.|Paprika und Zwiebel in Stücken mit dem Öl auf einem Blech mischen, das Hähnchen dazulegen und 20 bis 25 Minuten backen, bis es innen ganz durch ist.|In der Zwischenzeit den Reis nach Packungsanleitung kochen und dazu servieren.")
 
 # ======================= NEU (Runde 3) =======================
 r("Eier-Wrap-Röllchen mit Putenaufschnitt und Gurke", "F", 10, "a", "wrap:1;ei:2;paufs:30;gurke:60;senf:1;oel:1;~Salz und Pfeffer",
@@ -514,8 +510,8 @@ r("Knusprige Ofen-Kichererbsen", "S", 30, "p", "kiche:150;oel:1;~Paprikapulver, 
   "Am besten am selben Tag essen, sonst werden sie weich.")
 r("Mozzarella-Wrap mit Rucola und Tomate", "S", 5, "ka", "wrap:1;moz:35;tom:1;ruc:15;~Salz und Pfeffer",
   "Mozzarella und Tomate in Scheiben schneiden.|Mit Rucola auf dem Wrap verteilen, würzen und einrollen.")
-r("Schweineschnitzel mit Tomaten-Gurken-Salat und Couscous", "M", 25, "", "schnitzel:140;oel:1;couscous:60;tom:2;gurke:100;zitrone:1;~Salz und Pfeffer",
-  "Couscous mit der gleichen Menge heißem Wasser übergießen und 5 Minuten quellen lassen.|Schnitzel würzen und im Öl bei mittlerer Hitze von jeder Seite 4 bis 5 Minuten braten, bis es innen ganz durch ist.|Tomaten und Gurke würfeln und mit Zitronensaft, Salz und Pfeffer anmachen.",
+r("Schweineschnitzel mit Tomaten-Gurken-Salat und Reis", "M", 25, "", "schnitzel:140;oel:1;reis:60;tom:2;gurke:100;zitrone:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Schnitzel würzen und im Öl bei mittlerer Hitze von jeder Seite 4 bis 5 Minuten braten, bis es innen ganz durch ist.|Tomaten und Gurke würfeln und mit Zitronensaft, Salz und Pfeffer anmachen.",
   "Schweineschnitzel ist oft günstiger als Hähnchenbrust und liefert ähnlich viel Eiweiß.")
 r("Schnitzel-Brötchen mit Salat und Senf", "M", 20, "a", "schnitzel:120;broetchen:1;eisb:60;tom:1;senf:1;oel:1;~Salz und Pfeffer",
   "Schnitzel würzen und im Öl von jeder Seite 4 bis 5 Minuten braten, bis es innen ganz durch ist.|Brötchen aufschneiden und mit Senf bestreichen.|Mit Salat, Tomatenscheiben und dem aufgeschnittenen Schnitzel belegen.")
@@ -526,8 +522,8 @@ r("Paprika-Schnitzel-Pfanne mit Reis", "M", 25, "", "schnitzel:130;pap:2;zwie:1;
 r("Linsen-Hack-Pfanne mit Paprika", "M", 25, "g", "ghack:70;linse:50;pap:1;zwie:1;stueck:150;tmark:1;bruehe:200;~Paprikapulver, Salz und Pfeffer",
   "Hack mit klein geschnittener Zwiebel in einer Pfanne krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Paprika in Würfeln und Tomatenmark zugeben und 2 Minuten mitbraten.|Linsen, Tomaten, Brühe und Gewürze zugeben und 15 bis 18 Minuten köcheln lassen, bis die Linsen weich sind.",
   "Rote Linsen müssen nicht eingeweicht werden. Die Pfanne ist günstig und lässt sich gut vorkochen.")
-r("Eier-Reis-Bowl mit Schinken und Gurke", "M", 15, "g", "reis:70;ei:2;schink:40;gurke:100;soja:1;oel:1;zwie:0.5;~Pfeffer",
-  "Reis nach Packungsanleitung kochen.|Zwiebel klein schneiden und im Öl 2 Minuten anbraten. Schinken in Streifen kurz mitbraten, die Eier darüber verquirlen und unter Rühren fest werden lassen.|Reis mit Sojasauce vermengen, Ei-Mischung und Gurkenscheiben daraufgeben.")
+r("Eier-Reis-Bowl mit Schinken und Gurke", "M", 15, "g", "reis:70;ei:2;schink:40;gurke:100;oel:1;zwie:0.5;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Zwiebel klein schneiden und im Öl 2 Minuten anbraten. Schinken in Streifen kurz mitbraten, die Eier darüber verquirlen und unter Rühren fest werden lassen.|Den Reis in eine Schale geben, Ei-Mischung und Gurkenscheiben daraufgeben und mit Salz und Pfeffer würzen.")
 r("Hähnchen-Linsen-Pfanne mit Tomate", "M", 25, "", "haehn:120;linse:50;stueck:200;zwie:1;knob:1;curry:1;oel:1;bruehe:200;~Salz und Pfeffer",
   "Hähnchen in Würfeln im Öl rundherum anbraten, bis es außen gar ist. Zwiebel und Knoblauch klein schneiden und kurz mitbraten.|Curry, Linsen, Tomaten und Brühe zugeben und 15 bis 18 Minuten köcheln lassen, bis die Linsen weich und das Hähnchen innen ganz durch ist.")
 r("Pizza-Nudelpfanne mit Putenaufschnitt", "M", 20, "", "nudel:70;stueck:200;paufs:50;moz:40;zwie:1;pap:1;oel:0.5;~Oregano, Salz und Pfeffer",
@@ -546,8 +542,8 @@ r("Hähnchen-Fajita-Wrap", "M", 20, "a", "haehn:120;pap:2;zwie:1;wrap:1;jog35:40
 r("Bolognese-Nudelauflauf mit Quark-Haube", "M", 40, "p", "ghack:80;nudel:60;stueck:200;zwie:1;quark:100;gouda:20;knob:1;~Oregano, Salz und Pfeffer",
   "Nudeln 2 Minuten kürzer als auf der Packung angegeben kochen. Ofen auf 200 °C Ober- und Unterhitze vorheizen.|Hack mit Zwiebel und Knoblauch krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Tomaten und Gewürze zugeben und 5 Minuten köcheln lassen.|Nudeln und Sauce in eine Form geben. Quark mit Salz und Pfeffer glatt rühren, darauf verteilen, mit Gouda bestreuen und 20 Minuten überbacken.",
   "Gekühlt 2 Tage haltbar, vor dem Essen vollständig erhitzen.")
-r("Gefüllte Tomaten mit Hack und Couscous", "M", 35, "", "tom:3;ghack:80;couscous:40;zwie:0.5;moz:30;~Oregano, Salz und Pfeffer",
-  "Ofen auf 200 °C Ober- und Unterhitze vorheizen. Von den Tomaten einen Deckel abschneiden und mit einem Löffel aushöhlen.|Couscous mit der gleichen Menge heißem Wasser übergießen und 5 Minuten quellen lassen.|Hack mit klein geschnittener Zwiebel krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Mit Couscous und dem Fruchtfleisch mischen und würzen.|In die Tomaten füllen, mit Mozzarella belegen und 15 bis 18 Minuten backen.")
+r("Gefüllte Tomaten mit Hack und Reis", "M", 35, "", "tom:3;ghack:80;reis:40;zwie:0.5;moz:30;~Oregano, Salz und Pfeffer",
+  "Ofen auf 200 °C Ober- und Unterhitze vorheizen. Von den Tomaten einen Deckel abschneiden und mit einem Löffel aushöhlen.|Reis nach Packungsanleitung kochen.|Hack mit klein geschnittener Zwiebel krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Mit dem Reis und dem Fruchtfleisch mischen und würzen.|In die Tomaten füllen, mit Mozzarella belegen und 15 bis 18 Minuten backen.")
 r("Hack-Bohnen-Eintopf mit Nudeln", "M", 30, "pg", "ghack:70;bohne:100;nudel:40;stueck:200;zwie:1;bruehe:300;tmark:1;~Paprikapulver, Salz und Pfeffer",
   "Hack mit Zwiebel krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Tomatenmark zugeben und 2 Minuten mitbraten.|Tomaten, Bohnen, Brühe und Gewürze zugeben und 10 Minuten köcheln lassen.|Nudeln zugeben und weitere 8 bis 10 Minuten garen.",
   "Ein Eintopf für zwei Tage, der sich gut einfrieren lässt.")
@@ -557,8 +553,8 @@ r("Hack-Bohnen-Eintopf mit Nudeln", "M", 30, "pg", "ghack:70;bohne:100;nudel:40;
 r("Butter Chicken mit Reis", "M", 35, "p", "haehn:150;butter:10;zwie:1;knob:2;stueck:200;jogGr:60;garam:1;paprikap:1;reis:60;~Salz",
   "Reis nach Packungsanleitung kochen.|Zwiebel und Knoblauch klein schneiden und in der Butter 3 Minuten andünsten. Garam Masala und Paprikapulver kurz mitrösten.|Hähnchen in Würfel schneiden, dazugeben und rundum anbraten. Stückige Tomaten zugeben und 10 Minuten köcheln, bis das Fleisch im Kern durch ist.|Vom Herd nehmen, Joghurt unterrühren (nicht mehr kochen) und mit Salz abschmecken.",
   "Garam Masala ist eine fertige Gewürzmischung und gehört in jedes indische Gericht. Ein Teelöffel reicht.")
-r("Hähnchen Tikka aus dem Ofen mit Couscous und Paprika", "M", 35, "a", "haehn:170;jogGr:70;paprikap:1;kurkuma:1;zitrone:1;pap:1;zwie:1;couscous:60;~Salz",
-  "Joghurt mit Paprikapulver, Kurkuma, Zitronensaft und Salz verrühren, das Hähnchen in Stücken darin 15 Minuten marinieren. Ofen auf 220 °C Ober- und Unterhitze vorheizen.|Paprika und Zwiebel in Stücke schneiden und mit dem Hähnchen auf ein Blech geben.|20 bis 25 Minuten backen, bis das Fleisch im Kern durch und nicht mehr rosa ist.|Couscous mit heißem Wasser übergießen, 5 Minuten quellen lassen und dazu servieren.")
+r("Hähnchen Tikka aus dem Ofen mit Reis und Paprika", "M", 35, "a", "haehn:170;jogGr:70;paprikap:1;kurkuma:1;zitrone:1;pap:1;zwie:1;reis:60;~Salz",
+  "Joghurt mit Paprikapulver, Kurkuma, Zitronensaft und Salz verrühren, das Hähnchen in Stücken darin 15 Minuten marinieren. Ofen auf 220 °C Ober- und Unterhitze vorheizen.|Paprika und Zwiebel in Stücke schneiden und mit dem Hähnchen auf ein Blech geben.|20 bis 25 Minuten backen, bis das Fleisch im Kern durch und nicht mehr rosa ist.|In der Zwischenzeit den Reis nach Packungsanleitung kochen und dazu servieren.")
 r("Hähnchen-Linsen-Curry mit Kokosmilch", "M", 35, "pg", "haehn:120;linse:50;kokos:150;curry:1;kurkuma:1;zwie:1;pap:1;stueck:150;oel:1;~Salz",
   "Zwiebel und Paprika klein schneiden und im Öl 4 Minuten anbraten. Curry und Kurkuma kurz mitrösten.|Hähnchen in Würfeln zugeben und rundum anbraten.|Linsen, stückige Tomaten, Kokosmilch und 200 ml Wasser zugeben und 15 Minuten köcheln, bis die Linsen weich und das Hähnchen durch ist.|Mit Salz abschmecken.",
   "Rote Linsen brauchen keine Einweichzeit und machen die Soße von selbst cremig.")
@@ -569,23 +565,22 @@ r("Hähnchen-Fajita-Pfanne mit Wrap", "M", 20, "a", "haehn:150;pap:2;zwie:1;wrap
   "Hähnchen, Paprika und Zwiebel in Streifen schneiden.|Das Hähnchen im Öl 5 Minuten anbraten, dann Paprika, Zwiebel und Paprikapulver zugeben und weitere 5 Minuten braten, bis nichts Rosa mehr zu sehen ist.|Den Wrap kurz in der Pfanne erwärmen.|Mit Salat, Tomatenwürfeln und Joghurt füllen und die Fajita-Pfanne dazu essen.")
 r("Hähnchen-Burrito-Bowl mit Reis und Bohnen", "M", 30, "ap", "haehn:140;bohne:100;reis:60;tom:2;pap:1;eisb:40;gouda:20;oel:1;paprikap:1;~Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Hähnchen in Streifen im Öl anbraten, Paprika in Streifen dazugeben, mit Paprikapulver, Salz und Pfeffer würzen und braten, bis das Fleisch durch ist.|Bohnen und Tomatenwürfel kurz miterhitzen.|Reis, Füllung und Salat in eine Schüssel geben und mit Gouda bestreuen.")
-r("Hähnchen-Teriyaki-Pfanne mit Reis", "M", 25, "", "haehn:150;soja:1.5;honig:1;pap:2;zwie:1;knob:1;reis:70;oel:1;~Pfeffer",
-  "Reis nach Packungsanleitung kochen.|Hähnchen in Streifen im Öl anbraten, bis es rundum gar ist.|Paprika, Zwiebel und Knoblauch in Streifen zugeben und 4 Minuten braten.|Sojasauce, Honig und 3 EL Wasser dazugeben und einkochen lassen, bis die Soße glänzt. Zum Reis servieren.",
-  "Sojasauce ist salzig: Salze deshalb nicht extra nach.")
-r("Hähnchen mit Haferflocken-Panade und Gurkensalat", "M", 30, "", "haehn:160;ei:1;hafer:30;senf:1;gurke:200;tom:1;jogGr:40;oel:1;couscous:40;~Salz und Pfeffer",
-  "Hähnchen flach klopfen, mit Salz und Pfeffer würzen und mit Senf bestreichen. Ei verquirlen, Haferflocken auf einen Teller geben.|Das Hähnchen erst im Ei, dann in den Haferflocken wenden.|Im Öl bei mittlerer Hitze von jeder Seite 5 bis 6 Minuten braten, bis die Panade goldbraun und das Fleisch durch ist.|Gurke und Tomate würfeln, mit Joghurt, Salz und Pfeffer mischen. Couscous mit heißem Wasser quellen lassen und dazu essen.")
+r("Hähnchen in Honig-Senf-Soße mit Reis", "M", 25, "", "haehn:150;senf:1.5;honig:1;pap:2;zwie:1;knob:1;reis:70;oel:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Hähnchen in Streifen im Öl anbraten, bis es rundum gar ist.|Paprika, Zwiebel und Knoblauch in Streifen zugeben und 4 Minuten braten.|Senf, Honig und 3 EL Wasser verrühren, dazugeben und einkochen lassen, bis die Soße glänzt. Zum Reis servieren.")
+r("Hähnchen mit Haferflocken-Panade und Gurkensalat", "M", 30, "", "haehn:160;ei:1;hafer:30;senf:1;gurke:200;tom:1;jogGr:40;oel:1;reis:40;~Salz und Pfeffer",
+  "Hähnchen flach klopfen, mit Salz und Pfeffer würzen und mit Senf bestreichen. Ei verquirlen, Haferflocken auf einen Teller geben.|Das Hähnchen erst im Ei, dann in den Haferflocken wenden.|Im Öl bei mittlerer Hitze von jeder Seite 5 bis 6 Minuten braten, bis die Panade goldbraun und das Fleisch durch ist.|Gurke und Tomate würfeln, mit Joghurt, Salz und Pfeffer mischen. Reis nach Packungsanleitung kochen und dazu essen.")
 r("Hähnchen Caprese aus dem Ofen mit Nudeln", "M", 35, "", "haehn:150;tom:2;moz:60;nudel:70;stueck:100;knob:1;oel:1;~Basilikum, Salz und Pfeffer",
   "Ofen auf 200 °C Ober- und Unterhitze vorheizen. Nudeln nach Packungsanleitung kochen.|Das Hähnchen würzen, im Öl 2 Minuten pro Seite anbraten und in eine Auflaufform legen. Stückige Tomaten mit Knoblauch daneben geben.|Tomatenscheiben und Mozzarella darauflegen und 15 bis 20 Minuten backen, bis das Hähnchen im Kern durch ist.|Mit Basilikum bestreuen und zu den Nudeln servieren.")
-r("Hähnchen-Gemüse-Pfanne mit Couscous", "M", 25, "a", "haehn:150;pap:2;zwie:1;tom:1;couscous:60;oel:1;paprikap:1;zitrone:1;~Salz und Pfeffer",
-  "Couscous mit heißem Wasser übergießen und 5 Minuten quellen lassen.|Hähnchen in Würfeln im Öl rundum anbraten. Paprika und Zwiebel in Stücken zugeben und 6 Minuten mitbraten.|Tomate in Stücken, Paprikapulver und Zitronensaft zugeben und kurz erwärmen. Das Fleisch muss durch sein.|Mit Salz und Pfeffer abschmecken und mit dem Couscous mischen.")
-r("Hähnchen-Rucola-Couscous-Salat", "M", 20, "ka", "haehn:140;couscous:50;tom:2;gurke:100;ruc:30;zitrone:1;oel:1;~Salz und Pfeffer",
-  "Couscous mit heißem Wasser übergießen, 5 Minuten quellen lassen und abkühlen lassen.|Hähnchen in Würfeln im Öl braten, bis es durch ist.|Tomaten und Gurke würfeln und mit Zitronensaft, Salz und Pfeffer zum Couscous geben.|Hähnchen und Rucola unterheben.")
+r("Hähnchen-Gemüse-Pfanne mit Reis", "M", 25, "a", "haehn:150;pap:2;zwie:1;tom:1;reis:60;oel:1;paprikap:1;zitrone:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Hähnchen in Würfeln im Öl rundum anbraten. Paprika und Zwiebel in Stücken zugeben und 6 Minuten mitbraten.|Tomate in Stücken, Paprikapulver und Zitronensaft zugeben und kurz erwärmen. Das Fleisch muss durch sein.|Mit Salz und Pfeffer abschmecken und mit dem Reis mischen.")
+r("Hähnchen-Rucola-Reissalat", "M", 20, "ka", "haehn:140;reis:50;tom:2;gurke:100;ruc:30;zitrone:1;oel:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen und abkühlen lassen.|Hähnchen in Würfeln im Öl braten, bis es durch ist.|Tomaten und Gurke würfeln und mit Zitronensaft, Salz und Pfeffer zum Reis geben.|Hähnchen und Rucola unterheben.")
 r("Hähnchen-Gurken-Wrap mit Senf-Joghurt", "M", 15, "ka", "haehnst:150;wrap:2;gurke:100;tom:1;eisb:40;jogGr:50;senf:1;~Salz und Pfeffer",
   "Joghurt mit Senf, Salz und Pfeffer verrühren.|Die Mini-Steaks nach Packungsanleitung braten, bis sie durch sind, und in Streifen schneiden.|Wraps mit Soße bestreichen, mit Salat, Gurke und Tomate belegen.|Fleisch darauf legen, einrollen und halbieren.")
 r("Hähnchenspieße mit Paprika und Zwiebel, Joghurt-Dip und Reis", "M", 35, "", "haehn:160;pap:2;zwie:1;jogGr:60;reis:60;oel:1;knob:1;paprikap:1;~Salz und Pfeffer",
   "Ofen auf 220 °C vorheizen. Reis nach Packungsanleitung kochen.|Hähnchen, Paprika und Zwiebel in große Stücke schneiden, mit Öl, Paprikapulver, Salz und Pfeffer mischen und abwechselnd auf Spieße stecken.|20 Minuten backen, zwischendurch wenden, bis das Fleisch im Kern durch ist.|Joghurt mit Knoblauch, Salz und Pfeffer verrühren und zu Spießen und Reis servieren.")
-r("Ofentomaten-Hähnchen mit Rucola auf Couscous", "M", 35, "", "haehn:150;tom:3;zwie:1;knob:1;ruc:30;couscous:60;parm:10;oel:1;~Salz und Pfeffer",
-  "Ofen auf 200 °C Ober- und Unterhitze vorheizen. Tomaten und Zwiebel in Stücke schneiden.|Hähnchen, Tomaten, Zwiebel und Knoblauch mit Öl, Salz und Pfeffer in eine Form geben und 25 Minuten backen, bis das Fleisch im Kern durch ist.|Couscous mit heißem Wasser übergießen und 5 Minuten quellen lassen.|Alles auf dem Couscous anrichten, Rucola und Parmesan darübergeben.")
+r("Ofentomaten-Hähnchen mit Rucola auf Reis", "M", 35, "", "haehn:150;tom:3;zwie:1;knob:1;ruc:30;reis:60;parm:10;oel:1;~Salz und Pfeffer",
+  "Ofen auf 200 °C Ober- und Unterhitze vorheizen. Tomaten und Zwiebel in Stücke schneiden.|Hähnchen, Tomaten, Zwiebel und Knoblauch mit Öl, Salz und Pfeffer in eine Form geben und 25 Minuten backen, bis das Fleisch im Kern durch ist.|In der Zwischenzeit den Reis nach Packungsanleitung kochen.|Alles auf dem Reis anrichten, Rucola und Parmesan darübergeben.")
 r("Paprika-Hähnchen-Gulasch mit Reis", "M", 40, "p", "haehn:160;pap:2;zwie:2;tmark:1;paprikap:2;stueck:100;bruehe:100;reis:60;oel:1;~Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Zwiebeln und Paprika in Stücke schneiden. Hähnchen in Würfeln im Öl anbraten.|Zwiebeln, Paprika und Tomatenmark zugeben, 3 Minuten braten, dann Paprikapulver, stückige Tomaten und Brühe zugeben.|20 Minuten bei mittlerer Hitze köcheln, bis das Fleisch weich und durch ist, und mit Salz und Pfeffer abschmecken.")
 r("Hähnchen-Bowl mit Kichererbsen, Gurke und Tomate", "M", 20, "ka", "haehn:130;kiche:100;gurke:100;tom:1;reis:40;jogGr:40;zitrone:1;oel:1;~Salz und Pfeffer",
@@ -598,8 +593,8 @@ r("Hähnchen-Quesadilla mit Bohnen und Gouda", "M", 20, "a", "haehn:120;wrap:2;g
   "Hähnchen in Streifen im Öl braten, bis es durch ist. Zwiebel in Streifen mitbraten.|Bohnen zugeben und kurz erwärmen.|Wrap mit Füllung, Tomatenscheiben und Gouda belegen und mit dem zweiten Wrap abdecken.|In der Pfanne ohne zusätzliches Fett von jeder Seite 2 bis 3 Minuten braten, bis der Käse geschmolzen ist.")
 r("Hähnchen-Tomaten-Nudelsuppe", "M", 30, "p", "haehn:130;stueck:200;nudel:50;zwie:1;pap:1;bruehe:300;knob:1;oel:1;~Salz, Pfeffer und Oregano",
   "Zwiebel, Paprika und Knoblauch klein schneiden und im Öl 4 Minuten anbraten.|Hähnchen in Würfeln zugeben und rundum anbraten.|Stückige Tomaten und Brühe zugeben und 10 Minuten köcheln, bis das Fleisch durch ist.|Nudeln zugeben und nach Packungsanleitung garen. Würzen.")
-r("Hähnchen-Paprika-Auflauf mit Mozzarella und Couscous", "M", 40, "p", "haehn:150;pap:2;zwie:1;couscous:60;stueck:150;moz:60;bruehe:100;knob:1;~Salz, Pfeffer und Oregano",
-  "Ofen auf 200 °C vorheizen. Couscous in einer Auflaufform mit heißer Brühe übergießen.|Hähnchen, Paprika und Zwiebel in Stücke schneiden und auf dem Couscous verteilen.|Stückige Tomaten mit Knoblauch, Salz, Pfeffer und Oregano darübergeben, Mozzarella zerzupfen und obenauf legen.|25 Minuten backen, bis das Hähnchen durch und der Käse goldbraun ist.")
+r("Hähnchen-Paprika-Auflauf mit Mozzarella und Nudeln", "M", 40, "p", "haehn:150;pap:2;zwie:1;nudel:60;stueck:150;moz:60;bruehe:100;knob:1;~Salz, Pfeffer und Oregano",
+  "Ofen auf 200 °C vorheizen. Die Nudeln 3 Minuten kürzer als auf der Packung angegeben kochen und in eine Auflaufform geben.|Hähnchen, Paprika und Zwiebel in Stücke schneiden und auf den Nudeln verteilen.|Stückige Tomaten mit Brühe, Knoblauch, Salz, Pfeffer und Oregano darübergeben, Mozzarella zerzupfen und obenauf legen.|25 Minuten backen, bis das Hähnchen durch und der Käse goldbraun ist.")
 r("Würziges Hähnchen mit Kreuzkümmel, Reis und Gurken-Tomaten-Salat", "M", 30, "", "haehn:160;kreuz:1;paprikap:1;reis:60;gurke:150;tom:2;zitrone:1;jogGr:30;oel:1;~Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Hähnchen mit Kreuzkümmel, Paprikapulver, Salz und Pfeffer einreiben und im Öl von jeder Seite 5 bis 6 Minuten braten, bis es durch ist.|Gurke und Tomaten würfeln und mit Zitronensaft, Joghurt, Salz und Pfeffer mischen.|Das Fleisch in Scheiben schneiden und mit Reis und Salat servieren.")
 
@@ -609,13 +604,12 @@ r("Puten-Curry mit Kokosmilch und Reis", "M", 30, "p", "pute:150;kokos:110;curry
   "Reis nach Packungsanleitung kochen.|Zwiebel und Paprika klein schneiden und im Öl 4 Minuten anbraten. Curry und Kurkuma kurz mitrösten.|Putenbrust in Würfeln zugeben und rundum anbraten.|Kokosmilch und stückige Tomaten zugeben und 10 Minuten köcheln, bis das Fleisch durch ist. Mit Salz abschmecken.")
 r("Putengeschnetzeltes in Paprika-Rahm mit Nudeln", "M", 25, "", "pute:150;pap:2;zwie:1;speisequark:60;bruehe:100;nudel:70;paprikap:1;oel:1;~Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Pute in Streifen im Öl rundum anbraten, bis sie durch ist. Paprika und Zwiebel in Streifen zugeben und 5 Minuten braten.|Brühe angießen und kurz einkochen, dann die Pfanne vom Herd nehmen. Quark und Paprikapulver unterrühren.|Mit Salz und Pfeffer abschmecken und die Nudeln untermischen.")
-r("Asia-Putenpfanne mit Paprika und Reis", "M", 25, "", "pute:150;pap:2;zwie:1;soja:1.5;knob:1;reis:60;oel:1;~Pfeffer",
-  "Reis nach Packungsanleitung kochen.|Pute, Paprika und Zwiebel in Streifen schneiden.|Die Pute im Öl rundum anbraten, bis sie durch ist, dann Paprika, Zwiebel und Knoblauch 4 Minuten mitbraten.|Sojasauce und 3 EL Wasser zugeben, kurz einkochen und zum Reis servieren.",
-  "Sojasauce ist salzig: Salze deshalb nicht extra nach.")
-r("Puten-Tomaten-Pfanne mit Mozzarella und Couscous", "M", 25, "", "pute:150;tom:3;moz:50;couscous:50;zwie:0.5;knob:1;oel:1;~Basilikum, Salz und Pfeffer",
-  "Couscous mit heißem Wasser übergießen und 5 Minuten quellen lassen.|Pute in Würfeln im Öl anbraten, bis sie durch ist. Zwiebel und Knoblauch zugeben.|Tomaten in Stücken 3 Minuten mitschmoren, Mozzarella zerzupfen und unterheben, bis er schmilzt.|Mit Basilikum, Salz und Pfeffer würzen und auf dem Couscous servieren.")
-r("Putenspieße mit Paprika, Joghurt-Dip und Couscous", "M", 35, "", "pute:160;pap:2;zwie:1;jogGr:60;couscous:50;oel:1;knob:1;~Salz und Pfeffer",
-  "Ofen auf 220 °C vorheizen.|Pute, Paprika und Zwiebel in große Stücke schneiden, mit Öl, Salz und Pfeffer mischen und abwechselnd auf Spieße stecken.|20 Minuten backen, zwischendurch wenden, bis die Pute im Kern durch ist.|Couscous mit heißem Wasser quellen lassen. Joghurt mit Knoblauch, Salz und Pfeffer verrühren und dazu servieren.")
+r("Putenpfanne mit Paprika, Knoblauch und Reis", "M", 25, "", "pute:150;pap:2;zwie:1;knob:1;reis:60;oel:1;bruehe:100;paprikap:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Pute, Paprika und Zwiebel in Streifen schneiden.|Die Pute im Öl rundum anbraten, bis sie durch ist, dann Paprika, Zwiebel und Knoblauch 4 Minuten mitbraten.|Brühe und Paprikapulver zugeben, kurz einkochen, abschmecken und zum Reis servieren.")
+r("Puten-Tomaten-Pfanne mit Mozzarella und Nudeln", "M", 25, "", "pute:150;tom:3;moz:50;nudel:60;zwie:0.5;knob:1;oel:1;~Basilikum, Salz und Pfeffer",
+  "Nudeln nach Packungsanleitung kochen.|Pute in Würfeln im Öl anbraten, bis sie durch ist. Zwiebel und Knoblauch zugeben.|Tomaten in Stücken 3 Minuten mitschmoren, Mozzarella zerzupfen und unterheben, bis er schmilzt.|Mit Basilikum, Salz und Pfeffer würzen und auf den Nudeln servieren.")
+r("Putenspieße mit Paprika, Joghurt-Dip und Reis", "M", 35, "", "pute:160;pap:2;zwie:1;jogGr:60;reis:50;oel:1;knob:1;~Salz und Pfeffer",
+  "Ofen auf 220 °C vorheizen.|Pute, Paprika und Zwiebel in große Stücke schneiden, mit Öl, Salz und Pfeffer mischen und abwechselnd auf Spieße stecken.|20 Minuten backen, zwischendurch wenden, bis die Pute im Kern durch ist.|Den Reis nach Packungsanleitung kochen. Joghurt mit Knoblauch, Salz und Pfeffer verrühren und dazu servieren.")
 r("Putenhack-Chili mit Bohnen und Reis", "M", 35, "pg", "phack:120;bohne:100;stueck:200;pap:1;zwie:1;tmark:1;reis:40;paprikap:1;kreuz:1;oel:1;~Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Zwiebel und Paprika klein schneiden und im Öl anbraten. Putenhack zugeben und krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Tomatenmark, Paprikapulver und Kreuzkümmel kurz mitrösten, dann Tomaten, Bohnen und 100 ml Wasser zugeben.|15 Minuten köcheln und mit Salz und Pfeffer abschmecken.",
   "Schmeckt am zweiten Tag noch besser. Gekühlt 2 Tage haltbar, vor dem Essen vollständig erhitzen.")
@@ -625,8 +619,8 @@ r("Puten-Salat-Wrap mit Honig-Senf-Dressing", "M", 15, "ka", "pute:120;wrap:1;ei
   "Joghurt mit Senf, Honig, Salz und Pfeffer verrühren.|Die Pute in einer Pfanne ohne Fett braten, bis sie durch ist, oder fertig gegarte Pute verwenden. In Streifen schneiden.|Salat, Tomate und Gurke auf dem Wrap verteilen und das Dressing daraufgeben.|Pute darauflegen, einrollen und halbieren.")
 r("Paprika-Putenbrust mit Tomatenreis", "M", 30, "", "pute:160;reis:60;tmark:1;tom:2;pap:1;zwie:0.5;paprikap:1;oel:1;~Salz und Pfeffer",
   "Reis mit Tomatenmark und 150 ml Wasser nach Packungsanleitung kochen.|Pute mit Paprikapulver, Salz und Pfeffer würzen und im Öl von jeder Seite 5 bis 6 Minuten braten, bis sie durch ist.|Paprika, Zwiebel und Tomaten würfeln und die letzten 3 Minuten mitbraten.|Pute in Scheiben schneiden und mit dem Reis servieren.")
-r("Putenstreifen in Honig-Soja-Soße mit Couscous und Gurke", "M", 20, "", "pute:150;soja:1;honig:1;couscous:60;gurke:150;pap:1;oel:1;~Pfeffer",
-  "Couscous mit heißem Wasser übergießen und 5 Minuten quellen lassen.|Pute in Streifen im Öl braten, bis sie durch ist, Paprika in Streifen 3 Minuten mitbraten.|Sojasauce, Honig und 3 EL Wasser zugeben und einkochen, bis die Soße glänzt.|Mit Couscous und Gurkenscheiben servieren.")
+r("Putenstreifen in Honig-Senf-Soße mit Reis und Gurke", "M", 20, "", "pute:150;senf:1;honig:1;reis:60;gurke:150;pap:1;oel:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Pute in Streifen im Öl braten, bis sie durch ist, Paprika in Streifen 3 Minuten mitbraten.|Senf, Honig und 3 EL Wasser zugeben und einkochen, bis die Soße glänzt.|Mit Reis und Gurkenscheiben servieren.")
 r("Puten-Bolognese mit Karotte und Nudeln", "M", 35, "pg", "phack:130;nudel:70;stueck:200;zwie:1;karo:1;tmark:1;knob:1;oel:1;~Oregano, Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Zwiebel, Karotte und Knoblauch fein würfeln und im Öl 4 Minuten anbraten.|Putenhack zugeben und krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Tomatenmark kurz mitrösten.|Stückige Tomaten und Oregano zugeben und 15 Minuten köcheln, bis die Karotte weich ist. Mit den Nudeln mischen.",
   "Die Karotte wird in der Soße so weich, dass sie kaum auffällt.")
@@ -638,8 +632,8 @@ r("Rinderhack-Gemüse-Pfanne mit Reis", "M", 25, "", "rhack:120;pap:2;zwie:1;stu
   "Reis nach Packungsanleitung kochen.|Hack im Öl krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Paprika und Zwiebel in Stücken zugeben und 5 Minuten braten, dann Tomatenmark, Paprikapulver und stückige Tomaten zugeben.|5 Minuten köcheln und mit Salz und Pfeffer abschmecken. Zum Reis servieren.")
 r("Lasagne-Pfanne mit Hack, Tomate und Mozzarella", "M", 30, "", "rhack:100;nudel:60;stueck:250;zwie:1;moz:50;knob:1;oel:0.5;~Oregano, Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Zwiebel und Knoblauch im Öl andünsten, Hack zugeben und krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Stückige Tomaten und Oregano zugeben und 10 Minuten köcheln.|Nudeln unterheben, Mozzarella zerzupfen und obenauf legen, Deckel auflegen, bis der Käse geschmolzen ist.")
-r("Orientalische Hackbällchen mit Joghurt-Dip und Couscous", "M", 35, "", "rhack:130;hafer:15;zwie:0.5;paprikap:1;kreuz:1;couscous:50;gurke:150;tom:1;jogGr:50;oel:1;~Salz und Pfeffer",
-  "Hack mit Haferflocken, fein gehackter Zwiebel, Paprikapulver, Kreuzkümmel, Salz und Pfeffer verkneten und zu kleinen Bällchen formen.|Im Öl rundum 8 bis 10 Minuten braten, bis sie innen nicht mehr rosa sind.|Couscous mit heißem Wasser quellen lassen. Gurke und Tomate würfeln.|Joghurt mit Salz und Pfeffer verrühren und alles zusammen servieren.")
+r("Orientalische Hackbällchen mit Joghurt-Dip und Reis", "M", 35, "", "rhack:130;hafer:15;zwie:0.5;paprikap:1;kreuz:1;reis:50;gurke:150;tom:1;jogGr:50;oel:1;~Salz und Pfeffer",
+  "Hack mit Haferflocken, fein gehackter Zwiebel, Paprikapulver, Kreuzkümmel, Salz und Pfeffer verkneten und zu kleinen Bällchen formen.|Im Öl rundum 8 bis 10 Minuten braten, bis sie innen nicht mehr rosa sind.|Den Reis nach Packungsanleitung kochen. Gurke und Tomate würfeln.|Joghurt mit Salz und Pfeffer verrühren und alles zusammen servieren.")
 r("Hack-Bohnen-Reis-Pfanne mit Tomate", "M", 25, "p", "rhack:100;bohne:80;reis:50;tom:2;zwie:1;pap:1;oel:0.5;paprikap:1;~Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Hack im Öl krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Zwiebel und Paprika in Stücken zugeben und 4 Minuten braten.|Bohnen, Tomatenstücke und Paprikapulver zugeben und 5 Minuten schmoren.|Mit dem Reis mischen und abschmecken.")
 r("Sloppy Joe mit Hack und Salat", "M", 25, "", "rhack:120;broetchen:1;stueck:150;zwie:1;tmark:1;senf:1;eisb:50;sgurke:1;oel:0.5;~Salz und Pfeffer",
@@ -655,22 +649,22 @@ r("Hack-Pizza auf Wrap", "M", 20, "a", "wrap:1;rhack:80;tmark:1;moz:50;tom:1;pap
   "Ofen auf 220 °C vorheizen. Hack im Öl krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Wrap mit Tomatenmark bestreichen und mit Hack, Tomatenscheiben, Paprika, Zwiebel und Mozzarella belegen.|8 bis 10 Minuten backen, bis der Rand knusprig und der Käse geschmolzen ist.|Mit Oregano bestreuen.")
 r("Spaghetti mit Hackbällchen und Tomatensoße", "M", 35, "", "rhack:120;nudel:80;stueck:200;zwie:1;knob:1;hafer:10;oel:0.5;~Oregano, Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Hack mit Haferflocken, Salz und Pfeffer verkneten und zu kleinen Bällchen formen.|Bällchen im Öl rundum anbraten, Zwiebel und Knoblauch zugeben, dann stückige Tomaten und Oregano.|10 Minuten köcheln, bis die Bällchen innen nicht mehr rosa sind, und zu den Nudeln servieren.")
-r("Gefüllte Paprika mit Hack, Couscous und Mozzarella", "M", 40, "", "pap:2;rhack:100;couscous:40;moz:40;tmark:1;zwie:0.5;stueck:100;~Oregano, Salz und Pfeffer",
-  "Ofen auf 200 °C vorheizen. Paprika halbieren und entkernen.|Hack mit gehackter Zwiebel anbraten, bis nichts Rosa mehr zu sehen ist. Couscous mit heißem Wasser quellen lassen und untermischen. Tomatenmark und Gewürze zugeben.|Paprikahälften füllen, in eine Form setzen, stückige Tomaten daneben gießen und mit Mozzarella belegen.|25 Minuten backen, bis die Paprika weich und der Käse goldbraun ist.")
+r("Gefüllte Paprika mit Hack, Reis und Mozzarella", "M", 40, "", "pap:2;rhack:100;reis:40;moz:40;tmark:1;zwie:0.5;stueck:100;~Oregano, Salz und Pfeffer",
+  "Ofen auf 200 °C vorheizen. Paprika halbieren und entkernen.|Hack mit gehackter Zwiebel anbraten, bis nichts Rosa mehr zu sehen ist. Den Reis nach Packungsanleitung kochen und untermischen. Tomatenmark und Gewürze zugeben.|Paprikahälften füllen, in eine Form setzen, stückige Tomaten daneben gießen und mit Mozzarella belegen.|25 Minuten backen, bis die Paprika weich und der Käse goldbraun ist.")
 r("Hack-Taco-Salat mit Bohnen und Joghurt-Dressing", "M", 20, "a", "rhack:120;eisb:120;tom:2;bohne:60;gouda:20;jogGr:30;paprikap:1;kreuz:1;oel:0.5;~Salz und Pfeffer",
   "Hack im Öl krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Paprikapulver, Kreuzkümmel, Salz und Pfeffer zugeben, Bohnen kurz miterhitzen.|Salat in Streifen schneiden und Tomaten würfeln.|Salat, Tomaten und warmen Hack in einer Schüssel mischen.|Joghurt mit etwas Wasser, Salz und Pfeffer verrühren, darübergeben und Gouda darüberstreuen.")
 r("Orientalische Hackpfanne mit Kichererbsen und Joghurt", "M", 30, "", "rhack:100;kiche:100;pap:1;zwie:1;stueck:100;jogGr:50;kreuz:1;paprikap:1;oel:1;~Salz und Pfeffer",
   "Hack im Öl krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Zwiebel und Paprika in Stücken zugeben und 4 Minuten braten.|Kreuzkümmel und Paprikapulver kurz mitrösten, Kichererbsen und stückige Tomaten zugeben.|10 Minuten schmoren und mit Salz und Pfeffer abschmecken.|Mit einem Klecks Joghurt servieren.")
-r("Asiatische Hackpfanne mit Paprika und Reis", "M", 25, "", "ghack:90;pap:2;zwie:1;soja:1;knob:1;reis:50;oel:0.5;~Pfeffer",
-  "Reis nach Packungsanleitung kochen.|Hack im Öl krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Das ausgetretene Fett abgießen.|Paprika, Zwiebel und Knoblauch in Stücken zugeben und 5 Minuten braten.|Sojasauce und 3 EL Wasser zugeben, kurz einkochen und zum Reis servieren.")
+r("Hackpfanne mit Paprika, Tomaten und Reis", "M", 25, "", "ghack:90;pap:2;zwie:1;knob:1;stueck:100;reis:50;oel:0.5;~Paprikapulver, Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen.|Hack im Öl krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Das ausgetretene Fett abgießen.|Paprika, Zwiebel und Knoblauch in Stücken zugeben und 5 Minuten braten.|Stückige Tomaten und Paprikapulver zugeben, 5 Minuten einkochen, abschmecken und zum Reis servieren.")
 
 # ======================= NEU (Runde 4): Mini-Steaks, Schnitzel und Lyoner =======================
 r("Mini-Steaks mit Paprika-Zwiebel-Gemüse und Reis", "M", 25, "", "haehnst:160;pap:2;zwie:1;reis:60;oel:1;paprikap:1;~Salz und Pfeffer",
   "Reis nach Packungsanleitung kochen.|Die Mini-Steaks nach Packungsanleitung braten, bis sie durch sind.|Paprika und Zwiebel in Streifen im Öl mit Paprikapulver 6 Minuten braten.|Mit Salz und Pfeffer würzen und alles zusammen servieren.")
-r("Mini-Steak-Bowl mit Couscous, Gurke und Tomate", "M", 20, "a", "haehnst:140;couscous:50;gurke:150;tom:2;jogGr:40;zitrone:1;oel:0.5;~Salz und Pfeffer",
-  "Couscous mit heißem Wasser übergießen und 5 Minuten quellen lassen.|Die Mini-Steaks nach Packungsanleitung braten, bis sie durch sind, und in Streifen schneiden.|Gurke und Tomaten würfeln und mit Couscous, Zitronensaft, Salz und Pfeffer mischen.|Fleisch darauflegen und Joghurt daraufgeben.")
-r("Mini-Steaks mit Tomaten-Mozzarella-Gratin", "M", 30, "", "haehnst:150;tom:3;moz:50;couscous:40;knob:1;oel:0.5;~Basilikum, Salz und Pfeffer",
-  "Ofen auf 200 °C vorheizen. Couscous mit heißem Wasser quellen lassen.|Mini-Steaks nach Packungsanleitung kurz anbraten.|Tomatenscheiben mit Knoblauch und Salz in eine Form legen, Steaks daraufsetzen und mit Mozzarella belegen.|10 bis 12 Minuten backen, bis der Käse geschmolzen und das Fleisch durch ist. Mit Basilikum und Couscous servieren.")
+r("Mini-Steak-Bowl mit Reis, Gurke und Tomate", "M", 20, "a", "haehnst:140;reis:50;gurke:150;tom:2;jogGr:40;zitrone:1;oel:0.5;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen und abkühlen lassen.|Die Mini-Steaks nach Packungsanleitung braten, bis sie durch sind, und in Streifen schneiden.|Gurke und Tomaten würfeln und mit dem Reis, Zitronensaft, Salz und Pfeffer mischen.|Fleisch darauflegen und Joghurt daraufgeben.")
+r("Mini-Steaks mit Tomaten-Mozzarella-Gratin", "M", 30, "", "haehnst:150;tom:3;moz:50;reis:40;knob:1;oel:0.5;~Basilikum, Salz und Pfeffer",
+  "Ofen auf 200 °C vorheizen. Den Reis nach Packungsanleitung kochen.|Mini-Steaks nach Packungsanleitung kurz anbraten.|Tomatenscheiben mit Knoblauch und Salz in eine Form legen, Steaks daraufsetzen und mit Mozzarella belegen.|10 bis 12 Minuten backen, bis der Käse geschmolzen und das Fleisch durch ist. Mit Basilikum und Reis servieren.")
 r("Schnitzel in Paprika-Quark-Soße mit Nudeln", "M", 25, "", "schnitzel:150;pap:2;zwie:1;speisequark:50;nudel:60;paprikap:1;oel:1;~Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Schnitzel in Streifen im Öl braten, bis sie durch sind. Paprika und Zwiebel in Streifen zugeben und 5 Minuten braten.|Pfanne vom Herd nehmen, Quark und Paprikapulver unterrühren und abschmecken.|Mit den Nudeln mischen.")
 r("Schnitzel Caprese mit Rucola und Nudeln", "M", 30, "", "schnitzel:150;tom:2;moz:50;ruc:30;nudel:60;oel:1;~Basilikum, Salz und Pfeffer",
@@ -738,8 +732,8 @@ r("Kichererbsen-Hack-Suppe mit Tomate", "M", 30, "pg", "rhack:80;kiche:100;stuec
   "Hack mit der Zwiebel im Topf krümelig anbraten, bis nichts Rosa mehr zu sehen ist.|Kreuzkümmel und Paprikapulver kurz mitrösten.|Kichererbsen, stückige Tomaten und Brühe zugeben und 15 Minuten köcheln.|Abschmecken.")
 
 # ======================= NEU (Runde 4): Salate =======================
-r("Couscous-Salat mit Kichererbsen, Gurke und Mozzarella", "M", 20, "kap", "couscous:50;kiche:100;gurke:150;tom:2;moz:50;zitrone:1;oel:1;~Salz und Pfeffer",
-  "Couscous mit heißem Wasser übergießen, 5 Minuten quellen lassen und abkühlen lassen.|Gurke und Tomaten würfeln, Mozzarella würfeln, Kichererbsen abtropfen.|Alles mit Zitronensaft, Öl, Salz und Pfeffer vermengen.")
+r("Reissalat mit Kichererbsen, Gurke und Mozzarella", "M", 20, "kap", "reis:50;kiche:120;gurke:150;tom:2;moz:60;zitrone:1;oel:1;~Salz und Pfeffer",
+  "Reis nach Packungsanleitung kochen und abkühlen lassen.|Gurke und Tomaten würfeln, Mozzarella würfeln, Kichererbsen abtropfen.|Alles mit Zitronensaft, Öl, Salz und Pfeffer vermengen.")
 r("Eisbergsalat mit Mini-Steaks und Joghurt-Dressing", "M", 20, "a", "haehnst:140;eisb:150;tom:2;gurke:100;jogGr:40;brot:1;zitrone:1;~Salz und Pfeffer",
   "Die Mini-Steaks nach Packungsanleitung braten, bis sie durch sind, und in Streifen schneiden.|Salat in Streifen schneiden, Tomaten und Gurke würfeln.|Joghurt mit Zitronensaft, Salz und Pfeffer verrühren.|Alles anrichten, Fleisch und Dressing daraufgeben und mit dem Brot essen.")
 r("Tomaten-Mozzarella-Salat mit Putenstreifen und Gurke", "M", 20, "a", "pute:130;tom:3;moz:50;gurke:100;oel:1;~Basilikum, Salz und Pfeffer",
@@ -845,14 +839,14 @@ r("Mini-Steak-Mini-Wrap", "S", 10, "a", "haehnst:80;wrap:1;eisb:30;jogGr:30;~Sal
 # ======================= NEU (Runde 4): noch ein paar Hauptgerichte =======================
 r("Mini-Steak-Nudeln mit Tomate, Rucola und Parmesan", "M", 25, "", "haehnst:140;nudel:70;tom:3;ruc:30;parm:10;knob:1;oel:0.5;~Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Mini-Steaks nach Packungsanleitung braten, bis sie durch sind, und in Streifen schneiden.|Knoblauch und Tomaten in Stücken im Öl 3 Minuten schmoren.|Alles mit den Nudeln mischen, Rucola und Parmesan daraufgeben.")
-r("Putenhack-Gemüse-Auflauf mit Couscous", "M", 40, "p", "phack:130;pap:2;tom:2;zwie:1;couscous:40;moz:40;oel:0.5;~Oregano, Salz und Pfeffer",
-  "Ofen auf 200 °C vorheizen. Putenhack im Öl krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Couscous mit heißem Wasser quellen lassen.|Paprika, Tomaten und Zwiebel in Stücke schneiden und mit Couscous und Hack in eine Form geben, würzen.|Mit Mozzarella belegen und 20 bis 25 Minuten backen, bis der Käse goldbraun ist.")
+r("Putenhack-Gemüse-Auflauf mit Nudeln", "M", 40, "p", "phack:130;pap:2;tom:2;zwie:1;nudel:40;moz:40;oel:0.5;~Oregano, Salz und Pfeffer",
+  "Ofen auf 200 °C vorheizen. Putenhack im Öl krümelig anbraten, bis nichts Rosa mehr zu sehen ist. Die Nudeln 3 Minuten kürzer als auf der Packung angegeben kochen.|Paprika, Tomaten und Zwiebel in Stücke schneiden und mit Nudeln und Hack in eine Form geben, würzen.|Mit Mozzarella belegen und 20 bis 25 Minuten backen, bis der Käse goldbraun ist.")
 r("Lyoner-Nudelpfanne mit Tomate und Ei", "M", 25, "g", "lyoner:60;nudel:60;stueck:200;pap:1;zwie:1;ei:1;parm:10;oel:0.5;~Salz und Pfeffer",
   "Nudeln nach Packungsanleitung kochen.|Lyoner in Würfeln mit Paprika und Zwiebel im Öl 5 Minuten braten.|Stückige Tomaten zugeben und 5 Minuten köcheln. Das Ei verquirlen, unterrühren und stocken lassen, bis es ganz fest ist.|Nudeln untermischen und mit Parmesan bestreuen.")
 r("Hähnchen-Blech mit Paprika, Tomate und Zwiebel", "M", 35, "", "haehn:160;pap:2;zwie:1;tom:2;brot:1;oel:1;paprikap:1;~Salz und Pfeffer",
   "Ofen auf 220 °C vorheizen.|Hähnchen in Stücke schneiden, Paprika, Tomaten und Zwiebel in Stücke schneiden. Alles mit Öl, Paprikapulver, Salz und Pfeffer mischen und auf ein Blech geben.|20 bis 25 Minuten backen, bis das Hähnchen im Kern durch und nicht mehr rosa ist.|Mit dem Brot servieren.")
-r("Schnitzel-Tomaten-Auflauf mit Couscous und Mozzarella", "M", 40, "", "schnitzel:150;tom:3;pap:1;couscous:40;moz:40;zwie:0.5;knob:1;~Oregano, Salz und Pfeffer",
-  "Ofen auf 200 °C vorheizen. Couscous mit heißem Wasser übergießen und 5 Minuten quellen lassen.|Schnitzel in Streifen schneiden, Tomaten, Paprika und Zwiebel in Stücke. Alles mit Couscous, Knoblauch und Gewürzen in eine Form geben.|Mit Mozzarella belegen und 25 Minuten backen, bis das Fleisch durch und der Käse goldbraun ist.")
+r("Schnitzel-Tomaten-Auflauf mit Nudeln und Mozzarella", "M", 40, "", "schnitzel:150;tom:3;pap:1;nudel:40;moz:40;zwie:0.5;knob:1;~Oregano, Salz und Pfeffer",
+  "Ofen auf 200 °C vorheizen. Die Nudeln 3 Minuten kürzer als auf der Packung angegeben kochen.|Schnitzel in Streifen schneiden, Tomaten, Paprika und Zwiebel in Stücke. Alles mit den Nudeln, Knoblauch und Gewürzen in eine Form geben.|Mit Mozzarella belegen und 25 Minuten backen, bis das Fleisch durch und der Käse goldbraun ist.")
 
 # ======================= Erzeugte Rezepte (700) =======================
 import gen_core, gen_main
@@ -902,8 +896,8 @@ for rec in R:
     tags = [TAG[c] for c in rec["tags"]]
     contains = [c for c in SHOWN_CONTAINS if c in flags]
     note = None
-    if "Meal-Prep" in tags and set(keys) & {"reis", "nudel", "couscous"}:
-        note = "Zum Vorkochen: Reis, Nudeln und Couscous nach dem Kochen schnell abkühlen, im Kühlschrank aufbewahren, am besten am nächsten Tag essen (spätestens nach 2 Tagen) und vollständig erhitzen."
+    if "Meal-Prep" in tags and set(keys) & {"reis", "nudel"}:
+        note = "Zum Vorkochen: Reis und Nudeln nach dem Kochen schnell abkühlen, im Kühlschrank aufbewahren, am besten am nächsten Tag essen (spätestens nach 2 Tagen) und vollständig erhitzen."
     out.append(dict(id=slug(rec["title"]), title=rec["title"], meal=rec["meal"], time=rec["time"],
                     kcal=int(round(kcal / 5.0) * 5), protein=int(round(prot)), cost=round(cost, 2), veg=int(round(veg / 10.0) * 10),
                     diet=diet, tags=tags, contains=contains, ing=items, steps=rec["steps"],
@@ -920,7 +914,7 @@ problems = []
 ids = [o["id"] for o in out]
 assert len(set(ids)) == len(ids), ("doppelte IDs", [i for i, c in collections.Counter(ids).items() if c > 1][:10])
 assert not TARGET or len(out) == TARGET, (len(out), TARGET)
-BANNED = ["gyros", "fisch", "thunfisch", "lachs", "tofu", "kartoffel", "hüttenkäse", "pilz", "brokkoli", "zucchini", "radieschen"]
+BANNED = ["gyros", "fisch", "thunfisch", "lachs", "tofu", "kartoffel", "hüttenkäse", "pilz", "brokkoli", "zucchini", "radieschen", "couscous", "soja"]
 for o in out:
     text = (o["title"] + " " + " ".join(i[2] for i in o["ing"]) + " " + " ".join(o["steps"])).lower()
     for b in BANNED:

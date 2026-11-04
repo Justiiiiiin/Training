@@ -49,7 +49,7 @@ def salate():
                      "Salat, Gemüse und Hülsenfrüchte in einer Schüssel mischen, das warme Hack darauf verteilen, den Gouda reiben und darüberstreuen. Mit dem Dressing beträufeln."])
     # (3) Kichererbsen-Salat
     for mi, (m, g) in enumerate([("ei", 2), ("moz", 80), ("schink", 70), ("haehn", 100), ("paufs", 80)]):
-        for di in (0, 1, 7, 6):
+        for di in (0, 1, 7, 6, 9, 10):
             if (mi + di) % 2:
                 continue
             dn, dd, ds = D[di]
@@ -60,7 +60,7 @@ def salate():
                 ["Kichererbsen abtropfen, Gurke und Tomaten würfeln, die Zwiebel in feine Ringe schneiden.", cs, ds, "Alles in einer Schüssel mischen und 10 Minuten durchziehen lassen."])
     # (4) Bohnen-Salat
     for mi, (m, g) in enumerate([("schink", 70), ("haehn", 100), ("ei", 2), ("gouda", 40), ("paufs", 80)]):
-        for di in (3, 1, 6):
+        for di in (3, 1, 6, 9, 10):
             if (mi + di) % 2:
                 continue
             dn, dd, ds = D[di]
@@ -68,17 +68,17 @@ def salate():
             i = join(ci, ing(bohne=150, pap=1, zwie=0.5, tom=1, gurke=100), ing(**dd), ing(T="Salz und Pfeffer"))
             add(f"Bohnensalat mit {WORD[m]}, Paprika und {dn}-Dressing", "M", 20, "ka" if m not in ("haehn", "ei") else "a", i,
                 ["Bohnen abtropfen, Paprika, Tomate und Gurke würfeln, die Zwiebel in feine Ringe schneiden.", cs, ds, "Alles vermischen und 10 Minuten durchziehen lassen."])
-    # (5) Couscous-Salat
+    # (5) Reissalat
     for mi, (m, g) in enumerate([("haehn", 110), ("pute", 110), ("paufs", 90), ("moz", 80), ("ei", 2)]):
-        for di in (0, 5, 3, 7):
+        for di in (0, 5, 3, 7, 9, 10):
             if (mi + di) % 2:
                 continue
             dn, dd, ds = D[di]
             ci, cs = cooked_protein(m, g)
             vd, vs = V[(mi + di) % len(V)]
-            i = join(ci, ing(couscous=60), ing(**vd), ing(**dd), ing(T="Salz und Pfeffer"))
-            add(f"Couscous-Salat mit {WORD[m]} und {dn}-Dressing", "M", 20, "pa", i,
-                [CARB["couscous"][3], vs, cs, ds, "Couscous, Gemüse und Fleisch mischen, mit dem Dressing beträufeln und kurz durchziehen lassen."])
+            i = join(ci, ing(reis=50), ing(**vd), ing(**dd), ing(T="Salz und Pfeffer"))
+            add(f"Reissalat mit {WORD[m]} und {dn}-Dressing", "M", 20, "pa", i,
+                [CARB["reis"][3] + " Abkühlen lassen.", vs, cs, ds, "Reis, Gemüse und Fleisch mischen, mit dem Dressing beträufeln und kurz durchziehen lassen."])
     # (6) Rucola-Mozzarella
     for mi, (m, g) in enumerate([("pute", 100), ("schink", 70), ("ei", 2), ("haehn", 100)]):
         ci, cs = cooked_protein(m, g)
@@ -129,10 +129,10 @@ def eier():
             if (mi + vi) % 2:
                 continue
             ci_, cs = cooked_protein(m, g)
-            i = join(ing(reis=70, ei=2, soja=1, oel=1), ci_, ing(**vd), ing(T="Pfeffer"))
+            i = join(ing(reis=70, ei=2, knob=1, oel=1), ci_, ing(**vd), ing(T="Paprikapulver, Salz und Pfeffer"))
             add(f"Gebratener Reis mit {nl(WORD[m], 'Ei', vn)}", "M", 25, "pa", i,
                 [CARB["reis"][3] + " Am besten schon am Vortag kochen und kalt stellen.", vs, cs.replace(" Kurz abkühlen lassen.", ""),
-                 "Gemüse zum Fleisch geben und 3 Minuten braten, den Reis zugeben und 4 Minuten mitbraten. Alles an den Rand schieben, die Eier in die Mitte geben und unter Rühren fest werden lassen. Mit Sojasauce und Pfeffer würzen."])
+                 "Gemüse und den fein gehackten Knoblauch zum Fleisch geben und 3 Minuten braten, den Reis zugeben und 4 Minuten mitbraten. Alles an den Rand schieben, die Eier in die Mitte geben und unter Rühren fest werden lassen. Mit Paprikapulver, Salz und Pfeffer würzen."])
 
 
 def huelsen():
