@@ -917,3 +917,11 @@ html[data-big] #stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   body[data-group="training"] .pagehead { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
   body[data-group="training"] .tabs { margin-top: 0; }
 }
+
+/* Rezept-Dialog: Aktionen als ruhiges Raster (2 x 2, darunter leiser Link und Schließen) */
+.dlgacts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+.dlgacts .btn { width: 100%; padding: 0 12px; text-align: center; line-height: 1.2; }
+.dlgacts .wide { grid-column: 1 / -1; justify-self: center; }
+.dlgacts .btn.wide { justify-self: stretch; }
+.dlgacts .linkbtn { color: var(--muted); font-weight: 600; font-size: 0.9375rem; }
+@media (max-width: 359px) { .dlgacts { grid-template-columns: 1fr; } }

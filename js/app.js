@@ -506,9 +506,10 @@ function drawRecipe() {
     "<h4>Zubereitung</h4><ol>" + r.steps.map((s) => "<li>" + s + "</li>").join("") + "</ol>" +
     (r.ing.some((i) => i[4] === "erdb") ? '<p class="note"><b>Tiefkühl-Erdbeeren:</b> Erhitze sie vor dem Essen mindestens 2 Minuten auf über 90 °C und lass sie abkühlen. Das empfiehlt das BfR wegen möglicher Viren. Frische Erdbeeren gründlich waschen.</p>' : "") + (r.tip ? '<p class="note">' + r.tip + "</p>" : "") + (r.note ? '<p class="note">' + r.note + "</p>" : "") +
     '<p class="small muted">Nährwerte sind gerundete Richtwerte aus üblichen Tabellen. Marken weichen ab.</p>' +
-    '<div class="row"><button class="btn primary" data-cartadd="' + r.id + '">Zur Einkaufsliste</button><button class="btn" data-eatrec="' + r.id + '">Heute gegessen</button></div>' +
-    '<div class="row"><button class="btn" type="button" data-cook="' + r.id + '">Kochmodus</button><button class="btn" type="button" data-fav="' + r.id + '" aria-pressed="' + FAV.includes(r.id) + '">' + ic("heart") + "<span>Lieblingsrezept</span></button>" + '<button class="btn" type="button" data-hide="' + r.id + '">Nicht mehr vorschlagen</button></div>' +
-    '<div class="row"><button class="btn lg" type="button" data-close>Schließen</button></div></div>';
+    '<div class="dlgacts"><button class="btn primary" data-cartadd="' + r.id + '">Zur Einkaufsliste</button><button class="btn" data-eatrec="' + r.id + '">Heute gegessen</button>' +
+    '<button class="btn" type="button" data-cook="' + r.id + '">Kochmodus</button><button class="btn" type="button" data-fav="' + r.id + '" aria-pressed="' + FAV.includes(r.id) + '">' + ic("heart") + "<span>Lieblingsrezept</span></button>" +
+    '<button class="linkbtn wide" type="button" data-hide="' + r.id + '">Nicht mehr vorschlagen</button>' +
+    '<button class="btn lg wide" type="button" data-close>Schließen</button></div></div>';
 }
 function readRecipe(r) { say(r.title); }
 /* Kochmodus: Zutaten abhaken, dann Schritt für Schritt, mit Timer */
