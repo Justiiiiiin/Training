@@ -941,6 +941,7 @@ function syncCoach() {
 function showTab(name, quiet) {
   const g = GROUPS.find((x) => x.tabs.includes(name)); if (!g) return;
   const prevG = (GROUPS.find((x) => x.tabs.includes(CUR)) || {}).id;
+  const prevName = CUR;
   CUR = name; LAST[g.id] = name;
   if (name === "fortschritt" && typeof renderProgress === "function" && !quiet) renderProgress();
   if (name === "uebungen" && typeof renderEx === "function" && !quiet) renderEx();
@@ -959,7 +960,7 @@ function showTab(name, quiet) {
   $("#pagesub").textContent = name === "heute" ? WD[now.getDay()] + ", " + now.getDate() + ". " + MON[now.getMonth()] : TABSUB[name];
   syncCoach(); moveBoth();
   if (name === "rad") requestAnimationFrame(drawWheel);
-  if (name === "heute") renderToday();
+  if (name === "heute") { if (!quiet && prevName !== "heute") RINGANIM = true; renderToday(); }
   if (!quiet) {
     const p = $("#panel-" + name);
     if (p && p.animate && !reduceMotion()) p.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" });
@@ -1461,6 +1462,18 @@ function weekStreak() {
 const dateDE = (iso) => iso.slice(8) + "." + iso.slice(5, 7) + ".";
 
 /* Ringe */
+/* Die Ringe füllen sich beim Öffnen von Heute einmal sanft, bei jedem weiteren Neuzeichnen (Eintrag, Wasser) bleiben sie ruhig. */
+let RINGANIM = true;
+function animRings() {
+  if (!RINGANIM) return;
+  RINGANIM = false;
+  if (reduceMotion()) return;
+  document.querySelectorAll("#panel-heute .rgb").forEach((c, i) => {
+    const to = parseFloat(c.style.strokeDashoffset), from = parseFloat(c.style.strokeDasharray);
+    if (c.animate && from > to) c.animate([{ strokeDashoffset: from }, { strokeDashoffset: to }], { duration: 800, delay: i * 120, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)", fill: "backwards" });
+  });
+  document.querySelectorAll("#panel-heute .td.on").forEach((d, i) => { if (d.animate) d.animate([{ transform: "scale(0.3)", opacity: 0 }, { transform: "scale(1)", opacity: 1 }], { duration: 340, delay: 450 + i * 90, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)", fill: "backwards" }); });
+}
 /* Heute: ein Kreis. Außen Eiweiß, innen dünner Kalorien, in der Mitte die Punkte fürs Training der Woche. Die Zahlen stehen daneben. */
 function trioHTML(pv, pg, kv, kg, wc, n) {
   const arc = (r, f, color, cls) => {
@@ -1568,7 +1581,7 @@ function planAll() {
 function shiftHintHTML() {
   const t = todayISO(), a = shiftOf(t), b = shiftOf(shiftDay(t, 1)), N = { n: "Frühschicht", l: "Spätschicht", f: "frei" };
   const H = { n: "Training eher abends.", l: "Training vormittags, dann in Ruhe essen.", f: "Zeit fürs Kochen und Training." };
-  return '<p class="shifthint"><span class="tag g">Heute ' + N[a] + '</span><span class="tag">Morgen ' + N[b] + '</span><span class="shtxt">' + H[a] + "</span></p>";
+  return '<p class="shifthint"><button type="button" class="tag g shpill" data-shiftedit="1" aria-label="Schichten eintragen. Heute ' + N[a] + '">Heute ' + N[a] + '</button><button type="button" class="tag shpill" data-shiftedit="1" aria-label="Schichten eintragen. Morgen ' + N[b] + '">Morgen ' + N[b] + '</button><span class="shtxt">' + H[a] + "</span></p>";
 }
 function shAfter() {
   const d = dayEns(), free = shiftOf(todayISO()) === "f", ids = makeDayPlan(free);
@@ -1878,6 +1891,7 @@ function renderToday() {
     planHTML(rest, day) + '<div class="row"><button class="btn sm" type="button" data-tab="fortschritt" data-histgo="1">Alle Tage ansehen</button></div></div>' +
     '<div class="grid2"><div class="card"><div class="rday-h"><h3>Wasser</h3><span class="rtot">' + nf(Math.round(day.water * 25) / 100) + " von " + nf(Math.round(GOALS.water * 25) / 100) + ' Litern</span></div><div class="glasses">' + glasses + '</div></div>' +
     '<div class="card"><h3>Serie</h3><div class="stats"><div class="stat"><span class="big">' + streak + '</span><span>Wochen in Folge mit mindestens 2 Einheiten</span></div><div class="stat"><span class="big">' + sessions.length + '</span><span>Einheiten insgesamt</span></div></div></div></div>';
+  animRings();
 }
 
 /* ======================= Selbst berechnen (Zutaten oder Gericht) ======================= */

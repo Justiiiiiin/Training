@@ -907,3 +907,13 @@ details.src[open] > summary::after { transform: rotate(225deg); }
 #stats .statact { min-height: 0; }
 @media (max-width: 359px) { #stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 html[data-big] #stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Die Schicht-Pillen auf Heute sind Knöpfe: ein Tipp öffnet "Schichten eintragen" */
+.shpill { border: 0; font: inherit; font-size: 0.875rem; font-weight: 550; cursor: pointer; min-height: 36px; padding: 0 14px; }
+.shpill:hover { filter: brightness(0.97); }
+
+/* Training am Handy: Die Trainingskarte oben ist die Überschrift, der Seitentitel bleibt nur für Screenreader */
+@media (max-width: 979px) {
+  body[data-group="training"] .pagehead { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  body[data-group="training"] .tabs { margin-top: 0; }
+}

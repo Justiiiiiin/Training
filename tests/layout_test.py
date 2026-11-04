@@ -65,6 +65,9 @@ with sync_playwright() as p:
 
     # 3 Schicht-Hinweis als Pillen
     ck("L3 zwei Pillen", pg.evaluate("document.querySelectorAll('.shifthint .tag').length") == 2)
+    pg.click(".shifthint .shpill >> nth=0"); pg.wait_for_timeout(400)
+    ck("L3 Tipp auf die Pille öffnet Schichten eintragen", pg.evaluate("document.getElementById('dlg-shift').open"))
+    pg.evaluate("closeDialog(document.getElementById('dlg-shift'))"); pg.wait_for_timeout(300)
     t3 = pg.inner_text(".shifthint").replace("\n", " ")
     ck("L3 Text kurz und enthält Heute", "Heute" in t3 and len(t3) < 90, t3)
 
@@ -134,6 +137,20 @@ with sync_playwright() as p:
     pg.click("#b-settings"); pg.wait_for_timeout(400)
     ck("L9 Zahnrad öffnet die Einstellungen", pg.evaluate("document.getElementById('dlg-settings').open"))
     pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
+
+    # Ringe füllen sich einmal beim Öffnen von Heute, danach bleiben sie ruhig
+    ringanim = "document.getAnimations().filter(a=>a.effect&&a.effect.target&&a.effect.target.classList&&a.effect.target.classList.contains('rgb')).length"
+    pg.evaluate("dayEns().items.push({t:'Test',p:40,k:600,c:2,m:'x'}); saveToday()")
+    pg.evaluate("showTab('uebungen')"); pg.wait_for_timeout(100); pg.evaluate("showTab('heute')")
+    ck("A1 Ringe laufen beim Öffnen von Heute", pg.evaluate(ringanim) == 2, pg.evaluate(ringanim))
+    pg.wait_for_timeout(1500)
+    pg.evaluate("renderToday()")
+    ck("A1 Neuzeichnen löst keine neue Animation aus", pg.evaluate(ringanim) == 0, pg.evaluate(ringanim))
+    pg.evaluate("dayEns().items.length=0; saveToday(); renderToday()")
+    cr = b.new_context(viewport={"width": 390, "height": 844}, reduced_motion="reduce")
+    pr = cr.new_page(); pr.goto(URL); ready(pr); pr.evaluate("dayEns().items.push({t:'Test',p:40,k:600,c:2,m:'x'}); saveToday(); showTab('uebungen'); showTab('heute')")
+    ck("A1 Bewegung reduziert: keine Ring-Animation", pr.evaluate(ringanim) == 0, pr.evaluate(ringanim))
+    cr.close()
 
     # v3.45: Glücksrad zuerst sichtbar, Trainingskarte im Ruhezustand schlank, Fortschritt neu geordnet
     pg.evaluate("showTab('rad')"); pg.wait_for_timeout(350)
