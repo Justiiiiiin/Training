@@ -275,7 +275,7 @@ window.FC = (function () {
   async function boot(runMain) {
     if (mode === "local") { mainStarted = true; runMain(); return; }
     var p = start();
-    var done = await Promise.race([p.then(function () { return true; }), delay(7000).then(function () { return false; })]);
+    var done = await Promise.race([p.then(function () { return true; }), delay(4000).then(function () { return false; })]);
     KEYS.forEach(function (k) { view[k] = raw(k); });
     mainStarted = true; runMain(); paint();
     p.then(function (ch) {

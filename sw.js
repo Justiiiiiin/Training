@@ -27,18 +27,23 @@ self.addEventListener("activate", (e) => {
   })());
 });
 
+/* Hängt das Netz (Empfang da, aber es kommt nichts durch), wartet nicht jede Datei einzeln 4,5 s: Nach einer Zeitüberschreitung gilt 45 s lang nur noch 1,2 s, sofern die Datei im Speicher liegt. */
+let slowUntil = 0;
 async function netFirst(req) {
   const c = await caches.open(CACHE);
+  const key = keyOf(req.url);
+  const wait = Date.now() < slowUntil && (await c.match(key)) ? 1200 : 4500;
   try {
     /* bewusst eine frische Anfrage über die Adresse: manche Browser vertragen sich schlecht mit dem Navigations-Request samt Zusatzoptionen */
     const r = await Promise.race([
       fetch(req.url, { cache: "no-cache", credentials: "same-origin" }),
-      new Promise((_, no) => setTimeout(() => no(new Error("timeout")), 4500))
+      new Promise((_, no) => setTimeout(() => no(new Error("timeout")), wait))
     ]);
-    if (r && r.ok) c.put(keyOf(req.url), r.clone());
+    if (r && r.ok) c.put(key, r.clone());
     return r;
   } catch (err) {
-    const hit = (await c.match(keyOf(req.url))) || (req.mode === "navigate" ? (await c.match("index.html")) || (await c.match("./")) : null);
+    if (err && err.message === "timeout") slowUntil = Date.now() + 45000;
+    const hit = (await c.match(key)) || (req.mode === "navigate" ? (await c.match("index.html")) || (await c.match("./")) : null);
     return hit || Response.error();
   }
 }
