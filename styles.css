@@ -200,6 +200,7 @@ button, input, select { -webkit-tap-highlight-color: transparent; touch-action: 
 .rsub { color: var(--muted); font-size: 0.875rem; }
 .rmeta { display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; }
 .big { font-family: var(--display); font-size: 2.125rem; font-weight: 600; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.big small.pre { margin: 0 4px 0 0; }
 .big small { font-family: var(--body); font-size: 0.875rem; color: var(--muted); font-weight: 550; letter-spacing: 0; margin-left: 4px; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { font-size: 0.8125rem; font-weight: 550; padding: 2px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
@@ -244,6 +245,7 @@ dialog::backdrop { background: rgba(8, 12, 14, 0.56); }
 .stepper { display: inline-flex; align-items: center; gap: 10px; }
 .stepper b { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; }
 .settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+.settings .span2 { grid-column: 1 / -1; }
 .field { display: flex; flex-direction: column; gap: 6px; font-size: 0.875rem; color: var(--muted); font-weight: 550; }
 .check { display: flex; align-items: center; gap: 10px; font-size: 0.9375rem; }
 .check input { width: 20px; height: 20px; accent-color: var(--accent); }
@@ -757,7 +759,11 @@ a.btn { text-decoration: none; }
 .estlist li:first-child { border-top: 0; }
 .stat.inl { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 10px 16px; }
 #estbox .row { margin: 6px 0; }
-#spendcard .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+#spendcard .stats, .shopcard .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.shopcard .stat { padding: 12px 14px; }
+.shopcard .stat .big { font-size: 1.75rem; }
+.shopcard .stat.inl { grid-column: 1 / -1; padding: 10px 14px; }
+.shopcard .stat.inl .big { display: inline; margin: 0; font-size: 1.25rem; }
 .hhseg { display: grid; gap: 4px; margin: 6px 0; }
 .hhseg .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 /* Große Schrift (Einstellungen > Textgröße ab 130 %): Bedienelemente dürfen umbrechen bzw. seitlich scrollen statt abgeschnitten zu werden */
