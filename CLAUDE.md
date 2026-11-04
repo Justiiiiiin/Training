@@ -35,7 +35,7 @@ Rezepte ändern: `tools/recipes/build.py` bearbeiten, dann `python3 tools/recipe
 
 ## Tests
 
-Alle Tests laufen mit Playwright (Chromium) gegen `index.html`, ohne Server, außer `pwa_test.py` (lokaler Server). Pfade kommen aus `tests/fcenv.py`. Mit `FC_URL` oder `FC_APP_DIR` lässt sich eine andere Version prüfen. `audit2.py` füttert alle Speicherschlüssel mit kaputten Werten und geht die Tabs durch (dauert länger). `ui_test.py` prüft die Oberfläche: Kontrast nach WCAG AA, Tap-Ziele ab 24 px und seitlichen Überlauf, hell und dunkel. `robust_test.py`, `merge_test.py` und `swcache_test.py` decken kaputte Daten, Sync-Konflikte und den Offline-Speicher ab.
+Alle Tests laufen mit Playwright (Chromium) gegen `index.html`, ohne Server, außer `pwa_test.py` (lokaler Server). Pfade kommen aus `tests/fcenv.py`. Mit `FC_URL` oder `FC_APP_DIR` lässt sich eine andere Version prüfen. `audit2.py` füttert alle Speicherschlüssel mit kaputten Werten und geht die Tabs durch (dauert länger). `ui_test.py` prüft die Oberfläche: Kontrast nach WCAG AA, Tap-Ziele ab 24 px und seitlichen Überlauf, hell und dunkel. `robust_test.py`, `merge_test.py` und `swcache_test.py` decken kaputte Daten, Sync-Konflikte und den Offline-Speicher ab. `train_layout_test.py` prüft die Trainingskarte auf dem Handy (Jetzt/Danach, Erledigt-Zeile, Symbol-Knöpfe, Fertig ohne Scrollen), `anim_geometry_test.py` die Körpergeometrie von Pike-Liegestütze und Rucksack-Rudern.
 `update_test.py` und `swupdate_test.py` (Update-Banner und Service Worker) fehlen hier, weil sie handgebaute Fixtures brauchen.
 Bekannte Eigenheit: `Overnight Oats (dein Rezept)` hat 845 kcal und wird von `build.py` absichtlich als Ausnahme gemeldet.
 
@@ -43,7 +43,9 @@ Bekannte Eigenheit: `Overnight Oats (dein Rezept)` hat 845 kcal und wird von `bu
 
 - Der Code läuft von oben nach unten, Datei für Datei. Top-level-`const` und `let` müssen vor ihrer ersten Benutzung stehen, auch indirekt über Funktionen, die beim Start laufen (`sanitizeState` läuft mitten in `app.js`). Funktionen aus einer späteren Datei gibt es beim Laden einer früheren noch nicht. Doppelte Namen fallen mit dem zusammengefügten `node --check` auf.
 - Im Rechner (`cParse`) prüft `CDISH` (Gerichte) vor `CFOODS` (Zutaten), und ein einzelnes Wort in `CDISH` trifft auch als Teil eines längeren Wortes. Nimm dort nur eindeutige oder mehrwortige Schlüssel.
-- Beim Hinzufügen von Übungen ohne 3D-Animation (`V3A`) muss die Oberfläche das berücksichtigen (siehe `techBtn`, `coachFig`).
+- Trainingskarte (`renderSteps`, `renderActions`): Es gibt nur zwei sichtbare Zeilen (Jetzt, Danach), erledigte Übungen stehen in einer aufklappbaren Zeile (`.stepsdone`, bleibt beim Neuzeichnen offen). Nebenknöpfe sind reine Symbole mit `aria-label`. Alles Wichtige muss bei 390 x 844 px über der unteren Leiste liegen.
+- Pike-Liegestütze (`pike()` in `v3.js`): Füße und Hände stehen fest, die Hüfte ergibt sich aus Beinlänge und Rumpflänge (zwei Kreise). Wer Stufen ändert, lässt `anim_geometry_test.py` laufen.
+- Beim Hinzufügen von Übungen ohne 3D-Animation (`V3A`) muss die Oberfläche das berücksichtigen (siehe `coachFig`; der Technik-Knopf im Training ist entfallen, die Animation steht oben in der Karte).
 - `index.html` wird bei Veröffentlichung nur durch `tools/stamp.py` versioniert. Das Label steht in `#appver`, der Update-Check vergleicht es, und `boot.js` hängt es an die Skript-Adressen (frischer Cache nach Updates).
 - Texte stehen auf Deutsch mit echten Umlauten. Keine langen Gedankenstriche in Texten.
 

@@ -140,26 +140,31 @@ const V3A = (() => {
 
   /* ---------- Pike-Liegestütze (Schultern) ---------- */
   function pike(c) {
-    const A = [c.ax, 0.08 + (c.fh || 0)], hh = c.hh || 0, clampv = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-    const build = (beta, neckY, hx) => {
-      const P = [A[0] + 0.855 * Math.cos(beta * RAD), A[1] + 0.855 * Math.sin(beta * RAD)];
-      const t = Math.asin(clampv((neckY - P[1]) / 0.5, -1, -0.05)), tor = t / RAD;
-      const neck = [P[0] + 0.5 * Math.cos(t), P[1] + 0.5 * Math.sin(t)];
-      const x = hx == null ? neck[0] : hx;
+    /* Füße (Fußgelenk) und Hände (Handgelenk) stehen fest. Aus der gewünschten Schulterlage folgt die Hüfte:
+       Beine 0,855 m und Rumpf 0,5 m bilden ein umgedrehtes V, die Hüfte liegt am oberen Schnittpunkt der beiden Kreise. */
+    const A = [c.ax, 0.08 + (c.fh || 0)], W = [c.hx, (c.hh || 0) + 0.035], L = 0.855, T = 0.5;
+    const body = (off) => {
+      const S0 = [W[0] + off[0], W[1] + off[1]];
+      let N = S0.slice(), P = [0, 0], tor = -60;
+      for (let k = 0; k < 5; k++) {
+        const dx = N[0] - A[0], dy = N[1] - A[1], d0 = Math.hypot(dx, dy), d = Math.min(L + T - 0.01, Math.max(Math.abs(L - T) + 0.01, d0));
+        const a = (L * L - T * T + d * d) / (2 * d), h = Math.sqrt(Math.max(0, L * L - a * a)), ux = dx / d0, uy = dy / d0;
+        P = [A[0] + ux * a - uy * h, A[1] + uy * a + ux * h];
+        tor = Math.atan2(N[1] - P[1], N[0] - P[0]) / RAD;
+        N = [S0[0] + 0.04 * Math.cos(tor * RAD), S0[1] + 0.04 * Math.sin(tor * RAD)];
+      }
       const p = POSE({ pel: [P[0], P[1], 0], tor, hd: tor - 12, la: [A[0], A[1], -0.1], ra: [A[0], A[1], 0.1], lfa: -26, rfa: -26, lkp: [1, 0, 0], rkp: [1, 0, 0], lha: 0, rha: 0, lep: [-1, -0.2, -0.5], rep: [-1, -0.2, 0.5] });
-      p.lw = [x, hh + 0.035, -0.19]; p.rw = [x, hh + 0.035, 0.19];
-      return { p, x: neck[0] };
+      p.lw = [W[0], W[1], -0.19]; p.rw = [W[0], W[1], 0.19];
+      return p;
     };
-    const top = build(c.beta, hh + 0.035 + 0.53), bot = build(c.beta - (c.drop || 7), hh + 0.035 + 0.17, top.x);
-    top.p.lw[0] = top.p.rw[0] = top.x;
-    return { top: top.p, bot: bot.p };
+    return { top: body(c.top || [-0.05, 0.54]), bot: body(c.bot || [0.08, 0.34]) };
   }
   const pk = (c, down, label) => { const q = pike(c); return { kf: seq(q.top, q.bot, down, 1.2, 0.4, label || "Kopf zwischen den Händen senken, Hüfte bleibt hoch", "Hochdrücken", "Oben: Hüfte hoch, Arme gestreckt", "Unten kurz halten"), props: c.props || [], cam: c.cam || { cx: 0.5, cy: 0.6, R: 1.3 } }; };
-  const pike0 = pk({ ax: 0.1, fh: 0, hh: 0.45, beta: 52, props: block(0.62, 1.1, 0.45), cam: { cx: 0.55, cy: 0.65, R: 1.35 } }, 1.5);
-  const pike1 = pk({ ax: 0.1, fh: 0, hh: 0, beta: 62, props: mat(-0.3, 1.2) }, 1.5);
-  const pike2 = pk({ ax: 0.1, fh: 0.2, hh: 0, beta: 55, props: block(-0.1, 0.4, 0.2).concat(mat(-0.3, 1.2)), cam: { cx: 0.5, cy: 0.7, R: 1.35 } }, 1.5);
-  const pike3 = pk({ ax: 0.1, fh: 0.42, hh: 0, beta: 42, props: chair(0.12, 0.42).concat(mat(-0.3, 1.3)), cam: { cx: 0.55, cy: 0.8, R: 1.5 } }, 1.6);
-  const pike4 = pk({ ax: 0.1, fh: 0.42, hh: 0, beta: 42, props: chair(0.12, 0.42).concat(mat(-0.3, 1.3)), cam: { cx: 0.55, cy: 0.8, R: 1.5 } }, 3.0, "Langsam runter, 3 Sekunden");
+  const pike0 = pk({ ax: 0.1, fh: 0, hh: 0.45, hx: 1.2, top: [-0.38, 0.39], bot: [-0.1, 0.28], props: block(0.95, 1.45, 0.45).concat(mat(-0.3, 0.95)), cam: { cx: 0.65, cy: 0.62, R: 1.6 } }, 1.5);
+  const pike1 = pk({ ax: 0.1, fh: 0, hh: 0, hx: 0.94, props: mat(-0.3, 1.3), cam: { cx: 0.55, cy: 0.6, R: 1.4 } }, 1.5);
+  const pike2 = pk({ ax: 0.1, fh: 0.2, hh: 0, hx: 0.88, props: block(-0.1, 0.4, 0.2).concat(mat(-0.3, 1.3)), cam: { cx: 0.5, cy: 0.7, R: 1.4 } }, 1.5);
+  const pike3 = pk({ ax: 0.1, fh: 0.42, hh: 0, hx: 0.8, props: chair(0.12, 0.42).concat(mat(-0.3, 1.3)), cam: { cx: 0.5, cy: 0.8, R: 1.5 } }, 1.6);
+  const pike4 = pk({ ax: 0.1, fh: 0.42, hh: 0, hx: 0.8, props: chair(0.12, 0.42).concat(mat(-0.3, 1.3)), cam: { cx: 0.5, cy: 0.8, R: 1.5 } }, 3.0, "Langsam runter, 3 Sekunden");
 
   /* ---------- Rows unter dem Tisch ---------- */
   const TAB = table(-0.85, 1.05, 0.78);
@@ -262,19 +267,21 @@ const V3A = (() => {
   const PACK = "#2f6f5e", sh = (p) => V3.shoulderOf(p), mats = (a, b) => mat(a, b);
   const packHands = (off, s) => [{ at: "hands", off: off || [0, -0.14, 0], s: s || [0.07, 0.16, 0.17], col: PACK }];
   /* Rucksack-Rudern im Stand */
-  const rbp = (tor, up, chairHand) => {
-    const p = POSE({ pel: [-0.1, 0.8, 0], tor, hd: tor - 6, la: [0.08, 0.08, -0.13], ra: [0.08, 0.08, 0.13], lkp: [1, 0, 0], rkp: [1, 0, 0] });
-    const S = sh(p), t = up ? [S[0] - 0.12, S[1] - 0.36] : [S[0] + 0.02, S[1] - 0.55];
-    p.lw = [t[0], t[1], -0.2]; p.rw = [t[0], t[1], 0.2]; p.lep = [-1, 0.5, -0.6]; p.rep = [-1, 0.5, 0.6]; p.lha = p.rha = null;
-    if (chairHand) { p.lw = [chairHand[0], chairHand[1], -0.19]; p.lep = [0.3, -1, -0.3]; p.lha = 0; p.rw = [t[0], t[1], 0.1]; p.rep = [-1, 0.5, 0.4]; }
+  const rbp = (tor, up, chairHand, pel) => {
+    const p = POSE({ pel: pel || [-0.1, 0.8, 0], tor, hd: tor - 6, la: [0.08, 0.08, -0.13], ra: [0.08, 0.08, 0.13], lkp: [1, 0, 0], rkp: [1, 0, 0] });
+    /* unten hängen die Arme leicht nach vorn, oben sind die Hände an der Hüfte und die Ellbogen hinter dem Rücken */
+    const S = sh(p), t = up ? [S[0] - 0.24, S[1] - 0.3] : [S[0] + 0.07, S[1] - 0.55];
+    p.lw = [t[0], t[1], -0.2]; p.rw = [t[0], t[1], 0.2]; p.lep = [-1, 0.6, -0.6]; p.rep = [-1, 0.6, 0.6]; p.lha = p.rha = null;
+    if (chairHand) { p.lw = [chairHand[0], chairHand[1], -0.19]; p.lep = [0.3, -1, -0.3]; p.lha = 0; p.rw = [t[0], t[1], 0.1]; p.rep = [-1, 0.6, 0.4]; }
     return p;
   };
   const rowL = ["Rücken gerade, Rucksack hängt vor dir", "Ellbogen zur Hüfte ziehen", "Oben kurz halten, Schulterblätter zusammen", "Langsam absenken"];
   const rowSeqB = (a, b, down, up, hold) => [kf(a, 0.5, rowL[0]), kf(a, up, rowL[1]), kf(b, hold || 0.5, rowL[2]), kf(b, down, rowL[3])];
-  const rowbp0 = { kf: rowSeqB(rbp(42, false), rbp(42, true), 1.6, 1.1), props: [], held: packHands(), cam: { cx: 0.15, cy: 0.7, R: 1.5 } };
-  const rowbp1 = { kf: rowSeqB(rbp(42, false), rbp(42, true), 1.8, 1.1), props: [], held: packHands(), cam: { cx: 0.15, cy: 0.7, R: 1.5 } };
+  const HINGE = [-0.2, 0.85, 0];
+  const rowbp0 = { kf: rowSeqB(rbp(40, false, null, HINGE), rbp(40, true, null, HINGE), 1.6, 1.1), props: [], held: packHands(), cam: { cx: 0.12, cy: 0.62, R: 1.3 } };
+  const rowbp1 = { kf: rowSeqB(rbp(40, false, null, HINGE), rbp(40, true, null, HINGE), 1.8, 1.1), props: [], held: packHands(), cam: { cx: 0.12, cy: 0.62, R: 1.3 } };
   const chH = [0.46, 0.47];
-  const one1 = (single) => ({ kf: rowSeqB(rbp(26, false, chH), rbp(26, true, chH), 1.7, 1.1, single), props: chair(0.5, 0.45), held: [{ at: "wR", off: [0, -0.15, 0], s: [0.07, 0.16, 0.13], col: PACK }], cam: { cx: 0.2, cy: 0.6, R: 1.5 } });
+  const one1 = (single) => ({ kf: rowSeqB(rbp(26, false, chH), rbp(26, true, chH), 1.7, 1.1, single), props: chair(0.5, 0.45).map((b) => Object.assign({}, b, { z0: b.z0 - 0.26, z1: b.z1 - 0.26 })), held: [{ at: "wR", off: [0, -0.15, 0], s: [0.07, 0.16, 0.13], col: PACK }], cam: { cx: 0.2, cy: 0.6, R: 1.5 } });
   const rowbp2 = one1(0.5), rowbp3 = one1(2.0);
   rowbp3.kf[2].l = "Oben 2 Sekunden halten";
   /* Handtuch an der Tür */

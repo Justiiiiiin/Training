@@ -140,7 +140,7 @@ function startWorkout(quick) {
   W.quick = !!quick; W.ex = 0; W.set = 1; W.phase = "warmup";
   SESS = { date: todayISO(), t0: Date.now(), sets: [] };
   wake();
-  say(W.quick ? "Kurz-Training. Aufwärmen, anderthalb Minuten." : "Aufwärmen, drei Minuten.", "Aufwärmen: Handgelenke und Schultern kreisen, Hampelmänner, ein paar Dead Bugs und langsame Kniebeugen. Sag weiter, wenn du früher fertig bist.");
+  say(W.quick ? "Kurz-Training. Aufwärmen, anderthalb Minuten." : "Aufwärmen, drei Minuten.", "Aufwärmen: Handgelenke und Schultern kreisen, Hampelmänner, ein paar Dead Bugs und langsame Kniebeugen. Tippe auf Aufwärmen beenden, wenn du früher fertig bist.");
   startTimer(W.quick ? 90 : 180, beginWork);
 }
 function beginWork() {
@@ -222,10 +222,6 @@ function act(name) {
     case "resume":
       if (tm.id && !tm.running) { resumeTimer(); say("Weiter geht’s."); return render(); }
       return say("Es ist nichts pausiert.");
-    case "repeat":
-      if (p === "work" || p === "prep" || p === "hold") return say(instruction(), instructionLong());
-      if (p === "rest") { const nx = nextPos(); return say("Als Nächstes: " + EX[nx.ex].name + ", Satz " + nx.set + ".", "Als Nächstes: " + EX[nx.ex].name + ", Satz " + nx.set + ". " + levelName(EX[nx.ex]) + "."); }
-      return say("Tippe auf Training starten, um zu beginnen.");
     case "stop":
       return stopWorkout();
   }
@@ -255,21 +251,34 @@ function renderTimer() {
   bg.classList.toggle("sm", big.length > 4);
   $("#ringunit").textContent = unit;
 }
+/* Übungsliste im Training: nur die jetzige und die nächste Übung. Was fertig ist, rutscht in die ausklappbare Zeile „Erledigt“. */
+let STEPSDONEOPEN = false, STEPSLAST = -1;
+document.addEventListener("toggle", (ev) => { const d = ev.target; if (d && d.classList && d.classList.contains("stepsdone")) STEPSDONEOPEN = d.open; }, true);
 function renderSteps() {
-  const sets = setsN();
-  const started = isActive() && W.phase !== "warmup";
-  const done = W.phase === "done" ? EX.length * sets : (started ? W.ex * sets + (W.set - 1) + (W.phase === "rest" ? 1 : 0) : 0);
-  $("#steps").innerHTML = EX.map((e, i) => {
-    let pips = "";
-    for (let s = 1; s <= sets; s++) {
-      const idx = i * sets + (s - 1);
+  const sets = setsN(), ph = W.phase;
+  const started = isActive() && ph !== "warmup";
+  const done = ph === "done" ? EX.length * sets : (started ? W.ex * sets + (W.set - 1) + (ph === "rest" ? 1 : 0) : 0);
+  const cur = Math.min(EX.length, Math.floor(done / sets));
+  const pips = (i) => {
+    let s = "";
+    for (let k = 1; k <= sets; k++) {
+      const idx = i * sets + (k - 1);
       let c = "pip";
-      if (idx < done) c += " done"; else if (started && idx === done) c += W.phase === "rest" ? " next" : " now";
-      pips += '<span class="' + c + '"></span>';
+      if (idx < done) c += " done"; else if (started && idx === done) c += ph === "rest" ? " next" : " now";
+      s += '<span class="' + c + '"></span>';
     }
-    const cur = started && Math.floor(done / sets) === i;
-    return '<li class="' + (cur ? "cur" : "") + '"><div><b>' + e.name + '</b><span class="lvl">' + levelName(e) + '</span></div><div class="pips">' + pips + "</div></li>";
-  }).join("");
+    return s;
+  };
+  const row = (i, cls, lab, extra) => '<li class="' + cls + '"><div class="stx"><b>' + EX[i].name + '</b><span class="lvl">' + (lab ? '<span class="steplab">' + lab + "</span> " : "") + levelName(EX[i]) + (extra || "") + '</span></div><div class="pips">' + pips(i) + "</div></li>";
+  const fin = [];
+  for (let i = 0; i < cur; i++) fin.push(row(i, "fin", ""));
+  const rows = [];
+  if (cur < EX.length) rows.push(row(cur, "cur", started && ph !== "rest" ? "Jetzt" : "Als Nächstes", lastTxt(EX[cur]) ? " · zuletzt " + lastTxt(EX[cur]) : ""));
+  if (cur + 1 < EX.length) rows.push(row(cur + 1, "nxt", "Danach"));
+  const slide = STEPSLAST !== -1 && STEPSLAST !== cur;
+  STEPSLAST = cur;
+  $("#steps").innerHTML = (fin.length ? '<details class="stepsdone"' + (STEPSDONEOPEN ? " open" : "") + "><summary>Erledigt (" + fin.length + ')</summary><ul class="steplist">' + fin.join("") + "</ul></details>" : "") +
+    (rows.length ? '<ul class="steplist now' + (slide ? " slide" : "") + '">' + rows.join("") + "</ul>" : "");
 }
 
 /* Übung austauschen */
@@ -291,20 +300,15 @@ function doSwap(id, mode) {
   else { if (SWAPD.date !== todayISO()) SWAPD = { date: todayISO(), map: {} }; SWAPD.map[e.slot] = id; }
   applyAlts(); coachKey = ""; renderEx(); render(); renderToday(); if (swapSlot) drawSwap();
 }
-function techBtn() {
-  const p = W.phase; if (!["prep", "work", "hold", "rest"].includes(p)) return "";
-  const e = EX[Math.min(p === "rest" ? nextPos().ex : W.ex, EX.length - 1)];
-  if (!V3A[e.id]) return "";
-  return '<button class="btn" type="button" data-v3="' + e.id + '" data-i="' + lvl(e) + '">' + ic("info") + "<span>Technik</span></button>";
-}
 function swapBtn() {
   const p = W.phase; if (!["prep", "rest"].includes(p)) return "";
   const e = EX[Math.min(p === "rest" ? nextPos().ex : W.ex, EX.length - 1)];
-  return slotVariants(e.slot).length > 1 ? '<button class="btn" type="button" data-swapopen="' + e.slot + '">' + ic("repeat") + "<span>Austauschen</span></button>" : "";
+  return slotVariants(e.slot).length > 1 ? '<button class="btn icon" type="button" data-swapopen="' + e.slot + '" aria-label="Austauschen" title="Austauschen">' + ic("repeat") + "</button>" : "";
 }
 function renderActions() {
   const p = W.phase, active = isActive(), paused = !!tm.id && !tm.running;
   const btn = (a, label, icon, cls) => '<button class="btn ' + (cls || "") + '" data-act="' + a + '">' + ic(icon) + "<span>" + label + "</span></button>";
+  const ibtn = (a, label, icon) => '<button class="btn icon" type="button" data-act="' + a + '" aria-label="' + label + '" title="' + label + '">' + ic(icon) + "</button>";
   let h = "";
   if (!active) {
     h += btn("start", p === "done" ? "Noch mal starten" : "Training starten", "play", "primary lg");
@@ -314,7 +318,7 @@ function renderActions() {
     if (p === "work" && EX[W.ex].type !== "hold") h += repChips(EX[W.ex]);
     if (p === "work" || p === "hold") h += btn("done", "Fertig", "check", "primary lg");
     else h += btn("next", p === "warmup" ? "Aufwärmen beenden" : "Überspringen", "next", "primary lg");
-    h += '<div class="mini">' + (p !== "warmup" ? btn("back", "Zurück", "back") + btn("skipex", "Auslassen", "next") : "") + (tm.id ? btn("pause", paused ? "Fortsetzen" : "Pause", paused ? "play" : "pause") : "") + btn("repeat", "Ansage", "repeat") + techBtn() + swapBtn() + btn("stop", "Stopp", "stop") + "</div>";
+    h += '<div class="mini">' + (p !== "warmup" ? ibtn("back", "Zurück", "back") + ibtn("skipex", "Auslassen", "next") : "") + (tm.id ? ibtn("pause", paused ? "Fortsetzen" : "Pause", paused ? "play" : "pause") : "") + swapBtn() + ibtn("stop", "Stopp", "stop") + "</div>";
   }
   $("#actions").innerHTML = h;
 }
@@ -329,9 +333,9 @@ function render() {
   if (p === "warmup") { title = "Aufwärmen"; sub = "Handgelenke, Schultern, Hampelmänner, Dead Bugs"; }
   else if (p === "done") { title = "Training geschafft"; sub = "Dehnen nicht vergessen und Werte eintragen"; }
   else if (["prep", "work", "hold", "rest"].includes(p)) {
-    title = (p === "rest" ? "Als Nächstes: " : "") + e.name;
-    sub = levelName(e) + (lastTxt(e) ? " · zuletzt " + lastTxt(e) : "") + (W.quick ? " · Kurz-Training" : "");
-    info = "Übung " + (shown.ex + 1) + "/" + EX.length + ", Satz " + shown.set + "/" + setsN();
+    title = e.name;
+    sub = W.quick ? "Kurz-Training" : "";
+    info = (p === "rest" ? "Als Nächstes · " : "") + "Übung " + (shown.ex + 1) + "/" + EX.length + ", Satz " + shown.set + "/" + setsN();
   }
   $("#title").textContent = title;
   $("#sub").textContent = sub;
