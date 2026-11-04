@@ -902,6 +902,11 @@ function renderProgress() {
     chgTile(w, "weight", "f-weight", "kg seit Start", "Gewicht eintragen", "Noch ein Gewicht für den Verlauf") +
     chgTile(c, "waist", "f-waist", "cm Taille seit Start", "Taille eintragen", "Noch eine Taillenmessung für den Verlauf");
   $("#waistnote").textContent = waistNote();
+  /* Platzhalter zeigen den letzten Wert, damit man nur noch die Änderung eintippt */
+  [["weight", "#f-weight"], ["waist", "#f-waist"], ["pushups", "#f-push"], ["plank", "#f-plank"]].forEach((f) => {
+    let last = null; for (const x of log) if (x[f[0]] != null && (!last || x.date >= last.date)) last = x;
+    const el = $(f[1]); if (el) el.placeholder = last ? "zuletzt " + nf(last[f[0]]) : "";
+  });
   renderEatHist(); renderVolume(); renderBadges();
   renderCharts();
   if (!log.length) { $("#logtable").innerHTML = '<p class="muted">Noch keine Einträge. Miss heute Gewicht und Taille und trag sie oben ein.</p>'; return; }
