@@ -1,6 +1,6 @@
 /* Fitness Coach: Start (läuft zuletzt). Klassisches Skript, teilt sich den globalen Bereich mit den anderen Dateien in js/ (Reihenfolge siehe js/boot.js). */
 /* ======================= Start ======================= */
-$("#b-settings").innerHTML = ic("gear"); $("#b-settings2").innerHTML = ic("gear") + "<span>Einstellungen</span>";
+$("#b-settings").innerHTML = ic("gear");
 $("#x-settings").innerHTML = ic("close");
 applyPrices(); bindV3(); renderEx(); renderRecipes(); renderNutrition(); renderTips(); renderAusblick(); renderSources(); renderProgress(); bindSettings(); render(); bindGoals(); renderToday();
 function radShowAll() { rad.shown = new Set(); const P = RPL[RAD.mode]; if (P) P.days.forEach((d, di) => d.slots.forEach((x, si) => rad.shown.add(di + ":" + si))); }

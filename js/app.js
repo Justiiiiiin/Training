@@ -329,7 +329,7 @@ function render() {
   const ph = $("#phase");
   ph.dataset.phase = paused ? "idle" : p;
   ph.textContent = paused ? "Pausiert" : PH[p];
-  let title = "Training starten", sub = EX.length + " Übungen, " + settings.sets + " Sätze, ca. " + estMinutes() + " Minuten", info = "";
+  let title = "Ganzkörper-Training", sub = EX.length + " Übungen, " + settings.sets + " Sätze, ca. " + estMinutes() + " Minuten", info = "";
   if (p === "warmup") { title = "Aufwärmen"; sub = "Handgelenke, Schultern, Hampelmänner, Dead Bugs"; }
   else if (p === "done") { title = "Training geschafft"; sub = "Dehnen nicht vergessen und Werte eintragen"; }
   else if (["prep", "work", "hold", "rest"].includes(p)) {
@@ -392,6 +392,7 @@ function ingexHTML() {
     keys.map((k) => '<button class="fchip" data-excz="' + k + '" aria-pressed="' + EXC.includes("z:" + k) + '">' + zname(k) + "</button>").join("") + "</div>" +
     (hid.length ? '<div class="fgroup"><span class="lbl">Ausgeblendete Rezepte, antippen zum Zurückholen</span>' + hid.map((x) => { const r = byId(x.slice(2)); return r ? '<button class="fchip" data-excr="' + r.id + '">' + r.title + " ×</button>" : ""; }).join("") + "</div>" : "") + "</details>";
 }
+const SORTS = [["protein", "Meiste Eiweiß"], ["kcal", "Wenig Kalorien"], ["time", "Kurze Zeit"], ["dens", "Eiweiß je Kalorie"], ["cost", "Günstig zuerst"], ["ppe", "Eiweiß je Euro"], ["title", "Name"]];
 function renderFilters() {
   const chip = (g, v, label, on) => '<button class="fchip" data-f="' + g + '" data-v="' + v + '" aria-pressed="' + (on ? "true" : "false") + '">' + label + "</button>";
   const tog = (k, label) => '<button class="fchip" data-ft="' + k + '" aria-pressed="' + (F[k] ? "true" : "false") + '">' + label + "</button>";
@@ -400,14 +401,14 @@ function renderFilters() {
   $("#filters").innerHTML =
     '<div class="search">' + ic("search") + '<input type="search" id="rsearch" placeholder="Suchen, z. B. Quark, Linsen" value="' + F.q.replace(/"/g, "&quot;") + '" aria-label="Rezepte suchen"></div>' +
     '<div class="fgroup">' + ["Frühstück", "Mittag/Abend", "Snack"].map((m) => chip("meal", m, m, F.meal === m)).join("") + "</div>" +
-    '<details class="more" id="fmore"' + (FOPEN ? " open" : "") + '><summary>Weitere Filter' + (nAct ? '<span class="badge">' + nAct + "</span>" : "") + "</summary>" +
+    '<div class="fline"><details class="more" id="fmore"' + (FOPEN ? " open" : "") + '><summary>Weitere Filter' + (nAct ? '<span class="badge">' + nAct + "</span>" : "") + "</summary>" +
     '<div class="fgroup"><span class="lbl">Ernährung</span>' + chip("diet", "vegetarisch", "Vegetarisch", F.diet === "vegetarisch") + chip("diet", "vegan", "Vegan", F.diet === "vegan") + "</div>" +
     '<div class="fgroup"><span class="lbl">Zeit</span>' + chip("time", "10", "bis 10 Min", F.time === 10) + chip("time", "20", "bis 20 Min", F.time === 20) + "</div>" +
     '<div class="fgroup"><span class="lbl">Extras</span>' + tog("minProt", "Mind. 30 g Eiweiß") + tog("work", "Für die Arbeit") + tog("light", "Leicht") + tog("prep", "Meal-Prep") + tog("nocook", "Ohne Kochen") + tog("cheap", "Günstig") + tog("fav", "♥ Lieblinge") + "</div>" +
     '<div class="fgroup"><span class="lbl">Ohne</span>' + EXC_ALL.map((x) => '<button class="fchip" data-exc="' + x + '" aria-pressed="' + (EXC.includes(x) ? "true" : "false") + '">' + x + "</button>").join("") + "</div>" +
     ingexHTML() +
     (filterActive() ? '<div class="fgroup"><button class="fchip" data-freset="1">Filter zurücksetzen</button></div>' : "") +
-    "</details>";
+    '</details><select id="rsort" class="fsort" aria-label="Sortieren">' + SORTS.map((o) => '<option value="' + o[0] + '"' + (F.sort === o[0] ? " selected" : "") + ">" + o[1] + "</option>").join("") + "</select></div>";
 }
 document.addEventListener("toggle", (ev) => { if (ev.target && ev.target.id === "pricebox") PRICEOPEN = ev.target.open; if (ev.target && ev.target.id === "fmore") FOPEN = ev.target.open; if (ev.target && ev.target.id === "ingex") IOPEN = ev.target.open; }, true);
 /* Die Liste zeigt zuerst 48 Rezepte und lädt per Knopf mehr nach. So bleibt sie auch mit 1000 Rezepten schnell. */
@@ -433,7 +434,6 @@ function renderRecipes(more) {
     return;
   }
   $("#rcount").textContent = list.length + " von " + RECIPES.length + " Rezepten" + excLabel();
-  $("#rsort").value = F.sort;
   const shown = list.slice(0, rShow), rest = list.length - shown.length;
   $("#rgrid").innerHTML = list.length ? shown.map(rcardHTML).join("") + moreBtn(rest)
     : '<div class="card empty"><h3>Keine Treffer</h3><p class="muted">Lockere die Filter etwas.</p><div class="row" style="justify-content:center"><button class="btn" data-freset="1">Filter zurücksetzen</button></div></div>';
@@ -888,14 +888,18 @@ function renderEatHist() {
         (x.id && byId(x.id) ? '<button class="btn sm" type="button" data-recipe="' + x.id + '">Rezept ansehen</button>' : "") + '</div><button class="x" type="button" data-hdel="' + d + ":" + i + '" aria-label="Eintrag löschen">×</button></li>').join("") + "</ul></details>"; }).join("") +
     (days.length > HISTN ? '<div class="row"><button class="btn" type="button" data-histmore="1">Ältere Tage anzeigen</button></div>' : "");
 }
+/* Ohne Verlauf zeigt die Kachel statt eines Strichs, was zu tun ist, und springt zum Eingabefeld */
+function chgTile(v, key, field, label, first, second) {
+  if (v != null) return '<div class="stat"><span class="big">' + (v > 0 ? "+" : v < 0 ? "−" : "") + nf(Math.abs(v)) + "</span><span>" + label + "</span></div>";
+  return '<button type="button" class="stat statact" data-focusf="' + field + '"><span class="big" aria-hidden="true">+</span><span>' + (log.some((x) => x[key] != null) ? second : first) + "</span></button>";
+}
 function renderProgress() {
   const w = change("weight"), c = change("waist");
-  const sign = (n) => (n == null ? "–" : (n > 0 ? "+" : n < 0 ? "−" : "") + nf(Math.abs(n)));
   $("#stats").innerHTML =
     '<div class="stat"><span class="big">' + sessions.length + "</span><span>Trainings gesamt</span></div>" +
     '<div class="stat"><span class="big">' + weekCount() + "</span><span>letzte 7 Tage</span></div>" +
-    '<div class="stat"><span class="big">' + sign(w) + "</span><span>kg seit Start</span></div>" +
-    '<div class="stat"><span class="big">' + sign(c) + "</span><span>cm Taille seit Start</span></div>";
+    chgTile(w, "weight", "f-weight", "kg seit Start", "Gewicht eintragen", "Noch ein Gewicht für den Verlauf") +
+    chgTile(c, "waist", "f-waist", "cm Taille seit Start", "Taille eintragen", "Noch eine Taillenmessung für den Verlauf");
   $("#waistnote").textContent = waistNote();
   renderEatHist(); renderVolume(); renderBadges();
   renderCharts();
@@ -910,10 +914,10 @@ function renderProgress() {
 const GROUPS = [
   { id: "heute", title: "Heute", tabs: ["heute"] },
   { id: "training", title: "Training", tabs: ["uebungen", "tipps", "ausblick"] },
-  { id: "essen", title: "Essen", tabs: ["rezepte", "rad", "vorkochen", "einkauf", "ernaehrung"] },
-  { id: "fortschritt", title: "Fortschritt", tabs: ["fortschritt"] }
+  { id: "essen", title: "Essen", tabs: ["rezepte", "rad", "vorkochen", "einkauf"] },
+  { id: "fortschritt", title: "Fortschritt", tabs: ["fortschritt", "ernaehrung"] }
 ];
-const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", ausblick: "Ausblick", rezepte: "Rezepte", rad: "Rad", vorkochen: "Vorkochen", einkauf: "Einkauf", ernaehrung: "Ernährung", fortschritt: "Fortschritt" };
+const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", ausblick: "Ausblick", rezepte: "Rezepte", rad: "Glücksrad", vorkochen: "Vorkochen", einkauf: "Einkauf", ernaehrung: "Richtwerte", fortschritt: "Verlauf" };
 const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", ausblick: "Pläne, Ausrüstung und Kauflinks", rezepte: RECIPES.length + " Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", vorkochen: "Sonntag kochen, die Woche essen", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf" };
 const LAST = {};
 let CUR = "heute";
@@ -1331,7 +1335,7 @@ function renderShop() {
     (CART.length
       ? '<ul class="crows">' + rows + '</ul><div class="row"><button class="btn sm" data-cartclear="1">Liste leeren</button><button class="btn sm" data-tab="rezepte">Rezept hinzufügen</button><button class="btn sm" data-tab="rad">Vom Glücksrad</button></div>' +
         '<div class="stats"><div class="stat"><span class="big">' + eur(calc.total).replace("\u00a0€", "") + '<small>€</small></span><span>Einkauf gesamt (ca.)</span></div><div class="stat"><span class="big">' + eur(calc.total / portions).replace("\u00a0€", "") + '<small>€</small></span><span>pro Portion im Schnitt</span></div><div class="stat inl"><span class="big">' + portions + '</span><span>Portionen</span></div></div>' + budget
-      : '<div class="empty-in"><p class="muted">Noch leer.</p><div class="row"><button class="btn primary" data-tab="rezepte">Zu den Rezepten</button><button class="btn" data-tab="rad">Zum Glücksrad</button><button class="btn" data-tab="vorkochen">Vorkochplan</button></div></div>') + "</div>" +
+      : '<div class="empty-in"><p class="muted">Noch leer. Wähle Rezepte aus oder lass dir eine Woche planen.</p><div class="row"><button class="btn primary" data-tab="rezepte">Zu den Rezepten</button></div><div class="linkrow"><button class="linkbtn" data-tab="rad">Zum Glücksrad</button><button class="linkbtn" data-tab="vorkochen">Zum Vorkochplan</button></div></div>') + "</div>" +
     (CART.length ? '<div class="card" data-nofold><h3>Was du brauchst</h3><div class="slist">' + shopListHTML(calc) + '</div><p class="small muted">Auf ganze Packungen aufgerundet.</p></div>' : "") +
     spendHTML() +
     '<div class="card"><h3>So sparst du bei Lidl</h3><ul>' +
@@ -1455,10 +1459,20 @@ function weekStreak() {
 const dateDE = (iso) => iso.slice(8) + "." + iso.slice(5, 7) + ".";
 
 /* Ringe */
-function ringHTML(frac, color, big, small, label) {
-  const R = 44, C = 2 * Math.PI * R, f = Math.max(0, Math.min(1, frac));
-  return '<div class="rgwrap" role="img" aria-label="' + label + ": " + big + " " + small + '"><div class="rgbox"><svg viewBox="0 0 100 100" class="rg" aria-hidden="true"><circle cx="50" cy="50" r="' + R + '" class="rgt"/><circle cx="50" cy="50" r="' + R +
-    '" class="rgb" style="stroke:' + color + ";stroke-dasharray:" + C.toFixed(1) + ";stroke-dashoffset:" + (C * (1 - f)).toFixed(1) + '"/></svg><div class="rgc"><b>' + big + "</b><span>" + small + '</span></div></div><span class="rglab">' + label + "</span></div>";
+/* Heute: ein Kreis. Außen Eiweiß, innen dünner Kalorien, in der Mitte die Punkte fürs Training der Woche. Die Zahlen stehen daneben. */
+function trioHTML(pv, pg, kv, kg, wc, n) {
+  const arc = (r, f, color, cls) => {
+    const C = 2 * Math.PI * r, g = Math.max(0, Math.min(1, f || 0));
+    return '<circle cx="50" cy="50" r="' + r + '" class="rgt ' + cls + '"/><circle cx="50" cy="50" r="' + r + '" class="rgb ' + cls + '" style="stroke:' + color + ";stroke-dasharray:" + C.toFixed(1) + ";stroke-dashoffset:" + (C * (1 - g)).toFixed(1) + '"/>';
+  };
+  const over = kv > kg + 150, nd = Math.max(1, n);
+  const dots = Array.from({ length: nd }, (_, i) => '<i class="td' + (i < wc ? " on" : "") + '"></i>').join("");
+  const leg = (sw, name, val, extra) => '<li><i class="sw ' + sw + '"></i><div><b>' + name + "</b><span>" + val + "</span>" + (extra || "") + "</div></li>";
+  return '<div class="rings"><div class="rgbox" aria-hidden="true"><svg viewBox="0 0 100 100" class="rg">' + arc(45, pv / pg, "var(--good)", "o") + arc(34, kv / kg, over ? "var(--warn)" : "var(--accent)", "i") +
+    '</svg><div class="rgc"><div class="tdots">' + dots + "</div><span>" + wc + " von " + n + "</span></div></div>" +
+    '<ul class="rleg">' + leg("sw-o", "Eiweiß", pv + " von " + pg + " g") +
+    leg("sw-i" + (over ? " warn" : ""), "Kalorien", kv.toLocaleString("de-DE") + " von " + kg.toLocaleString("de-DE") + " kcal", over ? '<span class="warnt">über dem Ziel</span>' : "") +
+    leg("sw-t", "Training", wc + " von " + n + " diese Woche") + "</ul></div>";
 }
 
 /* Vorschläge: was passt noch zum Tag */
@@ -1552,7 +1566,7 @@ function planAll() {
 function shiftHintHTML() {
   const t = todayISO(), a = shiftOf(t), b = shiftOf(shiftDay(t, 1)), N = { n: "Frühschicht", l: "Spätschicht", f: "frei" };
   const H = { n: "Training eher abends.", l: "Training vormittags, dann in Ruhe essen.", f: "Zeit fürs Kochen und Training." };
-  return '<p class="small shifthint"><b>Heute ' + N[a] + ", morgen " + N[b] + ".</b> " + H[a] + "</p>";
+  return '<p class="shifthint"><span class="tag g">Heute ' + N[a] + '</span><span class="tag">Morgen ' + N[b] + '</span><span class="shtxt">' + H[a] + "</span></p>";
 }
 function shAfter() {
   const d = dayEns(), free = shiftOf(todayISO()) === "f", ids = makeDayPlan(free);
@@ -1852,10 +1866,7 @@ function renderToday() {
   $("#panel-heute").innerHTML =
     backupHTML() + '<div class="card hero"><div class="tdhead"><div><h3>' + title + '</h3><p class="muted">' + (plan[2] ? "Ganzkörper, etwa " + estMinutes() + " Minuten" : "Ruhetag: Erholung gehört zum Training") + "</p></div>" +
     '<div class="row">' + (plan[2] && !doneToday && !isActive() ? '<button class="btn primary" data-act="start">Training starten</button>' : "") + '<button class="btn" data-eatopen="1">Essen eintragen</button><button class="btn" data-tab="rad">Essen wählen</button></div></div>' +
-    shiftHintHTML() + '<div class="rings">' +
-    ringHTML(e.p / pg, "var(--good)", e.p, "von " + pg + " g", "Eiweiß") +
-    ringHTML(e.k / GOALS.kcal, e.k > GOALS.kcal + 150 ? "var(--warn)" : "var(--accent)", e.k.toLocaleString("de-DE"), "von " + GOALS.kcal.toLocaleString("de-DE") + " kcal", "Kalorien") +
-    ringHTML(wc / trainDays(), "var(--ink)", wc, "von " + trainDays(), "Training") + "</div>" +
+    shiftHintHTML() + trioHTML(e.p, pg, e.k, GOALS.kcal, wc, trainDays()) +
     '</div>' +
     prepTodayHTML() + reviewToday() +
     '<div class="card"><div class="rday-h"><h3>Heute gegessen</h3>' + (day.items.length ? '<span class="rtot">ca. ' + eur(e.c) + " bei Lidl</span>" : "") + "</div>" +
@@ -2892,7 +2903,8 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.eatdel != null && t.dataset.eatdel !== "") { const dd = dayEns(), gone = dd.items.splice(parseInt(t.dataset.eatdel, 10), 1)[0]; if (gone && dd.plan && !gone.again) { const ix = dd.plan.ids.indexOf(gone.id); if (ix >= 0) dd.plan.done[ix] = false; } saveToday(); return renderToday(); }
   if (t.dataset.effort) { if (WK[SUMIDX]) { WK[SUMIDX].effort = t.dataset.effort; saveToday(); drawSummary(SUMIDX); } return; }
   if (t.dataset.lvlup || t.dataset.lvldown) { const id = t.dataset.lvlup || t.dataset.lvldown, e = EX.find((x) => x.id === id); levels[id] = Math.max(0, Math.min(e.ladder.length - 1, lvl(e) + (t.dataset.lvlup ? 1 : -1))); store.set("fc_levels", levels); renderEx(); render(); drawSummary(SUMIDX); return; }
-  if (t.id === "b-settings" || t.id === "b-settings2") return openSettings();
+  if (t.dataset.focusf) { const f = $("#" + t.dataset.focusf); if (f) { try { f.scrollIntoView({ block: "center", behavior: reduceMotion() ? "auto" : "smooth" }); } catch (e) {} f.focus({ preventScroll: true }); } return; }
+  if (t.id === "b-settings") return openSettings();
   if (t.hasAttribute("data-close")) { closeDialog(t.closest("dialog")); return; }
   if (t.dataset.act) {
     if (t.dataset.act === "start" && window.matchMedia && matchMedia("(max-width: 979px)").matches) window.scrollTo({ top: 0, behavior: reduceMotion() ? "auto" : "smooth" });
@@ -2958,8 +2970,7 @@ document.addEventListener("input", (ev) => {
   if (t.dataset && t.dataset.chk) { CHK[t.dataset.chk] = t.checked; saveCart(); shopRefresh(t.dataset.chk); }
   if (t.dataset && t.dataset.prepchk) { PREP.done[t.dataset.prepchk] = t.checked; prepSave(); const li = t.closest("li"); if (li) li.classList.toggle("done", t.checked); }
 });
-$("#rsort").addEventListener("change", (ev) => { F.sort = ev.target.value; renderRecipes(); });
-document.addEventListener("change", (ev) => { if (ev.target && ev.target.id === "budget") { BUDGET = Math.max(0, parseFloat(String(ev.target.value).replace(",", ".")) || 0); saveCart(); renderShop(); } });
+document.addEventListener("change", (ev) => { if (ev.target && ev.target.id === "rsort") { F.sort = ev.target.value; renderRecipes(); const n = $("#rsort"); if (n) n.focus(); return; } if (ev.target && ev.target.id === "budget") { BUDGET = Math.max(0, parseFloat(String(ev.target.value).replace(",", ".")) || 0); saveCart(); renderShop(); } });
 ["#dlg-recipe", "#dlg-settings", "#dlg-eat", "#dlg-sum", "#dlg-swap", "#dlg-shift"].forEach((s) => {
   $(s).addEventListener("click", (ev) => { if (ev.target === ev.currentTarget) closeDialog(ev.currentTarget); });
   $(s).addEventListener("cancel", (ev) => { ev.preventDefault(); closeDialog(ev.currentTarget); });

@@ -12,7 +12,7 @@ Live: https://justiiiiiin.github.io/Training/
 - Der Sync-Block (`js/sync.js`, `window.FC`): Speicher über localStorage, optional Supabase (Tabelle `kv`). Schema und Row-Level-Security der Tabelle stehen in `docs/supabase.sql`.
 - `sw.js`: Service Worker (Netz zuerst, Offline-Rückfall, Cache `fc-offline-v3`). Neue Dateien gehören in seine Liste `FILES`. `manifest.webmanifest` und die Icons gehören zur Installation auf dem Home-Bildschirm.
 - Daten in `js/data.js`: `RECIPES` (1000 Rezepte: 300 von Hand in `build.py`, 700 aus den Generatoren `gen_*.py`), `DAYS`, `PRICE` (Lidl-Richtwerte) werden aus `tools/recipes/` eingesetzt. Mengen sind Rohgewichte (Fleisch roh, Reis, Nudeln und Linsen trocken), die App weist im Rezept und im Rechner darauf hin. Übungen: `EX`, `EXALT`, `EXFUT`, `GEAR`. 3D-Animationen: `V3A`.
-- Wichtige Stellen: `sanitizeState()` (prüft alle gespeicherten Daten), `showTab()`/`GROUPS`/`TABN` (Navigation), `renderEx`, `renderAusblick`, `prepCalc`/`prepGen` (Vorkochen), `shopCalc` (Einkaufsliste), `buyEstimate` (Ausgaben), `cParse` (Kalorien-Rechner mit `CEXTRA`, `CDISH`).
+- Wichtige Stellen: `sanitizeState()` (prüft alle gespeicherten Daten), `showTab()`/`GROUPS`/`TABN` (Navigation: Essen hat Rezepte, Glücksrad, Vorkochen, Einkauf; Fortschritt hat Verlauf `fortschritt` und Richtwerte `ernaehrung`; Tabs werden immer über ihre Id angesprochen), `trioHTML` (Heute: ein Kreis, außen Eiweiß, innen dünner Kalorien, in der Mitte die Trainingspunkte, Zahlen in der Liste `.rleg` daneben), `chgTile` (Fortschritt: ohne Verlauf ist die Kachel ein Knopf `data-focusf`, der ins Eingabefeld springt), `SORTS`/`renderFilters` (Sortierung `#rsort` steht in der Filterkarte, Auswahl wird per delegiertem `change` behandelt), `renderEx`, `renderAusblick`, `prepCalc`/`prepGen` (Vorkochen), `shopCalc` (Einkaufsliste), `buyEstimate` (Ausgaben), `cParse` (Kalorien-Rechner mit `CEXTRA`, `CDISH`).
 - Gespeichert wird alles in localStorage-Schlüsseln `fc_*` (zum Beispiel `fc_settings`, `fc_diary`, `fc_goals`). Ändere nie ihre Bedeutung, ohne `sanitizeState` mitzuziehen.
 
 ## Befehle
@@ -42,6 +42,7 @@ Alle Tests laufen mit Playwright (Chromium) gegen `index.html`, ohne Server, au�
 `swslow_test.py` prüft den Service Worker bei Serverfehlern 5xx (Rückfall auf den Speicher) und bei hängendem Netz (Start aus dem Speicher in unter 10 s statt 18 s). Die 5xx-Prüfung läuft zuerst, weil hängende Verbindungen sonst den Pool des Browsers belegen.
 `reste_test.py` prüft die Reste-Planung im Wochenplan des Glücksrads (`restChains`, `radReste`, `restNotes` in `app.js`): Eine angebrochene Packung wird im Plan über die Tage verfolgt (Haltbarkeit aus `RESTD`), und ein späteres Gericht innerhalb der Haltbarkeit verbraucht den Rest, ohne das Eiweißziel des Tages zu verschlechtern. Fixierte Plätze bleiben unangetastet, die Option heißt `RAD.reste`.
 `reviewtip_test.py` prüft den Satz „Fürs nächste Mal“ im Wochenrückblick (`reviewTip`), `paths_test.py` die Karte „Deine Pfade“ im Ausblick (`pathsHTML`, Stufen aus `levels`, Klimmzug-Weg aus den Meilensteinen).
+`layout_test.py` prüft die Layout-Runde: Kreis in Kreis auf Heute, Schicht-Pillen, Sortierung in der Filterkarte, vier Essen-Tabs, Richtwerte bei Fortschritt, 2 x 2 Werte, Aktions-Kacheln, Einkauf leer, Zahnrad oben rechts mit Version links davon, kein seitlicher Überlauf bei 320 px und großer Schrift.
 `update_test.py` und `swupdate_test.py` (Update-Banner und Service Worker) fehlen hier, weil sie handgebaute Fixtures brauchen.
 Bekannte Eigenheit: `Overnight Oats (dein Rezept)` hat 845 kcal und wird von `build.py` absichtlich als Ausnahme gemeldet.
 
@@ -55,6 +56,7 @@ Bekannte Eigenheit: `Overnight Oats (dein Rezept)` hat 845 kcal und wird von `bu
 - Pike-Liegestütze (`pike()` in `v3.js`): Füße und Hände stehen fest, die Hüfte ergibt sich aus Beinlänge und Rumpflänge (zwei Kreise). Wer Stufen ändert, lässt `anim_geometry_test.py` laufen.
 - Beim Hinzufügen von Übungen ohne 3D-Animation (`V3A`) muss die Oberfläche das berücksichtigen (siehe `coachFig`; der Technik-Knopf im Training ist entfallen, die Animation steht oben in der Karte).
 - `index.html` wird bei Veröffentlichung nur durch `tools/stamp.py` versioniert. Das Label steht in `#appver`, der Update-Check vergleicht es, und `boot.js` hängt es an die Skript-Adressen (frischer Cache nach Updates).
+- Das Zahnrad (`#b-settings`) steht am Handy oben rechts im Kopf, die untere Leiste hat vier gleich breite Gruppen. Die Version (`.ver`) sitzt am Handy links vom Zahnrad (Abstände in `styles.css`, bei sehr schmalen Handys kleiner), bei großer Schrift steht sie in einer eigenen Zeile.
 - Texte stehen auf Deutsch mit echten Umlauten. Keine langen Gedankenstriche in Texten.
 
 ## So bitte arbeiten

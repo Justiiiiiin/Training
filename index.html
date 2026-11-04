@@ -20,7 +20,7 @@
 <body>
 <div class="app">
 
-<span class="ver" id="appver" aria-label="Stand der Version">v3.43 · 04.11. 16:47</span>
+<span class="ver" id="appver" aria-label="Stand der Version">v3.44 · 04.11. 17:00</span>
 <header class="top">
   <div class="brand"><div class="brandrow"><svg class="brandmark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#b05d3f"/><g fill="#fff6e8"><rect x="11" y="23" width="6" height="18" rx="2"/><rect x="18" y="18" width="6" height="28" rx="2"/><rect x="40" y="18" width="6" height="28" rx="2"/><rect x="47" y="23" width="6" height="18" rx="2"/><rect x="24" y="30" width="16" height="4"/></g></svg><h1>Fitness Coach</h1></div><span class="syncchip" id="syncst" hidden></span></div>
   <nav class="gnav" id="gnav" aria-label="Hauptnavigation">
@@ -34,7 +34,6 @@
     <button class="btn icon" id="b-settings" aria-label="Einstellungen" title="Einstellungen"></button>
   </div>
 </header>
-<button class="setfab" id="b-settings2" type="button" aria-label="Einstellungen" title="Einstellungen"></button>
 
 <div class="bootskel" aria-hidden="true"><i></i><i></i><i></i></div>
 <div class="layout">
@@ -43,7 +42,7 @@
       <div class="coachhead">
         <div class="coachtxt">
           <span class="chip" id="phase" data-phase="idle">Bereit</span>
-          <h2 id="title">Training starten</h2>
+          <h2 id="title">Ganzkörper-Training</h2>
           <p class="muted small" id="sub"></p>
           <p class="muted small" id="setinfo"></p>
         </div>
@@ -69,7 +68,7 @@
 
     <section class="panel" id="panel-rezepte" role="tabpanel" hidden>
       <div class="card filters" id="filters"></div>
-      <div class="fbar"><p class="muted small" id="rcount"></p><label class="small muted">Sortieren <select id="rsort"><option value="protein">Eiweiß, hoch zuerst</option><option value="kcal">Kalorien, niedrig zuerst</option><option value="time">Zeit, kurz zuerst</option><option value="dens">Eiweiß je Kalorie</option><option value="cost">Preis, günstig zuerst</option><option value="ppe">Eiweiß je Euro</option><option value="title">Name</option></select></label></div>
+      <p class="muted small rcount" id="rcount"></p>
       <div class="rgrid" id="rgrid"></div>
     </section>
 
