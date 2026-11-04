@@ -810,3 +810,28 @@ html[data-big] .ringwrap { margin: 0 auto; }
 @media (max-height: 760px) and (max-width: 979px) { .coachfig { height: 128px; } }
 /* Handy: Karte enger, damit auch bei mehreren erledigten Übungen alle Knöpfe über der Leiste liegen */
 @media (max-width: 979px) { .coach { padding: 18px 18px 16px; gap: 10px; } }
+
+/* Ladezustand: Bis der Start fertig ist (html[data-ready]), bleibt die halbfertige Oberfläche unsichtbar. Ein ruhiges Gerüst erscheint erst nach 0,15 s, damit schnelle Starts nichts aufblitzen lassen. */
+.bootskel { display: none; }
+html:not([data-ready]) .bootskel { display: grid; gap: 16px; margin-top: 8px; animation: skelin 0.25s ease-out 0.15s both; }
+html:not([data-ready]) .layout, html:not([data-ready]) .gnav, html:not([data-ready]) .setfab { display: none !important; }
+.bootskel i { display: block; height: 132px; border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow); animation: skelpulse 1.3s ease-in-out infinite alternate; }
+.bootskel i:first-child { height: 188px; }
+.bootskel i:last-child { height: 96px; }
+@keyframes skelin { from { opacity: 0; } to { opacity: 1; } }
+@keyframes skelpulse { from { opacity: 1; } to { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) { .bootskel i { animation: none; } html:not([data-ready]) .bootskel { animation: none; } }
+
+/* Touch: größere Tippflächen für kleine Bedienelemente (nur bei Fingerbedienung, Desktop bleibt unverändert) */
+@media (pointer: coarse) {
+  .stg > summary, .more > summary { min-height: 44px; }
+  .exmore > summary { padding: 11px 0; }
+  .v3mini { min-height: 36px; }
+  .btn.icon.sm { width: 40px; min-height: 40px; }
+  .pl-title { padding: 10px 0; margin: -10px 0; }
+}
+/* Sehr schmale Handys (320 px): Unterseiten der Gruppe Essen nicht abschneiden, sondern wie bei großer Schrift verschiebbar lassen */
+@media (max-width: 340px) {
+  body[data-group="essen"] .tabs { display: flex; overflow-x: auto; gap: 2px; padding: 4px; }
+  body[data-group="essen"] .tab { flex: 1 0 auto; padding: 0 12px; font-size: 0.8125rem; overflow: visible; }
+}

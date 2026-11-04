@@ -1,5 +1,9 @@
 /* Fitness Coach: Start. Bricht der Hauptcode beim Start ab, bleibt sonst eine halbe App ohne Meldung. Dann Hinweis mit Neu laden und Sicherung. */
+/* Ladegerüst (siehe styles.css): html[data-ready] zeigt die Oberfläche. Das Sicherheitsnetz zeigt sie nach 12 s in jedem Fall. */
+function fcReveal() { document.documentElement.setAttribute("data-ready", "1"); }
+setTimeout(fcReveal, 12000);
 function fcStartFailed(msg) {
+  fcReveal();
   if (document.getElementById("startfail")) return;
   var box = document.createElement("div"); box.id = "startfail"; box.className = "startfail"; box.setAttribute("role", "alert");
   var p = document.createElement("p"); p.textContent = "Beim Start ist ein Fehler aufgetreten. Deine Daten sind noch gespeichert. Lade die App neu. Klappt es dann immer noch nicht, kopiere zur Sicherheit eine Sicherung.";
@@ -19,8 +23,16 @@ function fcStartFailed(msg) {
 }
 /* Lädt den Hauptcode in fester Reihenfolge (async = false). ?v= mit dem Versionslabel umgeht veraltete Browser-Caches nach einem Update. */
 var FC_FILES = ["js/data.js", "js/app.js", "js/v3.js", "js/start.js"];
+function fcVer() { return encodeURIComponent(((document.getElementById("appver") || {}).textContent || "").trim()); }
+/* Mit Sync wartet der Start bis zu 7 s auf das Netz. Die Skripte laden währenddessen schon vor (gleiche Adresse wie unten), statt erst danach zu beginnen. */
+if (FC.mode !== "local") {
+  FC_FILES.forEach(function (f) {
+    var v = fcVer(), l = document.createElement("link"); l.rel = "preload"; l.as = "script"; l.href = f + (v ? "?v=" + v : "");
+    document.head.appendChild(l);
+  });
+}
 function fcLoad(files, done) {
-  var v = encodeURIComponent(((document.getElementById("appver") || {}).textContent || "").trim()), left = files.length, failed = "";
+  var v = fcVer(), left = files.length, failed = "";
   files.forEach(function (f) {
     var el = document.createElement("script"); el.src = f + (v ? "?v=" + v : ""); el.async = false;
     el.onload = function () { if (--left === 0) done(failed); };

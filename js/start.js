@@ -23,4 +23,5 @@ if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
 applyTextSize();
 showTab("heute", true); window.addEventListener("resize", () => { moveBoth(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { moveBoth(); });
+document.documentElement.setAttribute("data-ready", "1");
 window.__fcReady = true; /* Start komplett durchgelaufen (sonst zeigt der Startblock unten einen Hinweis) */
