@@ -169,3 +169,122 @@ def haeckse():
                 ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. " + (CARB["reis"][3] if c == "reis" else ""), vs,
                  "Hähnchen in Streifen schneiden und salzen. Ei verquirlen, Haferflocken mit Paprikapulver und Pfeffer mischen. Die Streifen erst im Ei, dann in den Haferflocken wenden und fest andrücken.",
                  "Auf einem geölten Blech 15 bis 18 Minuten backen, einmal wenden, bis das Fleisch durch und die Kruste goldbraun ist.", ds, "Mit Salat, Dip und " + ("Reis" if c == "reis" else "Brot") + " servieren."])
+
+
+def brokkoli():
+    """Brokkoli: Nudeln in Parmesan-Sahne-Soße, Pfannen mit Reis, Nudelauflauf, Tomaten-Nudeln, Omelett und Suppe."""
+    teil = "Den Brokkoli in kleine Röschen teilen, den Strunk schälen und in Scheiben schneiden."
+    wort = {"haehn": "Hähnchen", "pute": "Pute", "schink": "Schinken"}
+
+    def fl(m, g=None):
+        """(Titelwort, Menge, Brat-Schritt, Öl in TL) für Fleisch aus MEAT oder Schinken."""
+        if m == "schink":
+            return "Schinken", g or 60, "Den Schinken in Würfel schneiden und im Öl 2 Minuten anbraten.", 0.5
+        pre, g0, art = MEAT[m]
+        return pre, g or g0, meat_step(m), meat_oel(m)
+
+    # (a) Nudeln mit Brokkoli in Parmesan-Sahne-Soße
+    for m in ["haehn", "pute", "schink"]:
+        pre, g, st, o = fl(m, 90 if m != "schink" else 60)
+        i = join(ing(**{m: g, "nudel": 70, "brok": 150, "sahne": 30, "parm": 15, "oel": o}), ing(zwie=0.5, knob=1, T="Muskat, Salz und Pfeffer"))
+        add(f"{pre}-Nudeln mit Brokkoli in Parmesan-Sahne-Soße", "M", 30, "p", i,
+            [teil + " Die Nudeln nach Packungsanleitung in Salzwasser kochen, den Brokkoli in den letzten 3 Minuten mitkochen. Etwas Nudelwasser aufheben, dann abgießen.",
+             "Zwiebel würfeln, Knoblauch fein hacken.", st,
+             "Zwiebel und Knoblauch zum Fleisch geben und 2 Minuten mitbraten. Die Sahne zugießen und bei niedriger Hitze 2 Minuten köcheln lassen. Den Parmesan einrühren, bis er geschmolzen ist, und mit Muskat, Salz und Pfeffer würzen.",
+             "Nudeln und Brokkoli untermischen, bei Bedarf einen Schuss Nudelwasser zugeben."])
+
+    # (b) Brokkoli-Pfanne mit Honig-Senf-Soße und Reis
+    for m in ["haehn", "pute", "haehnst", "schnitzel"]:
+        pre, g, st, o = fl(m, MEAT[m][1] - 20)
+        i = join(ing(**{m: g, "reis": 70, "brok": 150, "zwie": 0.5, "knob": 1, "senf": 1.5, "honig": 1, "bruehe": 100, "oel": o}), ing(T="Salz und Pfeffer"))
+        add(f"{pre}-Brokkoli-Pfanne mit Honig-Senf-Soße und Reis", "M", 30, "pa", i,
+            [CARB["reis"][3], teil + " Zwiebel in Streifen schneiden, Knoblauch fein hacken.", st,
+             "Zwiebel, Brokkoli und Knoblauch zum Fleisch geben und 3 Minuten mitbraten. Senf, Honig und Brühe zugeben und zugedeckt 5 Minuten garen, bis der Brokkoli bissfest ist. Dann ohne Deckel 2 Minuten einkochen lassen und mit Salz und Pfeffer abschmecken.",
+             "Mit dem Reis servieren."])
+
+    # (c) Hack-Brokkoli-Pfanne mit Tomaten und Reis
+    for m in ["rhack", "phack"]:
+        pre, g, st, o = fl(m)
+        i = join(ing(**{m: g, "reis": 70, "brok": 150, "stueck": 100, "zwie": 0.5, "knob": 1, "paprikap": 1, "oel": o}), ing(T="Salz und Pfeffer"))
+        add(f"{pre}-Brokkoli-Pfanne mit Tomaten und Reis", "M", 30, "pa", i,
+            [CARB["reis"][3], teil + " Zwiebel würfeln, Knoblauch fein hacken.", st,
+             "Zwiebel, Knoblauch und Paprikapulver zum Hack geben und 2 Minuten mitbraten. Brokkoli und stückige Tomaten zugeben und zugedeckt 8 Minuten garen, bis der Brokkoli bissfest ist. Mit Salz und Pfeffer würzen.",
+             "Mit dem Reis servieren."])
+
+    # (d) Brokkoli-Nudelauflauf
+    for m, kn, kg in [("haehn", "Gouda", dict(gouda=30)), ("pute", "Mozzarella", dict(moz=40)), ("schink", "Gouda", dict(gouda=30))]:
+        pre, g, st, o = fl(m, 80 if m != "schink" else 60)
+        i = join(ing(**{m: g, "nudel": 60, "brok": 150, "sahne": 40, "zwie": 0.5, "knob": 1, "oel": o}), ing(**kg), ing(T="Muskat, Salz und Pfeffer"))
+        add(f"Brokkoli-Nudelauflauf mit {wort[m]} und {kn}", "M", 40, "p", i,
+            ["Ofen auf 200 °C Ober- und Unterhitze vorheizen. " + teil + " Die Nudeln 3 Minuten kürzer als auf der Packung angegeben kochen, den Brokkoli in den letzten 2 Minuten mitkochen, dann abgießen.",
+             "Zwiebel würfeln, Knoblauch fein hacken.", st,
+             "Zwiebel und Knoblauch zum Fleisch geben und 2 Minuten mitbraten. Die Sahne zugießen, aufkochen und mit Muskat, Salz und Pfeffer abschmecken.",
+             "Nudeln, Brokkoli und die Soße in einer Auflaufform mischen, den Käse darauf verteilen und 15 bis 20 Minuten backen, bis er goldbraun ist."])
+
+    # (e) vegetarisch: Brokkoli-Tomaten-Nudeln
+    add("Brokkoli-Tomaten-Nudeln mit Mozzarella und Parmesan", "M", 25, "p",
+        join(ing(nudel=70, brok=150, tom=2, moz=60, parm=15, knob=1, oel=1), ing(T="Basilikum, Salz und Pfeffer")),
+        [teil + " Die Nudeln nach Packungsanleitung in Salzwasser kochen, den Brokkoli in den letzten 3 Minuten mitkochen, dann abgießen.",
+         "Tomaten in Stücke schneiden, Knoblauch fein hacken, Mozzarella zupfen.",
+         "Knoblauch im Öl 1 Minute anbraten, die Tomaten zugeben und 4 Minuten schmoren.",
+         "Nudeln und Brokkoli untermischen, den Mozzarella darauf verteilen und zugedeckt 2 Minuten schmelzen lassen. Mit Parmesan und Basilikum servieren."])
+
+    # (f) Omelett
+    add("Brokkoli-Omelett mit Mozzarella, Tomate und Brot", "M", 20, "",
+        join(ing(ei=3, brok=100, moz=40, tom=1, brot=1, oel=1), ing(T="Salz und Pfeffer")),
+        ["Den Brokkoli in kleine Röschen teilen und 3 Minuten in Salzwasser kochen, abgießen. Die Tomate in Scheiben schneiden, den Mozzarella zupfen.",
+         "Eier verquirlen und würzen. Das Öl in einer Pfanne erhitzen, den Brokkoli kurz anbraten und die Eier zugeben. Bei mittlerer Hitze fast stocken lassen.",
+         "Tomate und Mozzarella darauf verteilen, zuklappen und 1 Minute ziehen lassen, bis das Ei ganz fest ist.", "Mit dem Brot servieren."])
+
+    # (g) Brokkoli-Sahne-Suppe mit Fleisch
+    for m in ["haehn", "pute"]:
+        pre, g, st, o = fl(m, 90)
+        i = join(ing(**{m: g, "brok": 250, "zwie": 0.5, "knob": 1, "bruehe": 400, "sahne": 40, "parm": 15, "brot": 1, "oel": o}), ing(T="Muskat, Salz und Pfeffer"))
+        add(f"Brokkoli-Sahne-Suppe mit {wort[m]} und Parmesan", "M", 30, "p", i,
+            ["Den Brokkoli in Röschen teilen, den Strunk schälen und würfeln. Zwiebel würfeln, Knoblauch fein hacken.", st + " Das Fleisch herausnehmen und beiseitestellen.",
+             "Zwiebel und Knoblauch im selben Topf 2 Minuten andünsten. Brokkoli und Brühe (am besten aus Brühepulver) zugeben und 8 Minuten köcheln lassen.",
+             "Die Suppe mit dem Stabmixer pürieren (ein paar Röschen dürfen stückig bleiben), die Sahne einrühren und mit Muskat, Salz und Pfeffer abschmecken.",
+             "Das Fleisch in die Suppe geben und kurz erwärmen. Mit Parmesan bestreuen und mit dem Brot servieren."])
+
+
+def kartoffelbrei():
+    """Kartoffelbrei (aus frischen Kartoffeln, mit Milch und Butter) zu Fleisch und Gemüse. Pommes bleiben gesperrt (BANNED in build.py)."""
+    brei = dict(kart=250, milch=50, butter=5)
+    k1 = "Die Kartoffeln schälen, in gleich große Stücke schneiden und in Salzwasser 15 bis 20 Minuten kochen, bis sie ganz weich sind."
+    k2 = "Die Kartoffeln abgießen, mit der Milch und der Butter zu Brei stampfen und mit Salz und Muskat abschmecken."
+    tipk = "Mehligkochende Kartoffeln werden besonders cremig. Die Milch darf ruhig warm sein."
+    brok = "Den Brokkoli in Röschen teilen, den Strunk schälen und in Scheiben schneiden. In Salzwasser 4 bis 5 Minuten bissfest garen und abgießen."
+
+    # (a) Fleisch mit Kartoffelbrei und Brokkoli
+    for m in ["haehn", "pute", "schnitzel", "haehnst"]:
+        pre, g, art = MEAT[m]
+        i = join(ing(**{m: g - 20, "brok": 150, "oel": meat_oel(m)}), ing(**brei), ing(T="Salz, Pfeffer und Muskat"))
+        add(f"{NAME[m]} mit Kartoffelbrei und Brokkoli", "M", 35, "", i, [k1, meat_step(m), brok, k2, "Fleisch, Brokkoli und Kartoffelbrei anrichten."], tipk)
+
+    # (b) Fleisch in Senf-Sahne-Soße
+    for m in ["haehn", "schnitzel"]:
+        pre, g, art = MEAT[m]
+        i = join(ing(**{m: g - 20, "brok": 150, "zwie": 0.5, "sahne": 30, "senf": 1, "oel": meat_oel(m)}), ing(**brei), ing(T="Salz, Pfeffer und Muskat"))
+        add(f"{NAME[m]} in Senf-Sahne-Soße mit Kartoffelbrei und Brokkoli", "M", 35, "", i,
+            [k1, meat_step(m), brok,
+             "Die Zwiebel würfeln, zum Fleisch geben und 2 Minuten mitbraten. Sahne und Senf einrühren, 3 Minuten sanft köcheln lassen und mit Salz und Pfeffer abschmecken.",
+             k2, "Fleisch mit der Soße, Brokkoli und Kartoffelbrei anrichten."], tipk)
+
+    # (c) Hackbällchen in Tomatensoße
+    for m in ["rhack", "phack"]:
+        pre, g, art = MEAT[m]
+        i = join(ing(**{m: g, "hafer": 10, "senf": 0.5, "oel": 1, "stueck": 200, "zwie": 1, "knob": 1}), ing(**brei), ing(T="Oregano, Salz, Pfeffer und Muskat"))
+        add(f"{pre}-Bällchen in Tomatensoße mit Kartoffelbrei", "M", 40, "", i,
+            [k1, "Zwiebel würfeln, Knoblauch fein hacken.",
+             "Hack mit Haferflocken, Senf, Salz und Pfeffer verkneten, zu kleinen Bällchen formen und im Öl rundum 5 Minuten anbraten.",
+             "Zwiebel und Knoblauch zugeben und 2 Minuten mitbraten. Die stückigen Tomaten zugeben und 10 Minuten zugedeckt köcheln, bis die Bällchen innen nicht mehr rosa sind. Mit Oregano, Salz und Pfeffer würzen.",
+             k2, "Die Bällchen mit der Soße auf dem Kartoffelbrei servieren."], tipk)
+
+    # (d) Fleisch mit Paprika-Zwiebel-Gemüse
+    for m in ["haehn", "pute"]:
+        pre, g, art = MEAT[m]
+        i = join(ing(**{m: g - 20, "pap": 2, "zwie": 1, "paprikap": 1, "oel": meat_oel(m)}), ing(**brei), ing(T="Salz, Pfeffer und Muskat"))
+        add(f"{NAME[m]} mit Paprika-Zwiebel-Gemüse und Kartoffelbrei", "M", 35, "", i,
+            [k1, "Paprika in Streifen, Zwiebel in Ringe schneiden.", meat_step(m),
+             "Paprika, Zwiebel und Paprikapulver zum Fleisch geben und 6 Minuten mitbraten, bis das Gemüse weich ist. Mit Salz und Pfeffer abschmecken.",
+             k2, "Fleisch und Gemüse mit dem Kartoffelbrei anrichten."], tipk)

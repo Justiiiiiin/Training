@@ -1590,8 +1590,8 @@ function prepPool(kind) {
   return RECIPES.filter((r) => ok(r) && r.meal === "Snack" && r.tags.includes("Meal-Prep"));
 }
 /* Reste sparsam einplanen: Gewicht und Haltbarkeit offener Packungen */
-const RESTW = { quark: 1, skyr: 1, jog35: 1, moz: 1, schink: 1, paufs: 1, ruc: 1, eisb: 1, haehn: 0.5, pute: 0.5, schnitzel: 0.5, ghack: 0.5, rhack: 0.5, phack: 0.5, milch: 0.5, stueck: 0.7, kiche: 0.7, bohne: 0.7, burrata: 1, sahne: 0.5 };
-const RESTD = { quark: [4, 1], skyr: [4, 1], jog35: [4, 0], moz: [4, 0], schink: [3, 0], paufs: [3, 0], ruc: [3, 0], eisb: [4, 0], haehn: [2, 1], pute: [2, 1], schnitzel: [2, 1], ghack: [1, 1], rhack: [1, 1], phack: [1, 1], milch: [5, 0], stueck: [3, 0], kiche: [3, 0], bohne: [3, 0], burrata: [2, 0], sahne: [3, 0] };
+const RESTW = { quark: 1, skyr: 1, jog35: 1, moz: 1, schink: 1, paufs: 1, ruc: 1, eisb: 1, haehn: 0.5, pute: 0.5, schnitzel: 0.5, ghack: 0.5, rhack: 0.5, phack: 0.5, milch: 0.5, stueck: 0.7, kiche: 0.7, bohne: 0.7, burrata: 1, sahne: 0.5, brok: 1, kart: 1 };
+const RESTD = { quark: [4, 1], skyr: [4, 1], jog35: [4, 0], moz: [4, 0], schink: [3, 0], paufs: [3, 0], ruc: [3, 0], eisb: [4, 0], haehn: [2, 1], pute: [2, 1], schnitzel: [2, 1], ghack: [1, 1], rhack: [1, 1], phack: [1, 1], milch: [5, 0], stueck: [3, 0], kiche: [3, 0], bohne: [3, 0], burrata: [2, 0], sahne: [3, 0], brok: [4, 0], kart: [3, 0] };
 function restLines(calc) {
   return calc.lines.filter((l) => RESTW[l.k] && !l.staple && l.left != null && !PRICE[l.k].loose && l.left >= 0.2 * PRICE[l.k].pack)
     .map((l) => Object.assign({}, l, { val: l.left / PRICE[l.k].pack * PRICE[l.k].price }));
@@ -1772,9 +1772,9 @@ const CSYN = {
   tmark: "tomatenmark", stueck: "stueckige tomaten|passierte tomaten|dosentomaten", tom: "tomate tomaten", gurke: "gurke gurken salatgurke", pap: "paprika", zwie: "zwiebel zwiebeln", karo: "karotte karotten moehre moehren",
   eisb: "eisbergsalat salat eisberg", spin: "spinat", ruc: "rucola", sgurke: "saure gurke|saure gurken|gewuerzgurke|gewuerzgurken", knob: "knoblauch", banane: "banane bananen", erdb: "erdbeeren erdbeere", kiche: "kichererbsen",
   bohne: "kidneybohnen bohnen", linse: "linsen", kokos: "kokosmilch", bruehe: "gemuesebruehe bruehe", zitrone: "zitronensaft zitrone", senf: "senf", kakao: "kakao", schnitzel: "schweineschnitzel schnitzel schweinefleisch", curry: "currypulver curry",
-  speisequark: "speisequark", jogGr: "griechischer joghurt|griechisches joghurt|joghurt griechisch|sahnejoghurt", butter: "butter markenbutter suessrahmbutter streichbutter", haehnst: "mini steaks|ministeaks|minutensteaks|minisnitzel", lyoner: "lyoner delikatess lyoner", burrata: "burrata", sahne: "sahne schlagsahne"
+  speisequark: "speisequark", jogGr: "griechischer joghurt|griechisches joghurt|joghurt griechisch|sahnejoghurt", butter: "butter markenbutter suessrahmbutter streichbutter", haehnst: "mini steaks|ministeaks|minutensteaks|minisnitzel", lyoner: "lyoner delikatess lyoner", burrata: "burrata", sahne: "sahne schlagsahne", brok: "brokkoli broccoli", kart: "kartoffeln kartoffel"
 };
-const CDEF = { speisequark: 150, jogGr: 150, butter: 10, haehnst: 150, lyoner: 30, gouda: 30, moz: 60, parm: 15, schink: 40, paufs: 40, quark: 150, skyr: 150, jog35: 150, hafer: 50, mandel: 20, chia: 15, reis: 80, nudel: 100, milch: 200, eisb: 80, gurke: 100, spin: 80, ruc: 30, erdb: 150, kiche: 120, bohne: 120, linse: 60, kokos: 100, bruehe: 200, stueck: 200, burrata: 60, sahne: 50 };
+const CDEF = { speisequark: 150, jogGr: 150, butter: 10, haehnst: 150, lyoner: 30, gouda: 30, moz: 60, parm: 15, schink: 40, paufs: 40, quark: 150, skyr: 150, jog35: 150, hafer: 50, mandel: 20, chia: 15, reis: 80, nudel: 100, milch: 200, eisb: 80, gurke: 100, spin: 80, ruc: 30, erdb: 150, kiche: 120, bohne: 120, linse: 60, kokos: 100, bruehe: 200, stueck: 200, burrata: 60, sahne: 50, brok: 150, kart: 200 };
 /* weitere Lebensmittel: [Schlüssel (| getrennt), Name, kcal/100 g, Eiweiß/100 g, Gramm je Stück, Standardmenge in g, ca. € pro 100 g] */
 const CEXTRA = [
   ["eigelb|eidotter", "Eigelb", 322, 15.9, 17, 17, 0.3], ["eiweiss|eiklar", "Eiweiß (vom Ei)", 52, 10.9, 33, 33, 0.1],

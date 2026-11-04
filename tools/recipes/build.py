@@ -38,6 +38,7 @@ DB = {
  "broetchen": ("Vollkornbrötchen", "Vollkornbrötchen", "Stk", 60, 240, 9, "", "stärke"),
  "nudel": ("Vollkornnudeln (Rohgewicht)", None, "g", 1, 350, 12.5, "", "stärke"),
  "reis": ("Reis (Rohgewicht)", None, "g", 1, 350, 7, "", "stärke"),
+ "kart": ("Kartoffeln (geschält)", None, "g", 1, 71, 2.0, "", "stärke"),
  "honig": ("Honig", None, "TL", 7, 300, 0.3, "Honig", "sonst"),
  "oel": ("Rapsöl", None, "TL", 4.5, 884, 0, "", "fett"),
  "tmark": ("Tomatenmark", None, "EL", 15, 85, 4.5, "", "sonst"),
@@ -50,6 +51,7 @@ DB = {
  "eisb": ("Eisbergsalat", None, "g", 1, 14, 0.9, "", "gemüse"),
  "spin": ("Spinat (frisch oder Tiefkühl)", None, "g", 1, 23, 2.9, "", "gemüse"),
  "ruc": ("Rucola", None, "g", 1, 25, 2.6, "", "gemüse"),
+ "brok": ("Brokkoli", None, "g", 1, 34, 2.8, "", "gemüse"),
  "sgurke": ("Saure Gurke", "Saure Gurken", "Stk", 40, 15, 0.5, "", "gemüse"),
  "knob": ("Knoblauchzehe", "Knoblauchzehen", "Stk", 3, 150, 6, "", "sonst"),
  "banane": ("Banane", "Bananen", "Stk", 100, 90, 1.1, "", "obst"),
@@ -73,7 +75,7 @@ DB = {
 # ======================= Lidl-Preise (Richtwerte, Stand Nov 2026) =======================
 # key: (Packungsgröße in g bzw. ml, Preis in €, Abteilung, Packungsbeschreibung, lose?, Vorrat?)
 # Quellen: aktuelle Lidl-Prospektpreise und Supermarktcheck-Meldungen (Hähnchen, Quark, Skyr, Joghurt, Gouda, Haferflocken, Tomaten-Dose);
-# echte Kassenbons vom Okt/Nov 2026 (Quark, Milch, Tomaten-Dose, Tomatenmark, Rucola, Banane, Erdbeeren TK, Burrata, Sahne; Haferflocken 1 kg XXL und Butter 375 g passten schon; Eier, Joghurt, Speisequark 20 %, Mozzarella, Parmesan, Paprika, Gurke und Mini-Steaks stimmten schon);
+# echte Kassenbons vom Okt/Nov 2026 (Quark, Milch, Tomaten-Dose, Tomatenmark, Rucola, Banane, Erdbeeren TK, Burrata, Sahne, Brokkoli (Kopfgröße 500 g angenommen); Haferflocken 1 kg XXL und Butter 375 g passten schon; Eier, Joghurt, Speisequark 20 %, Mozzarella, Parmesan, Paprika, Gurke und Mini-Steaks stimmten schon);
 # alle anderen Werte sind geschätzte Marktpreise. Preise schwanken, Angebote und Lidl Plus drücken sie oft.
 PRICE = {
  "haehn": (600, 5.49, "Fleisch & Wurst", "Schale 600 g", 0, 0),
@@ -106,6 +108,7 @@ PRICE = {
  "broetchen": (60, 0.25, "Brot & Backwaren", "Stück", 0, 0),
  "nudel": (500, 1.15, "Nudeln, Reis & Trockenes", "Packung 500 g", 0, 0),
  "reis": (1000, 1.89, "Nudeln, Reis & Trockenes", "Beutel 1 kg", 0, 0),
+ "kart": (2000, 2.49, "Obst & Gemüse", "Beutel 2 kg (Preis geschätzt)", 0, 0),
  "honig": (500, 3.19, "Vorrat", "Glas 500 g", 0, 1),
  "oel": (920, 1.99, "Vorrat", "Flasche 1 l", 0, 1),
  "tmark": (200, 0.89, "Vorrat", "Tube 200 g", 0, 1),
@@ -118,6 +121,7 @@ PRICE = {
  "eisb": (500, 1.19, "Obst & Gemüse", "Kopf", 0, 0),
  "spin": (450, 1.29, "Tiefkühl", "Beutel 450 g (TK)", 0, 0),
  "ruc": (125, 0.89, "Obst & Gemüse", "Schale 125 g", 0, 0),
+ "brok": (500, 2.39, "Obst & Gemüse", "Kopf (ca. 500 g)", 0, 0),
  "sgurke": (320, 1.19, "Nudeln, Reis & Trockenes", "Glas (ca. 8 Stück)", 0, 0),
  "knob": (120, 0.99, "Obst & Gemüse", "Netz mit 3 Knollen", 0, 0),
  "banane": (1000, 1.69, "Obst & Gemüse", "lose", 1, 0),
@@ -919,7 +923,7 @@ problems = []
 ids = [o["id"] for o in out]
 assert len(set(ids)) == len(ids), ("doppelte IDs", [i for i, c in collections.Counter(ids).items() if c > 1][:10])
 assert not TARGET or len(out) == TARGET, (len(out), TARGET)
-BANNED = ["gyros", "fisch", "thunfisch", "lachs", "tofu", "kartoffel", "hüttenkäse", "pilz", "brokkoli", "zucchini", "radieschen", "couscous", "soja"]
+BANNED = ["gyros", "fisch", "thunfisch", "lachs", "tofu", "pommes", "hüttenkäse", "pilz", "zucchini", "radieschen", "couscous", "soja"]
 for o in out:
     text = (o["title"] + " " + " ".join(i[2] for i in o["ing"]) + " " + " ".join(o["steps"])).lower()
     for b in BANNED:

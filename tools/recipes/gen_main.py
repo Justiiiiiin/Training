@@ -129,6 +129,8 @@ def run():
     gen_main3.suppen()
     gen_main3.ofen()
     gen_main3.haeckse()
+    gen_main3.brokkoli()
+    gen_main3.kartoffelbrei()
     gen_main4.salate()
     gen_main4.eier()
     gen_main4.huelsen()

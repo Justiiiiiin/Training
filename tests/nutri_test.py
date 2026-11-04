@@ -22,7 +22,7 @@ REF = {
     "speisequark": (95, 110, 10, 12), "jogGr": (115, 135, 3.5, 5.5), "butter": (720, 760, 0.5, 1), "haehnst": (100, 125, 20, 23), "lyoner": (240, 290, 10, 14),
     "hafer": (360, 380, 12, 14), "chia": (470, 500, 15, 20), "mandel": (570, 610, 19, 22), "brot": (200, 250, 6, 9), "wrap": (270, 320, 8, 10),
     "broetchen": (220, 270, 8, 10), "nudel": (340, 360, 11.5, 14), "reis": (345, 365, 6.5, 8), "honig": (295, 320, 0, 0.6),
-    "burrata": (210, 290, 8, 15), "sahne": (280, 330, 2, 3),
+    "burrata": (210, 290, 8, 15), "sahne": (280, 330, 2, 3), "brok": (28, 40, 2.4, 4.0), "kart": (65, 80, 1.5, 2.5),
     "oel": (880, 900, 0, 0.1), "tmark": (70, 110, 4, 5.5), "stueck": (20, 32, 0.9, 1.5), "tom": (15, 22, 0.8, 1.1),
     "gurke": (10, 16, 0.5, 0.8), "pap": (20, 40, 0.8, 1.3), "zwie": (28, 42, 1.0, 1.4), "karo": (30, 42, 0.8, 1.0), "eisb": (11, 16, 0.7, 1.1),
     "spin": (18, 27, 2.5, 3.2), "ruc": (20, 30, 2.3, 2.8), "sgurke": (10, 20, 0.3, 0.9), "knob": (130, 160, 5.5, 7), "banane": (85, 95, 1.0, 1.3),
@@ -47,7 +47,7 @@ with sync_playwright() as p:
         n++; if (ids.has(r.id)) bad.push('doppelte ID ' + r.id); ids.add(r.id);
         let k = 0, pr = 0, c = 0, v = 0;
         r.ing.forEach(i => { const key = i[4]; if (!key) return; const P = PRICE[key]; if (!P) { bad.push(r.id + ': unbekannte Zutat ' + key); return; }
-          const g = i[0] * P.per; k += g * P.kcal / 100; pr += g * P.p / 100; c += g * P0price(key, P) / P.pack; if (['tom','gurke','pap','zwie','karo','eisb','spin','ruc','sgurke','stueck'].includes(key)) v += g; });
+          const g = i[0] * P.per; k += g * P.kcal / 100; pr += g * P.p / 100; c += g * P0price(key, P) / P.pack; if (['tom','gurke','pap','zwie','karo','eisb','spin','ruc','sgurke','stueck','brok'].includes(key)) v += g; });
         function P0price(key, P) { return p0[key]; }
         // Abweichung vom ungerundeten Wert: höchstens die halbe Rundungsstufe (auf der .5-Grenze runden Python und JS verschieden)
         const E = 0.01, dk = Math.abs(k - r.kcal), dp = Math.abs(pr - r.protein), dc = Math.abs(Math.round(c * 100) / 100 - r.cost), dv = Math.abs(v - r.veg);
