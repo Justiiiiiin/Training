@@ -23,7 +23,7 @@ JS = """
       shTopX: top.J.neck[0], shBotX: bot.J.neck[0], wristX: top.J.wL[0], wristY: top.J.wL[1],
       hipTop: top.J.P[1], hipBot: bot.J.P[1], neckTop: top.J.neck[1], neckBot: bot.J.neck[1],
       elbowBotY: bot.J.elL[1], headBotY: bot.J.head[1], armTop: d(top.J.sL, top.J.elL) + d(top.J.elL, top.J.wL), reachTop: d(top.J.sL, top.J.wL),
-      legStretch: d(top.J.hL, top.J.aL) });
+      legStretch: d(top.J.hL, top.J.aL), headBackBot: bot.J.neck[0] - bot.J.head[0], headBackTop: top.J.neck[0] - top.J.head[0] });
   });
   V3A.rowbp.forEach((an, li) => {
     const ps = uniq(an), a = V3.solve(ps[0]), b = V3.solve(ps[ps.length - 1]);
@@ -45,6 +45,7 @@ with sync_playwright() as p:
         ck(n + ": Hände bleiben auf dem Griffpunkt (Arme nicht zu kurz)", q["wristErr"] < 0.02, "%.3f" % q["wristErr"])
         ck(n + ": Füße bleiben stehen", q["ankleErr"] < 0.02, "%.3f" % q["ankleErr"])
         ck(n + ": Arme oben fast gestreckt", q["reachTop"] > 0.48, "%.2f" % q["reachTop"])
+        ck(n + ": Kopf bleibt in Verlängerung des Rückens, nicht eingedreht", q["headBackBot"] < 0.02 and q["headBackTop"] < 0.02, "%.2f / %.2f" % (q["headBackTop"], q["headBackBot"]))
         ck(n + ": Beine gestreckt (Hüfte oben)", q["legStretch"] > 0.8, "%.2f" % q["legStretch"])
         ck(n + ": Schultern sinken", q["neckBot"] < q["neckTop"] - 0.08, "%.2f -> %.2f" % (q["neckTop"], q["neckBot"]))
         ck(n + ": Hüfte sinkt höchstens 0,25 m", q["hipTop"] - q["hipBot"] < 0.25, "%.2f -> %.2f" % (q["hipTop"], q["hipBot"]))

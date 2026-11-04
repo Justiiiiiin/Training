@@ -153,7 +153,7 @@ const V3A = (() => {
         tor = Math.atan2(N[1] - P[1], N[0] - P[0]) / RAD;
         N = [S0[0] + 0.04 * Math.cos(tor * RAD), S0[1] + 0.04 * Math.sin(tor * RAD)];
       }
-      const p = POSE({ pel: [P[0], P[1], 0], tor, hd: tor - 12, la: [A[0], A[1], -0.1], ra: [A[0], A[1], 0.1], lfa: -26, rfa: -26, lkp: [1, 0, 0], rkp: [1, 0, 0], lha: 0, rha: 0, lep: [-1, -0.2, -0.5], rep: [-1, -0.2, 0.5] });
+      const p = POSE({ pel: [P[0], P[1], 0], tor, hd: Math.max(-90, tor - 6), la: [A[0], A[1], -0.1], ra: [A[0], A[1], 0.1], lfa: -26, rfa: -26, lkp: [1, 0, 0], rkp: [1, 0, 0], lha: 0, rha: 0, lep: [-1, -0.2, -0.5], rep: [-1, -0.2, 0.5] });
       p.lw = [W[0], W[1], -0.19]; p.rw = [W[0], W[1], 0.19];
       return p;
     };
