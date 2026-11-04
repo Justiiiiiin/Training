@@ -73,7 +73,7 @@ DB = {
 # ======================= Lidl-Preise (Richtwerte, Stand Nov 2026) =======================
 # key: (Packungsgröße in g bzw. ml, Preis in €, Abteilung, Packungsbeschreibung, lose?, Vorrat?)
 # Quellen: aktuelle Lidl-Prospektpreise und Supermarktcheck-Meldungen (Hähnchen, Quark, Skyr, Joghurt, Gouda, Haferflocken, Tomaten-Dose);
-# echte Kassenbons vom Okt/Nov 2026 (Quark, Milch, Tomaten-Dose, Tomatenmark, Rucola, Banane, Burrata, Sahne; Eier, Joghurt, Speisequark 20 %, Mozzarella, Parmesan, Paprika, Gurke und Mini-Steaks stimmten schon);
+# echte Kassenbons vom Okt/Nov 2026 (Quark, Milch, Tomaten-Dose, Tomatenmark, Rucola, Banane, Erdbeeren TK, Burrata, Sahne; Haferflocken 1 kg XXL und Butter 375 g passten schon; Eier, Joghurt, Speisequark 20 %, Mozzarella, Parmesan, Paprika, Gurke und Mini-Steaks stimmten schon);
 # alle anderen Werte sind geschätzte Marktpreise. Preise schwanken, Angebote und Lidl Plus drücken sie oft.
 PRICE = {
  "haehn": (600, 5.49, "Fleisch & Wurst", "Schale 600 g", 0, 0),
@@ -121,7 +121,7 @@ PRICE = {
  "sgurke": (320, 1.19, "Nudeln, Reis & Trockenes", "Glas (ca. 8 Stück)", 0, 0),
  "knob": (120, 0.99, "Obst & Gemüse", "Netz mit 3 Knollen", 0, 0),
  "banane": (1000, 1.69, "Obst & Gemüse", "lose", 1, 0),
- "erdb": (500, 1.99, "Tiefkühl", "Beutel 500 g (TK)", 0, 0),
+ "erdb": (750, 3.29, "Tiefkühl", "Beutel 750 g (TK)", 0, 0),
  "kiche": (265, 0.79, "Nudeln, Reis & Trockenes", "Dose 400 g", 0, 0),
  "bohne": (265, 0.69, "Nudeln, Reis & Trockenes", "Dose 400 g", 0, 0),
  "linse": (500, 1.29, "Nudeln, Reis & Trockenes", "Packung 500 g", 0, 0),
