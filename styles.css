@@ -835,3 +835,13 @@ html:not([data-ready]) .layout, html:not([data-ready]) .gnav, html:not([data-rea
   body[data-group="essen"] .tabs { display: flex; overflow-x: auto; gap: 2px; padding: 4px; }
   body[data-group="essen"] .tab { flex: 1 0 auto; padding: 0 12px; font-size: 0.8125rem; overflow: visible; }
 }
+
+/* Reste im Wochenplan (Glücksrad) */
+.rrest { color: var(--muted); font-size: 0.8125rem; line-height: 1.4; border-left: 3px solid var(--good); padding-left: 8px; margin-top: 4px; }
+
+.review-tip { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--line); }
+
+/* Deine Pfade (Ausblick) */
+.paths { list-style: none; margin: 0; padding: 0 !important; display: grid; gap: 16px; }
+.paths .path { max-width: none !important; }
+.paths .exready { color: var(--ink); }

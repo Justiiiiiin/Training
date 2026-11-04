@@ -569,10 +569,15 @@ function phaseHTML() {
   const txt = w <= 2 ? "Technik lernen. Lass bei jedem Satz noch ein paar Wiederholungen übrig." : w <= 8 ? "Aufbau. Lass 1 bis 3 Wiederholungen übrig, steigere erst die Wiederholungen, dann die Stufe." : "Weiter aufbauen. Klappt alles sauber, nimm die nächste Stufe.";
   return '<div class="card phase" data-nofold><div class="rday-h"><h3>Woche ' + w + '</h3><span class="rtot">' + cur + " Sätze pro Übung</span></div><p>" + txt + "</p>" + (w <= 8 && cur !== rec ? '<div class="row"><button class="btn primary" type="button" data-setsrec="' + rec + '">Auf ' + rec + " Sätze stellen</button></div>" : "") + fatigueHint() + "</div>";
 }
+/* Hat die letzte Einheit auf dieser Stufe gezeigt, dass die nächste Stufe dran ist? */
+function exUp(e) {
+  const li = lvl(e);
+  for (let i = WK.length - 1; i >= 0; i--) { const w = WK[i], mine = w.sets.filter((x) => x.ex === e.id && x.lvl === li); if (!mine.length) continue; if (!w.q) { const ev = evalEx(e, mine); return !!(ev && ev.status === "up"); } break; }
+  return false;
+}
 function exHintHTML(e) {
   const lt = lastTxt(e), li = lvl(e); if (!lt) return "";
-  let up = false;
-  for (let i = WK.length - 1; i >= 0; i--) { const w = WK[i], mine = w.sets.filter((x) => x.ex === e.id && x.lvl === li); if (!mine.length) continue; if (!w.q) { const ev = evalEx(e, mine); up = !!(ev && ev.status === "up"); } break; }
+  const up = exUp(e);
   const nxt = e.ladder[li + 1];
   return '<p class="small muted exlast">Zuletzt: ' + lt + "</p>" + (up && nxt ? '<p class="small exready"><b>Bereit für die nächste Stufe:</b> ' + esc(nxt) + '</p><div class="row"><button class="btn sm primary" type="button" data-lvlup="' + e.id + '">Stufe hoch</button></div>' : "");
 }
@@ -719,6 +724,21 @@ function futureHTML(e) {
   return '<details class="swopt fut"><summary><b>' + e.name + '</b><span class="swtag">' + (ok ? "Freigeschaltet" : "Braucht " + gearNames(e)) + '</span></summary><p class="small muted">Ersetzt: ' + slotN + "</p><p>" + e.why + '</p><p>' + e.cue + '</p><ol class="ladder">' + e.ladder.map((n) => "<li>" + n + "</li>").join("") + '</ol><p class="mistake"><b>Häufige Fehler:</b> ' + e.mistakes + "</p>" +
     (ok ? '<div class="row"><button class="btn primary" type="button" data-swapopen="' + e.slot + '">Übung tauschen</button></div>' : "") + "</details>";
 }
+/* Deine Pfade: pro Übung die Stufe auf dem Weg zur schwersten Stufe, dazu der Klimmzug-Weg aus den Meilensteinen */
+const msDone = (m) => (m.auto ? !!m.auto() : !!(settings.ms && settings.ms[m.id]));
+function pathRow(name, cur, n, now, goal, ready, next) {
+  const pct = Math.round(cur / n * 100);
+  return '<li class="vrow path"><span class="vname">' + esc(name) + '</span><span class="vnum">' + cur + "<small> von " + n + "</small></span>" +
+    '<span class="vbar" role="progressbar" aria-valuemin="0" aria-valuemax="' + n + '" aria-valuenow="' + cur + '" aria-label="' + esc(name) + ": " + cur + " von " + n + '"><i class="' + (cur >= n ? "good" : "ok") + '" style="width:' + pct + '%"></i></span>' +
+    '<span class="vsub muted small">' + (now ? "Jetzt: " + esc(now) + ". " : "") + (next ? "Als Nächstes: " + esc(next) + ". " : "") + (cur >= n ? "Ziel erreicht." : goal ? "Ziel: " + esc(goal) + "." : "") + "</span>" +
+    (ready ? '<span class="vsub small exready"><b>Bereit für die nächste Stufe:</b> ' + esc(ready) + "</span>" : "") + "</li>";
+}
+function pathsHTML() {
+  const rows = EX.map((e) => { const li = lvl(e), n = e.ladder.length; return pathRow(e.name, li + 1, n, e.ladder[li], e.ladder[n - 1], li < n - 1 && exUp(e) ? e.ladder[li + 1] : ""); });
+  const pull = ["mhang30", "mneg", "mpull"].map((id) => MILES.find((m) => m.id === id)).filter(Boolean);
+  if (pull.length === 3) { const done = pull.filter(msDone).length, nxt = pull.find((m) => !msDone(m)); rows.push(pathRow("Klimmzug", done, 3, nxt ? "" : pull[2].t, nxt && nxt !== pull[2] ? pull[2].t : "", "", nxt ? nxt.t : "")); }
+  return '<div class="card" data-nofold><h3>Deine Pfade</h3><p class="kicker">Jede Übung hat Stufen. Hier siehst du, wie weit du auf dem Weg zur schwersten Stufe bist.</p><ul class="paths">' + rows.join("") + "</ul></div>";
+}
 function renderAusblick(keep) {
   const p = $("#panel-ausblick"); if (!p) return;
   const wasOpen = keep ? $$("#panel-ausblick details").map((d) => d.open) : [], y = window.scrollY;
@@ -735,13 +755,13 @@ function renderAusblick(keep) {
     '<p>Alles zusammen wären etwa <b>' + eurR([lo, hi]) + "</b> neu, gebraucht etwa " + eurR([ulo, uhi]) + "." + (start.length ? " Du musst nicht alles kaufen: " + start.map((x) => x[0].name).join(", ") + " (zusammen etwa " + eurR([slo, shi]) + ") reichen für viele Monate." : "") + "</p>" : "<p>Du hast alles Wichtige. Super.</p>") +
     '<p class="note">Die Preise sind grobe Richtwerte (Stand November 2026) und ändern sich. Die Knöpfe unten öffnen eine Suche bei Amazon, Otto und Kleinanzeigen, keine festen Produkte. Vergleiche Bewertungen und die Angaben zur Traglast selbst.</p></div>';
   const ms = '<div class="card"><h3>Meilensteine</h3><p class="kicker">Ziele, die du abhaken kannst</p><ul class="msl">' + MILES.map((m) => {
-    const done = m.auto ? !!m.auto() : !!(settings.ms && settings.ms[m.id]), d = settings.ms && settings.ms[m.id];
+    const done = msDone(m), d = settings.ms && settings.ms[m.id];
     return '<li class="' + (done ? "ok" : "") + '"><span>' + (done ? "✓ " : "○ ") + m.t + "</span>" + (m.auto ? '<span class="small muted">' + (done ? "automatisch erkannt" : "wird automatisch erkannt") + "</span>" : '<button class="btn" type="button" data-ms="' + m.id + '" aria-pressed="' + done + '">' + (done ? "Geschafft" + (d ? " am " + d.slice(8, 10) + "." + d.slice(5, 7) + "." : "") : "Abhaken") + "</button>") + "</li>";
   }).join("") + "</ul></div>";
   const gear = '<h3 class="gearh">Ausrüstung</h3><div class="grid2">' + GEAR.map(gearHTML).join("") + "</div>";
   const fut = '<div class="card"><h3>Das kannst du später trainieren</h3><p class="kicker">Neue Übungen mit Ausrüstung</p><p>Sobald du etwas besitzt und oben auf „Habe ich“ tippst, erscheinen die passenden Übungen im Dialog „Tauschen“ in deinem Plan.</p><div class="swlist">' + EXFUT.map(futureHTML).join("") + "</div></div>";
   const later = '<div class="card"><h3>Noch später</h3><p class="kicker">Nur zum Merken, nichts davon brauchst du jetzt</p><ul class="laterl">' + LATER.map((x) => "<li><b>" + x.name + '</b> <span class="small muted">' + eurR(x.p) + "</span><br>" + x.note + '<div class="row gearrow">' + linksHTML(x.q, x.qk) + "</div></li>").join("") + "</ul></div>";
-  p.innerHTML = road + buy + gear + ms + fut + later;
+  p.innerHTML = road + pathsHTML() + buy + gear + ms + fut + later;
   foldCards(p);
   if (keep) { $$("#panel-ausblick details").forEach((d, i) => { if (wasOpen[i]) d.open = true; }); if (window.scrollY !== y) window.scrollTo(0, y); }
 }
@@ -946,7 +966,7 @@ function showTab(name, quiet) {
 }
 
 /* ======================= Glücksrad ======================= */
-const RAD = Object.assign({ mode: "day", meal: "Mittag/Abend", bfDay: true, bfWeek: false, noSpinat: true, cheap: true, work: false, maxDay: 0, people: 2 }, store.get("fc_rad", {}));
+const RAD = Object.assign({ mode: "day", meal: "Mittag/Abend", bfDay: true, bfWeek: false, noSpinat: true, cheap: true, work: false, maxDay: 0, people: 2, reste: true }, store.get("fc_rad", {}));
 let RPL = store.get("fc_radplans", {});
 const rad = { seg: [], theta: 0, hi: -1, busy: false, skip: false, shown: new Set() };
 const TAU = Math.PI * 2;
@@ -1023,7 +1043,9 @@ function radBuild(old) {
     recs.forEach((r) => used.add(r.id));
     days.push({ name: nm, slots: specs.map((sp, i) => ({ label: sp.label, k: sp.k, work: !!sp.work, id: recs[i].id, locked: !!(od && od[i].locked) })) });
   });
-  return { days };
+  const plan = { days };
+  radReste(plan);
+  return plan;
 }
 function rerollOne(plan, d, s) {
   const day = plan.days[d], sl = day.slots[s];
@@ -1157,7 +1179,7 @@ function radBusyUI(b) {
 function radRender() {
   const P = RPL[RAD.mode];
   if (!P) { $("#radres").innerHTML = '<div class="card empty"><h3>Noch nichts gedreht</h3><p class="muted">Tippe auf „Drehen“. Das Rad wählt aus deinen Rezepten.</p></div>'; return; }
-  const tgt = protTarget();
+  const tgt = protTarget(), notes = restNotes(P);
   $("#radres").innerHTML = P.days.map((d, di) => {
     const all = d.slots.every((s, si) => rad.shown.has(di + ":" + si));
     const recs = d.slots.map((s) => byId(s.id));
@@ -1167,7 +1189,7 @@ function radRender() {
       '<ul class="rslots">' + d.slots.map((s, si) => {
         const key = di + ":" + si, r = byId(s.id), on = rad.shown.has(key);
         return '<li class="rslot"><span class="rlab">' + esc(s.label) + "</span>" +
-          (on ? '<div class="rbody"><button class="rtitle" data-recipe="' + r.id + '">' + r.title + '</button><span class="rsub">' + r.protein + " g Eiweiß, " + r.kcal + " kcal, " + r.time + " Min, ca. " + eur(r.cost) + "</span></div>" +
+          (on ? '<div class="rbody"><button class="rtitle" data-recipe="' + r.id + '">' + r.title + '</button><span class="rsub">' + r.protein + " g Eiweiß, " + r.kcal + " kcal, " + r.time + " Min, ca. " + eur(r.cost) + "</span>" + (notes[key] || []).slice(0, 2).map((t) => '<span class="rrest">' + esc(t) + "</span>").join("") + "</div>" +
             '<div class="ract"><button class="fchip" data-rlock="' + key + '" aria-pressed="' + (s.locked ? "true" : "false") + '">' + (s.locked ? "Fixiert" : "Fixieren") + '</button><button class="fchip" data-rspin="' + key + '"' + (rad.busy ? " disabled" : "") + ">Neu drehen</button></div>"
             : '<div class="rbody"><span class="rpend">…</span></div><div></div>') + "</li>";
       }).join("") + "</ul>" + (RAD.mode === "meal" ? "" : "") + "</section>";
@@ -1180,6 +1202,7 @@ function renderRadOpts() {
   if (RAD.mode === "meal") h += ["Frühstück", "Mittag/Abend", "Snack", "Egal"].map((m) => '<button class="fchip" data-rmeal="' + m + '" aria-pressed="' + (RAD.meal === m ? "true" : "false") + '">' + m + "</button>").join("");
   if (RAD.mode === "day") h += tog("bfDay", "Mit Frühstück");
   if (RAD.mode === "week") h += tog("bfWeek", "Frühstück auch unter der Woche");
+  if (RAD.mode === "week") h += tog("reste", "Reste verwerten");
   h += tog("noSpinat", "Ohne Spinat") + tog("cheap", "Günstig") + tog("work", RAD.mode === "meal" ? "Für die Arbeit" : "Mittag zum Mitnehmen");
   const seg = (label, items, attr, cur) => '<div class="segwrap"><span class="small muted">' + label + '</span><div class="seg">' + items.map((x) => '<button class="segb" data-' + attr + '="' + x[0] + '" aria-pressed="' + (cur === x[0]) + '">' + x[1] + "</button>").join("") + "</div></div>";
   h = '<div class="chips">' + h + '</div><div class="radsegs">' + (RAD.mode !== "meal" ? seg("Preis pro Tag", [[0, "Egal"], [6, "bis 6 €"], [5, "bis 5 €"]], "rmax", RAD.maxDay) : "") + seg("Für", [[1, "1 Person"], [2, "2 Personen"]], "rpeople", RAD.people) + "</div>";
@@ -1359,7 +1382,7 @@ let WK = store.get("fc_wk", []);
   /* Rad: Einstellungen und gespeicherte Pläne prüfen */
   if (!["day", "week", "meal"].includes(RAD.mode)) RAD.mode = "day";
   if (typeof RAD.meal !== "string" || !["Frühstück", "Mittag/Abend", "Snack", "Egal"].includes(RAD.meal)) RAD.meal = "Mittag/Abend";
-  RAD.people = num(RAD.people, 1, 8, 2); RAD.maxDay = num(RAD.maxDay, 0, 100, 0);
+  RAD.people = num(RAD.people, 1, 8, 2); RAD.maxDay = num(RAD.maxDay, 0, 100, 0); RAD.reste = RAD.reste !== false;
   if (!isObj(RPL)) RPL = {};
   Object.keys(RPL).forEach((k) => {
     const pl = RPL[k];
@@ -1597,6 +1620,88 @@ function restLines(calc) {
     .map((l) => Object.assign({}, l, { val: l.left / PRICE[l.k].pack * PRICE[l.k].price }));
 }
 const restWaste = (calc) => restLines(calc).reduce((a, l) => a + l.val * RESTW[l.k], 0);
+/* Reste über mehrere Tage im Wochenplan: Eine angebrochene Packung hält nur kurz (RESTD). Der Plan sucht für den Rest ein späteres Gericht innerhalb der Haltbarkeit. */
+const slotAmt = (r, k) => r.ing.reduce((a, i) => a + (i[4] === k && i[0] != null ? i[0] * PRICE[k].per : 0), 0) * RAD.people;
+function restChains(plan) {
+  const chains = [], open = {};
+  plan.days.forEach((d, di) => d.slots.forEach((s, si) => {
+    const r = byId(s.id); if (!r) return;
+    const seen = {};
+    r.ing.forEach((i) => {
+      const k = i[4];
+      if (!k || seen[k] || i[0] == null || !RESTD[k] || !PRICE[k] || PRICE[k].loose || PRICE[k].staple) return;
+      seen[k] = 1;
+      const a = slotAmt(r, k), p = PRICE[k], c = open[k];
+      let more = a;
+      if (c && di - c.day <= RESTD[k][0] && c.left > 1e-6) { const take = Math.min(a, c.left); c.left -= take; c.uses.push({ d: di, s: si, amt: take, from: true }); more = a - take; }
+      if (more > 1e-6) {
+        const np = Math.ceil(more / p.pack - 1e-9), nc = { k, day: di, slot: si, pack: p.pack, total: np * p.pack, left: np * p.pack - more, uses: [{ d: di, s: si, amt: more, from: false }] };
+        chains.push(nc); open[k] = nc;
+      }
+    });
+  }));
+  return chains;
+}
+const chainVal = (c) => (c.left >= 0.2 * c.pack ? c.left / c.pack * PRICE[c.k].price * (RESTW[c.k] || 0) : 0);
+const planWaste = (plan) => restChains(plan).reduce((a, c) => a + chainVal(c), 0);
+function radReste(plan) {
+  if (RAD.mode !== "week" || RAD.reste === false) return;
+  const pools = {}, poolOf = (sl) => { const key = sl.k + "|" + (sl.work ? 1 : 0); return pools[key] || (pools[key] = new Set(radPool(sl.k, sl.work).map((r) => r.id))); };
+  const dsc = (day) => dayScore(day.slots.map((y) => byId(y.id)));
+  let waste = planWaste(plan);
+  for (let round = 0; round < 8 && waste > 0.05; round++) {
+    const inPlan = new Set(); plan.days.forEach((d) => d.slots.forEach((y) => inPlan.add(y.id)));
+    const cs = restChains(plan).filter((c) => chainVal(c) > 0.05).sort((a, b) => chainVal(b) - chainVal(a)).slice(0, 4);
+    let step = null;
+    for (const c of cs) {
+      const found = [];
+      plan.days.forEach((d, di) => {
+        if (di < c.day || di - c.day > RESTD[c.k][0]) return;
+        const old = dsc(d);
+        d.slots.forEach((sl, si) => {
+          if (sl.locked || (di === c.day && si <= c.slot)) return;
+          const keep = sl.id, pool = poolOf(sl);
+          recipesWith(c.k).forEach((r) => {
+            if (!pool.has(r.id) || inPlan.has(r.id)) return;
+            const amt = slotAmt(r, c.k);
+            if (amt > c.left + 1e-6 || amt < 0.25 * c.left) return;
+            sl.id = r.id;
+            const w = planWaste(plan), ds = dsc(d);
+            sl.id = keep;
+            if (ds <= old + 1e-9 && w < waste - 0.05) found.push({ d: di, s: si, id: r.id, w, ds });
+          });
+        });
+      });
+      if (found.length) {
+        found.sort((a, b) => a.w - b.w || a.ds - b.ds);
+        const top = found.filter((f) => f.w <= found[0].w + 0.05);
+        step = pickRnd(top); break;
+      }
+    }
+    if (!step) break;
+    plan.days[step.d].slots[step.s].id = step.id; waste = step.w;
+  }
+}
+function restNotes(plan) {
+  const out = {};
+  if (!plan || RAD.mode !== "week" || RAD.reste === false) return out;
+  const add = (d, s, t) => { (out[d + ":" + s] = out[d + ":" + s] || []).push(t); };
+  const g = (k, x) => Math.max(10, Math.round(x / 10) * 10) + " " + PRICE[k].u;
+  restChains(plan).forEach((c) => {
+    const n = PRICE[c.k].n, f = c.uses[0], later = c.uses.slice(1);
+    if ((c.total - f.amt) / c.pack * PRICE[c.k].price < 0.5) return;   /* Kleinkram ohne Hinweis */
+    if (later.length) {
+      const same = later.every((u) => u.d === f.d), days = later.map((u) => DAYN[u.d]).filter((x, i, a) => a.indexOf(x) === i);
+      const when = same ? "noch am selben Tag" : "am " + (days.length > 1 ? days.slice(0, -1).join(", ") + " und " + days[days.length - 1] : days[0]);
+      add(f.d, f.s, "Rest: " + n + " " + g(c.k, f.amt) + " von " + g(c.k, c.total) + ". Den Rest brauchst du " + when + ".");
+      later.forEach((u) => add(u.d, u.s, "Rest: " + n + " " + g(c.k, u.amt) + " " + (u.d === f.d ? "vom " + plan.days[f.d].slots[f.s].label : "von " + DAYN[f.d]) + " wird verbraucht."));
+    } else if (c.left >= 0.2 * c.pack) {
+      const sh = RESTD[c.k] || [3, 0];
+      add(f.d, f.s, "Rest: " + n + " " + g(c.k, f.amt) + " von " + g(c.k, c.total) + ". Übrig ca. " + g(c.k, c.left) + ", hält bis " + DAYN[(c.day + sh[0]) % 7] + (sh[1] ? ", sonst einfrieren" : "") + ".");
+    }
+  });
+  return out;
+}
 function prepCalcWith(mains, b, s) {
   const keep = { main: PREP.main, b: PREP.b, s: PREP.s };
   PREP.main = mains; PREP.b = b || ""; PREP.s = s || "";
@@ -2644,6 +2749,19 @@ function weekReview(ws) {
   const sp = { bought: GOALS.buys.filter((b) => b.d >= ws && b.d <= we).reduce((a, b) => a + b.a, 0), eaten: past.reduce((a, d) => a + dsum(d).c, 0), est: estRange(ws, we) };
   return { ws, we, trained, goal: trainDays(), nEaten: eaten.length, nPast: past.length, kcal: eaten.length ? eaten.reduce((a, x) => a + x.e.k, 0) / eaten.length : null, prot: eaten.length ? eaten.reduce((a, x) => a + x.e.p, 0) / eaten.length : null, water, dWeight: inWeek && prev ? last.weight - prev.weight : null, weight: inWeek ? last.weight : null, sp };
 }
+/* Ein Satz fürs nächste Mal: die größte Lücke der Woche, mit einem konkreten Schritt */
+function reviewTip(r) {
+  if (!r || r.nPast < 2) return "";
+  const pg = protGoal(), tgt = Math.round(pg * 0.95);
+  if (r.trained < r.goal) return "Plane die nächsten Trainings gleich zu Wochenbeginn ein, am besten nach einer Frühschicht oder an freien Tagen. Wenn die Kraft fehlt, zählt auch die Kurz-Einheit mit etwa 15 Minuten.";
+  if (r.prot != null && r.prot < tgt) { const gap = Math.round(pg - r.prot), g = Math.max(50, Math.round(gap / PRICE.quark.p * 100 / 10) * 10); return "Dir fehlen im Schnitt etwa " + gap + " g Eiweiß am Tag. Das schließen zum Beispiel " + g + " g Magerquark als Snack."; }
+  if (r.nPast >= 4 && r.nEaten < r.nPast - 1) return "Trag nächste Woche jeden Tag wenigstens das Abendessen ein. Dann stimmen die Durchschnitte hier.";
+  if (r.kcal != null && r.kcal > GOALS.kcal + 250) return "Du liegst im Schnitt etwa " + Math.round(r.kcal - GOALS.kcal) + " kcal über deinem Ziel. Ein Snack weniger oder etwas weniger Reis oder Nudeln reicht schon.";
+  if (r.nPast >= 4 && r.water < Math.ceil(r.nPast / 2)) return "Wasser war nur an " + r.water + " Tagen im Ziel. Stell dir morgens eine volle Flasche hin.";
+  if (r.sp.bought > 0 && r.sp.est > 0 && r.sp.bought > r.sp.est * 1.25) return "Du hast mehr eingekauft als geschätzt (" + eur(r.sp.bought) + " gegen " + eur(r.sp.est) + "). Im Glücksrad plant „Reste verwerten“ angebrochene Packungen in die Woche ein.";
+  return "Alles im Plan. Bleib bei deiner Routine, oder gehe bei einer Übung eine Stufe hoch, wenn sie leicht war.";
+}
+function reviewTipHTML(r) { const t = reviewTip(r); return t ? '<p class="small review-tip"><b>Fürs nächste Mal:</b> ' + esc(t) + "</p>" : ""; }
 function reviewHTML(ws, nav) {
   const r = weekReview(ws), pg = protGoal(), ok = (c) => (c ? ' <span class="tag g">geschafft</span>' : "");
   const sg = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + nf(Math.abs(Math.round(v * 10) / 10));
@@ -2658,7 +2776,7 @@ function reviewHTML(ws, nav) {
   ];
   const range = dateDE(r.ws) + " bis " + dateDE(r.we);
   return '<div class="card review" data-nofold><div class="rday-h"><div><h3>Wochenrückblick</h3><p class="muted small">' + range + "</p></div>" + (nav ? '<span class="row" style="gap:4px"><button class="btn icon sm" type="button" data-rvw="-1" aria-label="Vorige Woche">‹</button><button class="btn icon sm" type="button" data-rvw="1" aria-label="Nächste Woche"' + (r.we >= todayISO() && r.ws >= weekStartISO(todayISO()) ? " disabled" : "") + ">›</button></span>" : "") + '</div><ul class="ptable rvl">' +
-    rows.map((x) => "<li><span>" + x[0] + "</span><b>" + x[1] + "</b></li>").join("") + "</ul></div>";
+    rows.map((x) => "<li><span>" + x[0] + "</span><b>" + x[1] + "</b></li>").join("") + "</ul>" + reviewTipHTML(r) + "</div>";
 }
 function reviewToday() {
   const wd = (new Date().getDay() + 6) % 7, ws = weekStartISO(todayISO());
