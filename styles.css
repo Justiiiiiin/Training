@@ -978,3 +978,8 @@ html[data-big] #stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .coach .repchips .fchip { flex: none; min-height: 44px; min-width: 44px; }
   .app { padding-top: 12px; gap: 10px; }
 }
+
+/* Krankmeldung */
+.sickrow { margin: 10px 0 0; text-align: center; }
+.sickcard { border-color: var(--accent); }
+.sickcard h3 { margin-bottom: 6px; }

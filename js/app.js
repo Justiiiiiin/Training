@@ -1438,6 +1438,13 @@ const shOk = (x) => typeof x === "string" && /^[nlf]{7}$/.test(x);
 const shIdx = (iso) => (new Date(iso + "T12:00:00").getDay() + 6) % 7;
 if (!GOALS.sched || typeof GOALS.sched !== "object" || Array.isArray(GOALS.sched)) GOALS.sched = {};
 Object.keys(GOALS.sched).forEach((k) => { if (!/^\d{4}-\d{2}-\d{2}$/.test(k) || !shOk(GOALS.sched[k])) delete GOALS.sched[k]; });
+/* Krankmeldung: GOALS.sick = { "JJJJ-MM-TT": 1 }, höchstens 60 Tage */
+if (!GOALS.sick || typeof GOALS.sick !== "object" || Array.isArray(GOALS.sick)) GOALS.sick = {};
+Object.keys(GOALS.sick).forEach((k) => { if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) delete GOALS.sick[k]; else GOALS.sick[k] = 1; });
+{ const ks = Object.keys(GOALS.sick).sort(); while (ks.length > 60) delete GOALS.sick[ks.shift()]; }
+const isSick = (iso) => !!GOALS.sick[iso || todayISO()];
+const sickInWeek = (ws) => { let n = 0; for (let i = 0; i < 7; i++) if (GOALS.sick[shiftDay(ws, i)]) n++; return n; };
+function setSick(on) { const d = todayISO(); if (on) GOALS.sick[d] = 1; else delete GOALS.sick[d]; saveToday(); renderToday(); }
 if (GOALS.shift === "late") { const w0 = weekStartISO(todayISO()); if (!GOALS.sched[w0]) GOALS.sched[w0] = "llllllf"; }
 delete GOALS.shift;
 GOALS.buys = (Array.isArray(GOALS.buys) ? GOALS.buys : []).filter((x) => x && typeof x === "object" && /^\d{4}-\d{2}-\d{2}$/.test(x.d) && typeof x.a === "number" && isFinite(x.a) && x.a > 0 && x.a <= 2000).map((x) => ({ d: x.d, a: Math.round(x.a * 100) / 100 })).sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0)).slice(-400);
@@ -1462,7 +1469,8 @@ const weekCountISO = (ws) => sessions.filter((s) => weekStartISO(s) === ws).leng
 function weekStreak() {
   let ws = weekStartISO(todayISO()), n = 0;
   if (weekCountISO(ws) < 2) ws = shiftDay(ws, -7);
-  while (weekCountISO(ws) >= 2 && n < 520) { n++; ws = shiftDay(ws, -7); }
+  /* Eine Woche mit mindestens 3 Krankheitstagen bricht die Serie nicht, sie zählt aber auch nicht mit */
+  while (n < 520) { if (weekCountISO(ws) >= 2) n++; else if (sickInWeek(ws) < 3) break; ws = shiftDay(ws, -7); }
   return n;
 }
 const dateDE = (iso) => iso.slice(8) + "." + iso.slice(5, 7) + ".";
@@ -1877,6 +1885,17 @@ function prepBoxHTML(wd) {
   return '<div class="card"><div class="tdhead"><div><h3>Heute aus der Box</h3><p>' + (b && wd < 5 ? "Frühstück: " + b.r.title + ". " : "") + "Essen: " + m.title + ' <span class="muted small">(' + how + ')</span></p></div><div class="row"><button class="btn" type="button" data-tab="vorkochen">Vorkochplan</button></div></div></div>';
 }
 
+function renderSickToday(day, e) {
+  const glasses = Array.from({ length: GOALS.water }, (_, i) => '<button class="gl' + (i < day.water ? " on" : "") + '" data-water="' + i + '" aria-pressed="' + (i < day.water) + '" aria-label="Glas ' + (i + 1) + '"></button>').join("");
+  $("#panel-heute").innerHTML = backupHTML() +
+    '<div class="card hero sickcard"><h3>Du bist krankgemeldet</h3><p class="muted">Heute zählt nur Erholung. Das Training pausiert, und deine Serie bleibt erhalten, wenn du mindestens drei Tage in der Woche krank warst.</p>' +
+    '<div class="row"><button class="btn primary" data-sick="0">Wieder fit</button><button class="btn" data-eatopen="1">Essen eintragen</button></div></div>' +
+    '<div class="card"><div class="rday-h"><h3>Wasser und Tee</h3><span class="rtot">' + nf(Math.round(day.water * 25) / 100) + " von " + nf(Math.round(GOALS.water * 25) / 100) + ' Litern</span></div><div class="glasses">' + glasses + '</div><p class="muted small">Bei Infekt lieber mehr trinken als sonst: Wasser, ungesüßter Tee, Brühe.</p></div>' +
+    '<div class="card"><h3>Leichte Kost bei Infekt</h3><ul><li>Brühe und klare Suppen, gern mit Nudeln oder Reis</li><li>Zwieback, Toast, Banane, Haferschleim</li><li>Kartoffelbrei, Reis, gekochte Möhren</li><li>Wenig ist in Ordnung. Ziele für Eiweiß und Kalorien gelten heute nicht.</li></ul>' +
+    '<p class="muted small">Bei hohem Fieber, Atemnot oder wenn es nach ein paar Tagen nicht besser wird, geh bitte zum Arzt. Die App ersetzt keine Krankschreibung.</p></div>' +
+    '<div class="card"><div class="rday-h"><h3>Heute gegessen</h3></div>' +
+    (day.items.length ? '<ul class="eatlist">' + day.items.map((x, i) => "<li><div><b>" + esc(x.t) + '</b><span class="muted small">' + x.p + " g Eiweiß, " + x.k + ' kcal</span></div><button class="btn icon sm" data-eatdel="' + i + '" aria-label="Eintrag löschen">' + ic("close") + "</button></li>").join("") + "</ul>" : '<p class="muted">Noch nichts eingetragen.</p>') + "</div>";
+}
 function renderToday() {
   const now = new Date(), plan = weekPlan()[(now.getDay() + 6) % 7], pg = protGoal(), e = dsum(), day = dayGet();
   const wc = weekCountISO(weekStartISO(todayISO())), streak = weekStreak(), doneToday = sessions.includes(todayISO());
@@ -1884,10 +1903,11 @@ function renderToday() {
   const rest = Math.max(0, pg - e.p);
   const sug = suggestList(3);
   const glasses = Array.from({ length: GOALS.water }, (_, i) => '<button class="gl' + (i < day.water ? " on" : "") + '" data-water="' + i + '" aria-pressed="' + (i < day.water) + '" aria-label="Glas ' + (i + 1) + '"></button>').join("");
+  if (isSick()) { renderSickToday(day, e); return; }
   $("#panel-heute").innerHTML =
     backupHTML() + '<div class="card hero"><div class="tdhead"><div><h3>' + title + '</h3><p class="muted">' + (plan[2] ? "Ganzkörper, etwa " + estMinutes() + " Minuten" : "Ruhetag: Erholung gehört zum Training") + "</p></div>" +
     '<div class="row">' + (plan[2] && !doneToday && !isActive() ? '<button class="btn primary" data-act="start">Training starten</button>' : "") + '<button class="btn" data-eatopen="1">Essen eintragen</button><button class="btn" data-tab="rad">Essen wählen</button></div></div>' +
-    shiftHintHTML() + trioHTML(e.p, pg, e.k, GOALS.kcal, wc, trainDays()) +
+    shiftHintHTML() + trioHTML(e.p, pg, e.k, GOALS.kcal, wc, trainDays()) + '<p class="sickrow"><button type="button" class="linkbtn" data-sick="1">Krank melden</button></p>' +
     '</div>' +
     prepTodayHTML() + reviewToday() +
     '<div class="card"><div class="rday-h"><h3>Heute gegessen</h3>' + (day.items.length ? '<span class="rtot">ca. ' + eur(e.c) + " bei Lidl</span>" : "") + "</div>" +
@@ -2920,6 +2940,7 @@ document.addEventListener("click", (ev) => {
   if (t.dataset.ckgo) return ckGo(parseInt(t.dataset.ckgo, 10));
   if (t.dataset.cktimer) return ckTimer(parseInt(t.dataset.cktimer, 10));
   if (t.dataset.ckclose) { ckStop(); unwake(); return closeDialog($("#dlg-cook")); }
+  if (t.dataset.sick != null) return setSick(t.dataset.sick === "1");
   if (t.dataset.eatopen) return openEat();
   if (t.dataset.eat) { const r = byId(t.dataset.eat); if (r) { logEat(r, 1); t.textContent = "Eingetragen"; t.disabled = true; } return; }
   if (t.dataset.eatrec) { const r = byId(t.dataset.eatrec); if (r) { logEat(r, portions); t.textContent = "Eingetragen"; } return; }
