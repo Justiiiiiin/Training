@@ -2,7 +2,7 @@
 /* ======================= Start ======================= */
 $("#b-settings").innerHTML = ic("gear");
 $("#x-settings").innerHTML = ic("close");
-applyPrices(); bindV3(); renderEx(); renderRecipes(); renderNutrition(); renderTips(); renderAusblick(); renderSources(); renderProgress(); bindSettings(); render(); bindGoals(); renderToday();
+applyPrices(); bindV3(); renderEx(); renderRecipes(); renderNutrition(); renderTips(); renderDu(); duInit(); renderAusblick(); renderSources(); renderProgress(); bindSettings(); render(); bindGoals(); renderToday();
 function radShowAll() { rad.shown = new Set(); const P = RPL[RAD.mode]; if (P) P.days.forEach((d, di) => d.slots.forEach((x, si) => rad.shown.add(di + ":" + si))); }
 Object.keys(RPL).forEach((k) => { if (!RPL[k] || !RPL[k].days || RPL[k].days.some((d) => d.slots.some((x) => !byId(x.id)))) delete RPL[k]; });
 radShowAll(); renderRadOpts(); radIdle(); radRender(); renderShop();

@@ -45,7 +45,8 @@ const ICONS = {
   dumbbell: '<path d="M3.5 9v6M6.5 7v10M17.5 7v10M20.5 9v6M6.5 12h11"/>',
   bowl: '<path d="M3.5 11h17a8.5 8.5 0 0 1-17 0z"/><path d="M8.5 7.5c0-1.5 1.5-1.5 1.5-3M13 7.5c0-1.5 1.5-1.5 1.5-3"/>',
   chart: '<path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l3.5-4 3 2.5L19 8"/>',
-  speaker: '<path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 0 1 0 6"/>'
+  speaker: '<path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 0 1 0 6"/>',
+  user: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3-6 7-6s7 2.4 7 6"/>'
 };
 const ic = (n) => '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + ICONS[n] + "</svg>";
 
@@ -666,6 +667,75 @@ function renderTips() {
   $("#panel-tipps .card").setAttribute("data-nofold", "");
   foldCards($("#panel-tipps"));
 }
+/* ======================= Du: gesperrter Bereich (Pflege, Haare und Bart) =======================
+   Der Inhalt liegt nur als Geheimtext in du.enc.json (AES-GCM, Schlüssel per PBKDF2 aus deinem Code).
+   Der Code steht nirgends im Repo. Auf Wunsch merkt sich dieses Gerät den abgeleiteten Schlüssel (localStorage fc__du, nicht synchronisiert, nicht in der Sicherung).
+   Neu verschlüsseln: tools/du_encrypt.js. */
+const DU_ITER_MAX = 2000000;
+let DUDATA = null, DUBUSY = false;
+const duB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const duCrypto = () => !!(window.crypto && crypto.subtle);
+function duStored() { try { const o = JSON.parse(localStorage.getItem("fc__du") || "null"); return o && typeof o.k === "string" ? o : null; } catch (e) { return null; } }
+async function duFile() {
+  const r = await fetch("du.enc.json", { cache: "no-cache" });
+  if (!r.ok) throw new Error("file");
+  const j = await r.json();
+  if (!j || j.v !== 1 || !Number.isInteger(j.iter) || j.iter < 1000 || j.iter > DU_ITER_MAX || typeof j.salt !== "string" || typeof j.iv !== "string" || typeof j.ct !== "string") throw new Error("file");
+  return j;
+}
+async function duOpen(j, key) {
+  const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: duB64(j.iv) }, key, duB64(j.ct));
+  const o = JSON.parse(new TextDecoder().decode(pt));
+  if (!o || typeof o.pflege !== "string" || typeof o.haare !== "string") throw new Error("file");
+  return o;
+}
+async function duUnlock(code, keep) {
+  if (!duCrypto()) throw new Error("crypto");
+  const j = await duFile();
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(String(code).normalize("NFKC")), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: duB64(j.salt), iterations: j.iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, true, ["decrypt"]);
+  DUDATA = await duOpen(j, key);   /* falscher Code: wirft OperationError */
+  if (keep) { try { localStorage.setItem("fc__du", JSON.stringify({ k: (await crypto.subtle.exportKey("jwk", key)).k })); } catch (e) {} }
+}
+async function duInit() {
+  const s = duStored(); if (!s || !duCrypto()) return;
+  try {
+    const key = await crypto.subtle.importKey("jwk", { kty: "oct", k: s.k, alg: "A256GCM", ext: true }, { name: "AES-GCM" }, false, ["decrypt"]);
+    DUDATA = await duOpen(await duFile(), key); renderDu();
+  } catch (e) { if (e && e.name === "OperationError") { try { localStorage.removeItem("fc__du"); } catch (e2) {} } }   /* Inhalt neu verschlüsselt: gemerkter Schlüssel passt nicht mehr */
+}
+function renderDu() {
+  const pf = $("#panel-pflege"), hr = $("#panel-haare"); if (!pf || !hr) return;
+  if (DUDATA) {
+    const bar = '<div class="row"><button class="btn" type="button" data-dulock>Bereich sperren</button></div>';
+    pf.innerHTML = DUDATA.pflege + bar; hr.innerHTML = DUDATA.haare + bar;
+    foldCards(pf); foldCards(hr); return;
+  }
+  const lock = '<div class="card" data-nofold><h3>Gesperrt</h3><p>Dieser Bereich ist mit einem Code geschützt.</p>' +
+    '<label class="field">Code<input class="du-code" type="password" autocomplete="off" autocapitalize="off" spellcheck="false"></label>' +
+    '<label class="check"><input class="du-keep" type="checkbox" checked> Auf diesem Gerät merken</label>' +
+    '<div class="row"><button class="btn primary" type="button" data-duunlock>Entsperren</button></div>' +
+    '<p class="small muted du-msg" role="status" aria-live="polite"></p></div>';
+  pf.innerHTML = lock; hr.innerHTML = lock;
+}
+async function duSubmit(panel) {
+  if (DUBUSY) return;
+  const msg = panel.querySelector(".du-msg"), inp = panel.querySelector(".du-code"), keep = panel.querySelector(".du-keep");
+  if (!inp || !inp.value) { if (msg) msg.textContent = "Gib zuerst deinen Code ein."; return; }
+  DUBUSY = true; if (msg) msg.textContent = "Prüfe …";
+  try { await duUnlock(inp.value, !!(keep && keep.checked)); inp.value = ""; renderDu(); }
+  catch (e) {
+    const t = !duCrypto() ? "Dieser Browser kann den Bereich nicht öffnen (kein sicherer Kontext)." : e && e.name === "OperationError" ? "Der Code stimmt nicht." : "Der Inhalt konnte nicht geladen werden. Prüfe die Verbindung.";
+    if (msg) msg.textContent = t;
+  }
+  DUBUSY = false;
+}
+document.addEventListener("click", (ev) => {
+  const t = ev.target.closest && ev.target.closest("[data-duunlock],[data-dulock]"); if (!t) return;
+  if (t.hasAttribute("data-dulock")) { DUDATA = null; try { localStorage.removeItem("fc__du"); } catch (e) {} renderDu(); return; }
+  duSubmit(t.closest(".panel"));
+});
+document.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && ev.target.classList && ev.target.classList.contains("du-code")) duSubmit(ev.target.closest(".panel")); });
 const ROAD = [
   { a: 1, b: 2, t: "Technik lernen", sp: "Woche 1 und 2", goal: "Saubere Bewegung vor Schwere. Jede Übung auf der ersten Stufe, ohne Schmerzen und mit Kontrolle.", gear: "Keine Ausrüstung nötig. Eine Matte macht den Boden bequemer." },
   { a: 3, b: 8, t: "Aufbau", sp: "Woche 3 bis 8", goal: "Wiederholungen steigern, Stufen hochgehen und 2 bis 3 Einheiten pro Woche durchziehen. Der Rucksack ist dein Gewicht.", gear: "Bänder fürs Rudern, Liegestützgriffe falls die Handgelenke stören." },
@@ -921,10 +991,11 @@ const GROUPS = [
   { id: "heute", title: "Heute", tabs: ["heute"] },
   { id: "training", title: "Training", tabs: ["uebungen", "tipps", "ausblick"] },
   { id: "essen", title: "Essen", tabs: ["rezepte", "rad", "vorkochen", "einkauf"] },
-  { id: "fortschritt", title: "Fortschritt", tabs: ["fortschritt", "ernaehrung"] }
+  { id: "fortschritt", title: "Fortschritt", tabs: ["fortschritt", "ernaehrung"] },
+  { id: "du", title: "Du", tabs: ["pflege", "haare"] }
 ];
-const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", ausblick: "Ausblick", rezepte: "Rezepte", rad: "Glücksrad", vorkochen: "Vorkochen", einkauf: "Einkauf", ernaehrung: "Richtwerte", fortschritt: "Verlauf" };
-const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", ausblick: "Pläne, Ausrüstung und Kauflinks", rezepte: RECIPES.length + " Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", vorkochen: "Sonntag kochen, die Woche essen", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf" };
+const TABN = { heute: "Heute", uebungen: "Übungen", tipps: "Tipps", ausblick: "Ausblick", rezepte: "Rezepte", rad: "Glücksrad", vorkochen: "Vorkochen", einkauf: "Einkauf", ernaehrung: "Richtwerte", fortschritt: "Verlauf", pflege: "Pflege", haare: "Haare und Bart" };
+const TABSUB = { uebungen: "Dein Plan mit Stufen für jede Übung", tipps: "Wochenplan und Hinweise für den Alltag", ausblick: "Pläne, Ausrüstung und Kauflinks", rezepte: RECIPES.length + " Rezepte mit Eiweiß und Lidl-Preis", rad: "Lass das Rad entscheiden, was es gibt", vorkochen: "Sonntag kochen, die Woche essen", einkauf: "Liste, Preise und Aufbewahrung", ernaehrung: "Richtwerte und Grundlagen", fortschritt: "Gewicht, Taille und Training im Verlauf", pflege: "Hautpflege mit günstigen Drogerie-Produkten", haare: "Haarschnitt, Styling, Bart und Friseur" };
 const LAST = {};
 let CUR = "heute";
 const greeting = () => { const h = new Date().getHours(); return h < 11 ? "Guten Morgen" : h < 18 ? "Guten Tag" : "Guten Abend"; };

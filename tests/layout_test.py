@@ -125,7 +125,7 @@ with sync_playwright() as p:
     pg.click('.empty-in .linkbtn[data-tab="rad"]'); pg.wait_for_timeout(300)
     ck("L8 Link führt zum Glücksrad", pg.is_visible("#panel-rad"))
 
-    # 9 Zahnrad oben, Version daneben, vier gleiche Spalten unten
+    # 9 Zahnrad oben, Version daneben, fünf gleiche Spalten unten
     pg.evaluate("showTab('heute')"); pg.wait_for_timeout(300)
     ck("L9 kein schwebender Einstellungsknopf mehr", pg.evaluate("document.querySelector('.setfab')===null && document.getElementById('b-settings2')===null"))
     g = box(pg, "#b-settings"); v = box(pg, "#appver")
@@ -133,7 +133,7 @@ with sync_playwright() as p:
     ck("L9 Version links vom Zahnrad", v["x"] + v["w"] <= g["x"] + 2 and v["x"] > 150, [v, g])
     ck("L9 Version und Zahnrad auf einer Höhe", abs((v["y"] + v["h"] / 2) - (g["y"] + g["h"] / 2)) <= 6, [v, g])
     gw = pg.evaluate("[...document.querySelectorAll('#gnav .gbtn')].map(e=>Math.round(e.getBoundingClientRect().width))")
-    ck("L9 vier gleich breite Leistenknöpfe", len(gw) == 4 and max(gw) - min(gw) <= 1, gw)
+    ck("L9 fünf gleich breite Leistenknöpfe", len(gw) == 5 and max(gw) - min(gw) <= 1, gw)
     pg.click("#b-settings"); pg.wait_for_timeout(400)
     ck("L9 Zahnrad öffnet die Einstellungen", pg.evaluate("document.getElementById('dlg-settings').open"))
     pg.keyboard.press("Escape"); pg.wait_for_timeout(300)

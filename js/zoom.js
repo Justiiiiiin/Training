@@ -10,3 +10,5 @@
   ["gesturestart", "gesturechange", "gestureend"].forEach(function (n) { document.addEventListener(n, stop, { passive: false }); });
   document.addEventListener("touchmove", function (e) { if (typeof e.scale === "number" && e.scale !== 1) stop(e); }, { passive: false });
 })();
+/* Clickjacking: in einem fremden Rahmen (iframe) nichts anzeigen. GitHub Pages erlaubt keine Header wie X-Frame-Options, deshalb hier. */
+try { if (window.top !== window.self) document.documentElement.style.display = "none"; } catch (e) { document.documentElement.style.display = "none"; }

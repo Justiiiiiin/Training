@@ -132,6 +132,7 @@ window.FC = (function () {
     if (isObj(l) && isObj(r)) {
       var bo = isObj(b) ? b : null, o = {};
       Object.keys(r).concat(Object.keys(l).filter(function (k) { return !has(r, k); })).forEach(function (k) {
+        if (k === "__proto__") return;
         var hb = !!bo && has(bo, k), hl = has(l, k), hr = has(r, k);
         if (k === "plan" && hl && hr) { o[k] = hb && same(l[k], bo[k]) ? r[k] : hb && same(r[k], bo[k]) ? l[k] : (lw ? l[k] : r[k]); return; }
         if (hl && hr) o[k] = merge3(hb ? bo[k] : undefined, l[k], r[k], lw);
@@ -302,7 +303,7 @@ window.FC = (function () {
   async function sbLogin(url, key, email, pw, signup) {
     loggedOut = false;
     url = String(url || "").trim().replace(/\/+$/, ""); key = String(key || "").trim(); email = String(email || "").trim();
-    if (!/^(https:\/\/[^\s/]+|http:\/\/(127\.0\.0\.1|localhost)(:\d+)?)$/.test(url)) throw new Error("Die Projekt-URL sieht nicht richtig aus. Sie beginnt mit https:// und endet auf .supabase.co.");
+    if (!/^(https:\/\/[a-z0-9-]+\.supabase\.co|http:\/\/(127\.0\.0\.1|localhost)(:\d+)?)$/.test(url)) throw new Error("Die Projekt-URL sieht nicht richtig aus. Sie beginnt mit https:// und endet auf .supabase.co.");
     if (!key || !email || !pw) throw new Error("Bitte alle Felder ausfüllen.");
     var j;
     if (signup) {
